@@ -3,6 +3,33 @@
 import { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 
+function getAvatarSrc(url: string): string {
+  if (!url?.startsWith('http')) return url
+  try {
+    const u = new URL(url)
+    if (u.hostname.includes('espncdn.com') || u.hostname.includes('cdn.nba.com')) {
+      return `/api/avatar?url=${encodeURIComponent(url)}`
+    }
+  } catch {}
+  return url
+}
+
+function PlayerAvatar({ src, alt }: { src: string; alt: string }) {
+  const proxySrc = getAvatarSrc(src)
+  return (
+    <img
+      src={proxySrc}
+      alt={alt}
+      className="absolute inset-0 w-14 h-14 rounded-full object-cover"
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      onError={(e) => {
+        ;(e.target as HTMLImageElement).style.display = 'none'
+      }}
+    />
+  )
+}
+
 interface PlayerStat {
   name: string
   avatar?: string
@@ -769,15 +796,7 @@ export default function EventsPage() {
                                                       {match.homeTopScorer?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.homeTopScorer?.avatar ? (
-                                                      <img
-                                                        src={match.homeTopScorer.avatar}
-                                                        alt={match.homeTopScorer.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.homeTopScorer.avatar} alt={match.homeTopScorer.name} />
                                                     ) : null}
                                                   </div>
                                                   <div className="min-w-0">
@@ -794,15 +813,7 @@ export default function EventsPage() {
                                                       {match.awayTopScorer?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.awayTopScorer?.avatar ? (
-                                                      <img
-                                                        src={match.awayTopScorer.avatar}
-                                                        alt={match.awayTopScorer.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.awayTopScorer.avatar} alt={match.awayTopScorer.name} />
                                                     ) : null}
                                                   </div>
                                                 </div>
@@ -814,15 +825,7 @@ export default function EventsPage() {
                                                       {match.homeTopRebounder?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.homeTopRebounder?.avatar ? (
-                                                      <img
-                                                        src={match.homeTopRebounder.avatar}
-                                                        alt={match.homeTopRebounder.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.homeTopRebounder.avatar} alt={match.homeTopRebounder.name} />
                                                     ) : null}
                                                   </div>
                                                   <div className="min-w-0">
@@ -839,15 +842,7 @@ export default function EventsPage() {
                                                       {match.awayTopRebounder?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.awayTopRebounder?.avatar ? (
-                                                      <img
-                                                        src={match.awayTopRebounder.avatar}
-                                                        alt={match.awayTopRebounder.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.awayTopRebounder.avatar} alt={match.awayTopRebounder.name} />
                                                     ) : null}
                                                   </div>
                                                 </div>
@@ -859,15 +854,7 @@ export default function EventsPage() {
                                                       {match.homeTopAssister?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.homeTopAssister?.avatar ? (
-                                                      <img
-                                                        src={match.homeTopAssister.avatar}
-                                                        alt={match.homeTopAssister.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.homeTopAssister.avatar} alt={match.homeTopAssister.name} />
                                                     ) : null}
                                                   </div>
                                                   <div className="min-w-0">
@@ -884,15 +871,7 @@ export default function EventsPage() {
                                                       {match.awayTopAssister?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.awayTopAssister?.avatar ? (
-                                                      <img
-                                                        src={match.awayTopAssister.avatar}
-                                                        alt={match.awayTopAssister.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.awayTopAssister.avatar} alt={match.awayTopAssister.name} />
                                                     ) : null}
                                                   </div>
                                                 </div>
@@ -1095,15 +1074,7 @@ export default function EventsPage() {
                                                       {match.homeTopScorer?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.homeTopScorer?.avatar ? (
-                                                      <img
-                                                        src={match.homeTopScorer.avatar}
-                                                        alt={match.homeTopScorer.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.homeTopScorer.avatar} alt={match.homeTopScorer.name} />
                                                     ) : null}
                                                   </div>
                                                   <div className="min-w-0">
@@ -1120,15 +1091,7 @@ export default function EventsPage() {
                                                       {match.awayTopScorer?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.awayTopScorer?.avatar ? (
-                                                      <img
-                                                        src={match.awayTopScorer.avatar}
-                                                        alt={match.awayTopScorer.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.awayTopScorer.avatar} alt={match.awayTopScorer.name} />
                                                     ) : null}
                                                   </div>
                                                 </div>
@@ -1140,15 +1103,7 @@ export default function EventsPage() {
                                                       {match.homeTopRebounder?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.homeTopRebounder?.avatar ? (
-                                                      <img
-                                                        src={match.homeTopRebounder.avatar}
-                                                        alt={match.homeTopRebounder.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.homeTopRebounder.avatar} alt={match.homeTopRebounder.name} />
                                                     ) : null}
                                                   </div>
                                                   <div className="min-w-0">
@@ -1165,15 +1120,7 @@ export default function EventsPage() {
                                                       {match.awayTopRebounder?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.awayTopRebounder?.avatar ? (
-                                                      <img
-                                                        src={match.awayTopRebounder.avatar}
-                                                        alt={match.awayTopRebounder.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.awayTopRebounder.avatar} alt={match.awayTopRebounder.name} />
                                                     ) : null}
                                                   </div>
                                                 </div>
@@ -1185,15 +1132,7 @@ export default function EventsPage() {
                                                       {match.homeTopAssister?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.homeTopAssister?.avatar ? (
-                                                      <img
-                                                        src={match.homeTopAssister.avatar}
-                                                        alt={match.homeTopAssister.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.homeTopAssister.avatar} alt={match.homeTopAssister.name} />
                                                     ) : null}
                                                   </div>
                                                   <div className="min-w-0">
@@ -1210,15 +1149,7 @@ export default function EventsPage() {
                                                       {match.awayTopAssister?.name?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                     {match.awayTopAssister?.avatar ? (
-                                                      <img
-                                                        src={match.awayTopAssister.avatar}
-                                                        alt={match.awayTopAssister.name}
-                                                        className="absolute inset-0 w-14 h-14 rounded-full object-cover"
-                                                        loading="lazy"
-                                                        onError={(e) => {
-                                                          ; (e.target as HTMLImageElement).style.display = 'none'
-                                                        }}
-                                                      />
+                                                      <PlayerAvatar src={match.awayTopAssister.avatar} alt={match.awayTopAssister.name} />
                                                     ) : null}
                                                   </div>
                                                 </div>

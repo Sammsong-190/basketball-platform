@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import * as path from 'path'
 import { fetchNBAScheduleNode } from '@/lib/nba-fetch'
 
-const execAsync = promisify(exec)
+// 禁用缓存，确保每次请求都获取最新数据（含实时比分）
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 interface PlayerStat {
   name: string
@@ -43,34 +42,6 @@ interface NBANews {
   publishedAt: string
   author: string
   url: string
-}
-
-async function fetchNBAScheduleWithPython(): Promise<NBAMatch[]> {
-  // Vercel 等 serverless 环境无 Python，直接用 Node.js
-  if (process.env.VERCEL) {
-    const matches = await fetchNBAScheduleNode()
-    console.log(`Node.js 爬虫成功获取 ${matches.length} 场比赛 (Vercel)`)
-    return matches
-  }
-
-  try {
-    const scriptPath = path.join(process.cwd(), 'scripts', 'nba_scraper.py')
-    const { stdout, stderr } = await execAsync(`python3 "${scriptPath}"`, {
-      timeout: 30000,
-      maxBuffer: 10 * 1024 * 1024
-    })
-    if (stderr) console.log('Python stderr:', stderr)
-    const result = JSON.parse(stdout.trim())
-    if (result.error) {
-      console.error('Python 返回错误:', result.message)
-      return await fetchNBAScheduleNode()
-    }
-    console.log(`Python 爬虫成功获取 ${result.count} 场比赛`)
-    return result.matches || []
-  } catch (error: any) {
-    console.error('Python 爬虫失败:', error.message)
-    return await fetchNBAScheduleNode()
-  }
 }
 
 // 爬取NBA新闻
@@ -448,7 +419,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'schedule' || type === 'all') {
       // 优化：并行获取比赛数据和新闻数据（如果type是'all'）
-      const promises: Promise<any>[] = [fetchNBAScheduleWithPython()]
+      const promises: Promise<any>[] = [fetchNBAScheduleNode()]
 
       if (type === 'all') {
         // 并行获取新闻，不等待比赛数据完成
@@ -460,7 +431,7 @@ export async function GET(request: NextRequest) {
       const matches = results[0]
       const news = type === 'all' ? results[1] : []
 
-      console.log(`获取到 ${matches.length} 场比赛数据`)
+      console.log(`Node.js 获取 ${matches.length} 场比赛数据`)
 
       if (matches.length === 0) {
         console.warn('未获取到任何NBA比赛数据')

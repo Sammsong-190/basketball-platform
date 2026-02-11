@@ -1,6 +1,5 @@
 /**
- * Node.js NBA schedule fetcher - works on Vercel (no Python required)
- * Fetches from ESPN API and NBA CDN
+ * Node.js NBA schedule fetcher - 从 ESPN API 获取数据，适用于 Vercel 等无 Python 环境
  */
 
 const TEAM_NAME_TO_CHINESE: Record<string, string> = {
@@ -78,15 +77,25 @@ const HEADERS = {
   'Accept-Language': 'en-US,en;q=0.9'
 }
 
-/** Fetch NBA schedule from ESPN API - works on Vercel */
+/** 获取美东时间某天的 YYYYMMDD（NBA 赛程以美东日期为准） */
+function getETDateString(offsetDays: number): string {
+  const etStr = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  const et = new Date(etStr)
+  et.setDate(et.getDate() + offsetDays)
+  const y = et.getFullYear()
+  const m = String(et.getMonth() + 1).padStart(2, '0')
+  const d = String(et.getDate()).padStart(2, '0')
+  return `${y}${m}${d}`
+}
+
+/** 从 ESPN API 获取 NBA 赛程 */
 export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
   const matches: NBAMatchFromFetch[] = []
   const dates: string[] = []
 
   for (let offset = -3; offset <= 3; offset++) {
-    const d = new Date()
-    d.setDate(d.getDate() + offset)
-    dates.push(d.toISOString().slice(0, 10).replace(/-/g, ''))
+    const dateStr = getETDateString(offset)
+    if (!dates.includes(dateStr)) dates.push(dateStr)
   }
 
   for (const dateStr of dates) {
@@ -110,34 +119,75 @@ export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
           const awayTeam = getChineseTeamName((away.team || {}).displayName || '')
 
           const gameId = e.id || (e.uid || '').split('~')[1] || ''
-          const statusText = (e.status?.type?.state || '').toUpperCase()
+          const rawDate = e.date || e.competitions?.[0]?.date || ''
+          const stEvent = e.status || comp.status
+          const statusText = (stEvent?.type?.state || '').toUpperCase()
+          const isCompleted = !!(stEvent?.type as { completed?: boolean })?.completed
           let status: 'upcoming' | 'live' | 'finished' = 'upcoming'
           if (statusText === 'pre' || statusText === 'post') status = statusText === 'pre' ? 'upcoming' : 'finished'
           else if (statusText === 'in') status = 'live'
+          else if (isCompleted) status = 'finished'
 
           const homeScore = toIntOrNull(home.score)
           const awayScore = toIntOrNull(away.score)
-
-          const rawDate = e.date || e.competitions?.[0]?.date || ''
+          // 有完整比分且 API 标记已结束 → 确保为 finished（防止漏判）
+          if (status === 'upcoming' && homeScore != null && awayScore != null && isCompleted) status = 'finished'
+          // 有完整比分且开赛时间已过 → 视为 finished
+          if (status === 'upcoming' && homeScore != null && awayScore != null && rawDate) {
+            const gameTime = new Date(rawDate).getTime()
+            if (gameTime < Date.now() - 60000) status = 'finished' // 开赛超过 1 分钟
+          }
           const dateObj = rawDate ? new Date(rawDate) : new Date()
-          const dateStrOut = dateObj.toISOString().slice(0, 10)
-          const timeStr = rawDate ? dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBD'
+          // 使用美东日期，与前端 convertETDateToBeijing 一致
+          const dateStrOut = dateObj.toLocaleDateString('en-CA', { timeZone: 'America/New_York' })
+          const st = e.status || {}
+          let timeStr: string
+          if (status === 'live') {
+            const period = st.period ?? 0
+            const displayClock = st.displayClock ?? ''
+            const shortDetail = (st.type as { shortDetail?: string })?.shortDetail ?? ''
+            if (shortDetail && (shortDetail.toLowerCase().includes('halftime') || shortDetail === 'Half')) {
+              timeStr = 'Halftime'
+            } else if (period > 0 && displayClock) {
+              timeStr = `Q${period} ${displayClock}`
+            } else {
+              timeStr = shortDetail || 'Live'
+            }
+          } else {
+            timeStr = rawDate ? dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBD'
+          }
 
           const venue = comp.venue?.fullName || comp.venue?.address?.city || '未知场馆'
 
           const takeLeader = (c: Record<string, unknown>, cat: string) => {
             const leaders = (c.leaders as Array<Record<string, unknown>>) || []
             const catLower = cat.toLowerCase()
+            const abbrevMap: Record<string, string[]> = { points: ['pts', 'points'], rebounds: ['reb', 'rebounds'], assists: ['ast', 'assists'] }
+            const catAliases = abbrevMap[catLower] || [catLower]
             for (const l of leaders) {
               const lName = String((l as Record<string, unknown>).name || '').toLowerCase()
-              if (lName !== catLower && !lName.includes(catLower)) continue
+              const lAbbr = String((l as Record<string, unknown>).abbreviation || '').toLowerCase()
+              const matches = catAliases.some(a => lName === a || lName.includes(a) || lAbbr === a)
+              if (!matches) continue
               const lLeaders = ((l as Record<string, unknown>).leaders as Array<Record<string, unknown>>) || []
               const first = lLeaders[0] || {}
               const athlete = (first.athlete as Record<string, unknown>) || {}
               const name = String(athlete.displayName || '').trim()
-              const athleteId = String(athlete.id || '').trim()
-              const headshot = (athlete.headshot as Record<string, unknown>) || {}
-              let avatar: string | null = typeof headshot === 'object' && headshot ? (headshot.href as string) || null : null
+              let athleteId = String(athlete.id || '').trim()
+              if (!athleteId) {
+                const links = (athlete.links as Array<{ href?: string }>) || []
+                const playerLink = links.find(lnk => lnk?.href?.includes('/player/_/id/'))
+                const idMatch = playerLink?.href?.match(/\/id\/(\d+)/)
+                if (idMatch) athleteId = idMatch[1]
+              }
+              let avatar: string | null = null
+              const headshotRaw = athlete.headshot
+              if (typeof headshotRaw === 'string' && headshotRaw.startsWith('http')) {
+                avatar = headshotRaw
+              } else if (headshotRaw && typeof headshotRaw === 'object') {
+                const href = (headshotRaw as { href?: string }).href || null
+                if (href) avatar = href.startsWith('http') ? href : `https://a.espncdn.com${href.startsWith('/') ? '' : '/'}${href}`
+              }
               if (!avatar && athleteId) avatar = `https://a.espncdn.com/i/headshots/nba/players/full/${athleteId}.png`
               const value = toIntOrNull((first as Record<string, unknown>).value)
               if (!name) return null
