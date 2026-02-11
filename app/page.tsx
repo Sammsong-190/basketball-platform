@@ -19,6 +19,18 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-r from-orange-600 via-red-600 to-orange-500 text-white py-20">
           <div className="absolute inset-0 bg-black/10"></div>
+          {/* Smooth basketball-themed wave background */}
+          <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
+            {/* Main smooth wave layer - basketball themed */}
+            <div className="absolute inset-0 basketball-smooth-wave"></div>
+            {/* Sun: rise from left, set on right - transform-only for smooth motion */}
+            <div className="absolute inset-0 sun-orbit-wrapper">
+              <div className="sun-orbit">
+                <div className="sun-glow"></div>
+                <div className="sun-core"></div>
+              </div>
+            </div>
+          </div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-5xl md:text-7xl font-extrabold mb-6 animate-fade-in tracking-tight leading-[1.05]">
@@ -71,45 +83,45 @@ export default function Home() {
               <p className="text-gray-600 mb-6 leading-relaxed">
                 Rich selection of basketball products, sneakers, jerseys, accessories all included, authentic guarantee, excellent quality
               </p>
-              <Link 
-                href="/products" 
+              <Link
+                href="/products"
                 className="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors group-hover:translate-x-2 duration-200"
               >
-                Browse Products 
+                Browse Products
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
-            
+
             <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
               <div className="text-5xl mb-4">💬</div>
               <h3 className="text-2xl font-bold mb-4 text-gray-900">Community Interaction</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
                 Exchange and discuss with basketball enthusiasts, share basketball insights, meet like-minded friends
               </p>
-              <Link 
-                href="/posts" 
+              <Link
+                href="/posts"
                 className="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors group-hover:translate-x-2 duration-200"
               >
-                Enter Community 
+                Enter Community
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
-            
+
             <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
               <div className="text-5xl mb-4">📰</div>
               <h3 className="text-2xl font-bold mb-4 text-gray-900">Event News</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
                 Latest basketball event news, score data analysis, get basketball updates first
               </p>
-              <Link 
-                href="/events" 
+              <Link
+                href="/events"
                 className="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors group-hover:translate-x-2 duration-200"
               >
-                View News 
+                View News
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -163,7 +175,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500">
               <h3 className="font-bold text-lg mb-3 text-gray-900">Community Interaction</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
@@ -181,7 +193,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-orange-500">
               <h3 className="font-bold text-lg mb-3 text-gray-900">Product Trading</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
@@ -199,7 +211,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500">
               <h3 className="font-bold text-lg mb-3 text-gray-900">After-sales Service</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
@@ -213,7 +225,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-orange-500">
               <h3 className="font-bold text-lg mb-3 text-gray-900">System Management</h3>
               <ul className="text-gray-600 space-y-2 text-sm">

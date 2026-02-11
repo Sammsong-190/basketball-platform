@@ -243,6 +243,7 @@ model Order {
   items         OrderItem[]
   payments      Payment[]
   refunds       Refund[]
+  complaints    Complaint[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -311,6 +312,7 @@ model Complaint {
   title     String
   content   String
   orderId   String?
+  order     Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
   status    String           @default("PENDING")
   reply     String?
   repliedAt DateTime?

@@ -17,6 +17,7 @@ interface Product {
   rating: number
   reviewCount: number
   sourceType?: string
+  status?: string
   _count: { reviews: number; orderItems: number }
 }
 
@@ -254,6 +255,8 @@ export default function ProductDetailPage() {
       </>
     )
   }
+
+  if (!product) return null
 
   const images = product.images ? JSON.parse(product.images) : []
 
