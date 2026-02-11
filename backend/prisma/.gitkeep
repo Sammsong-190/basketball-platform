@@ -1,0 +1,2 @@
+# 此目录用于存放 Prisma schema
+# schema.prisma 应该是指向根目录 prisma/schema.prisma 的符号链接

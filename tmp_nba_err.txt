@@ -1,0 +1,33 @@
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260209.json
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260208.json
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260210.json
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/09/2026
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/10/2026
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/08/2026
+DayOffset=-3: 获取到 4 场比赛
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260211.json
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/11/2026
+DayOffset=-1: 获取到 4 场比赛
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260212.json
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/12/2026
+Stats请求/解析异常: HTTPSConnectionPool(host='stats.nba.com', port=443): Read timed out. (read timeout=20)
+DayOffset=-2: 获取到 0 场比赛
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260213.json
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/13/2026
+Stats请求/解析异常: HTTPSConnectionPool(host='stats.nba.com', port=443): Read timed out. (read timeout=20)
+DayOffset=0: 获取到 0 场比赛
+正在尝试(CDN): https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20260214.json
+CDN请求失败: 403
+正在尝试(Stats): https://stats.nba.com/stats/scoreboardV2?DayOffset=0&LeagueID=00&gameDate=02/14/2026
+Stats请求/解析异常: HTTPSConnectionPool(host='stats.nba.com', port=443): Read timed out. (read timeout=20)
+DayOffset=1: 获取到 0 场比赛
+Stats请求/解析异常: HTTPSConnectionPool(host='stats.nba.com', port=443): Read timed out. (read timeout=20)
+DayOffset=2: 获取到 0 场比赛
+Stats请求/解析异常: HTTPSConnectionPool(host='stats.nba.com', port=443): Read timed out. (read timeout=20)
+DayOffset=3: 获取到 0 场比赛
