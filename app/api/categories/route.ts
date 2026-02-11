@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
     if (orphanChildren.length > 0) {
       structuredCategories.push({
-        id: null,
+        id: 'other',
         name: '其他',
         parentId: null,
         children: orphanChildren.map(child => ({
