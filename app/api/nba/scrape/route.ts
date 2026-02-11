@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import * as path from 'path'
+import { fetchNBAScheduleNode } from '@/lib/nba-fetch'
 
 const execAsync = promisify(exec)
 
@@ -44,48 +45,32 @@ interface NBANews {
   url: string
 }
 
-// 使用Python爬虫获取NBA数据
 async function fetchNBAScheduleWithPython(): Promise<NBAMatch[]> {
+  // Vercel 等 serverless 环境无 Python，直接用 Node.js
+  if (process.env.VERCEL) {
+    const matches = await fetchNBAScheduleNode()
+    console.log(`Node.js 爬虫成功获取 ${matches.length} 场比赛 (Vercel)`)
+    return matches
+  }
+
   try {
-    // 获取Python脚本路径
     const scriptPath = path.join(process.cwd(), 'scripts', 'nba_scraper.py')
-
-    console.log(`执行Python脚本: ${scriptPath}`)
-
-    // 执行Python脚本
     const { stdout, stderr } = await execAsync(`python3 "${scriptPath}"`, {
-      timeout: 30000, // 30秒超时
-      maxBuffer: 10 * 1024 * 1024 // 10MB缓冲区
+      timeout: 30000,
+      maxBuffer: 10 * 1024 * 1024
     })
-
-    if (stderr) {
-      console.log('Python脚本stderr:', stderr)
-    }
-
-    // 解析JSON输出
+    if (stderr) console.log('Python stderr:', stderr)
     const result = JSON.parse(stdout.trim())
-
     if (result.error) {
-      console.error('Python脚本返回错误:', result.message)
-      return []
+      console.error('Python 返回错误:', result.message)
+      return await fetchNBAScheduleNode()
     }
-
-    console.log(`Python爬虫成功获取 ${result.count} 场比赛`)
-
+    console.log(`Python 爬虫成功获取 ${result.count} 场比赛`)
     return result.matches || []
   } catch (error: any) {
-    console.error('执行Python爬虫失败:', error.message)
-
-    // 如果Python不可用，尝试使用Node.js的fetch作为备用
-    console.log('尝试使用Node.js fetch作为备用方案...')
-    return await fetchNBAScheduleWithNodeJS()
+    console.error('Python 爬虫失败:', error.message)
+    return await fetchNBAScheduleNode()
   }
-}
-
-// 备用方案：使用Node.js fetch（如果Python不可用）
-async function fetchNBAScheduleWithNodeJS(): Promise<NBAMatch[]> {
-  // 这里可以保留之前的Node.js实现作为备用
-  return []
 }
 
 // 爬取NBA新闻
