@@ -52,10 +52,13 @@ export async function POST(request: NextRequest) {
       },
       token
     })
-  } catch (error) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('登录错误:', error)
+    // 开发/预览环境返回详细错误，便于排查 Vercel 部署问题
+    const isDev = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview'
     return NextResponse.json(
-      { error: '登录失败，请稍后重试' },
+      { error: isDev ? `登录失败: ${msg}` : '登录失败，请稍后重试' },
       { status: 500 }
     )
   }

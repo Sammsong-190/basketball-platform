@@ -619,7 +619,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-1">
                                                 <img
-                                                  src={getTeamInfo(match.homeTeam, match.homeTeamId).logo}
+                                                  src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                                   alt={match.homeTeam}
                                                   className="w-20 h-20 object-contain"
                                                   onError={(e) => {
@@ -640,7 +640,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-1">
                                                 <img
-                                                  src={getTeamInfo(match.awayTeam, match.awayTeamId).logo}
+                                                  src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                                   alt={match.awayTeam}
                                                   className="w-20 h-20 object-contain"
                                                   onError={(e) => {
@@ -729,7 +729,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-2">
                                                 <img
-                                                  src={getTeamInfo(match.homeTeam, match.homeTeamId).logo}
+                                                  src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                                   alt={match.homeTeam}
                                                   className="w-24 h-24 object-contain"
                                                   onError={(e) => {
@@ -752,7 +752,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-2">
                                                 <img
-                                                  src={getTeamInfo(match.awayTeam, match.awayTeamId).logo}
+                                                  src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                                   alt={match.awayTeam}
                                                   className="w-24 h-24 object-contain"
                                                   onError={(e) => {
@@ -991,7 +991,7 @@ export default function EventsPage() {
                                                 <div className="text-center flex-1">
                                                   <div className="flex justify-center mb-1">
                                                     <img
-                                                      src={getTeamInfo(match.homeTeam, match.homeTeamId).logo}
+                                                      src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                                       alt={match.homeTeam}
                                                       className="w-20 h-20 object-contain"
                                                       onError={(e) => {
@@ -1019,7 +1019,7 @@ export default function EventsPage() {
                                                 <div className="text-center flex-1">
                                                   <div className="flex justify-center mb-1">
                                                     <img
-                                                      src={getTeamInfo(match.awayTeam, match.awayTeamId).logo}
+                                                      src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                                       alt={match.awayTeam}
                                                       className="w-20 h-20 object-contain"
                                                       onError={(e) => {

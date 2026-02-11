@@ -69,10 +69,13 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ user, token }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('注册错误:', error)
+    // 开发/预览环境返回详细错误，便于排查 Vercel 部署问题
+    const isDev = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview'
     return NextResponse.json(
-      { error: '注册失败，请稍后重试' },
+      { error: isDev ? `注册失败: ${msg}` : '注册失败，请稍后重试' },
       { status: 500 }
     )
   }
