@@ -9,6 +9,7 @@ interface Post {
   id: string
   title: string
   content: string
+  images?: string | null
   author: { username: string; avatar: string | null }
   category: { name: string } | null
   views: number
@@ -80,7 +81,19 @@ function PostsContent() {
             </div>
           ) : (
             <div className="space-y-6">
-              {posts.map((post) => (
+              {posts.map((post) => {
+                let firstImage: string | null = null
+                if (post.images) {
+                  try {
+                    const parsed = JSON.parse(post.images)
+                    if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+                      firstImage = parsed[0]
+                    } else if (typeof parsed === 'string' && parsed.startsWith('data:')) {
+                      firstImage = parsed
+                    }
+                  } catch (_) {}
+                }
+                return (
                 <Link key={post.id} href={`/posts/${post.id}`}>
                   <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 group">
                     <div className="flex items-start justify-between mb-4">
@@ -98,9 +111,14 @@ function PostsContent() {
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
+                    <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
                       {post.content}
                     </p>
+                    {firstImage && (
+                      <div className="mb-4 w-20 h-20 rounded-lg overflow-hidden border border-gray-200 inline-block">
+                        <img src={firstImage} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <div className="flex items-center space-x-6">
                         <div className="flex items-center space-x-2">
@@ -131,7 +149,7 @@ function PostsContent() {
                     </div>
                   </div>
                 </Link>
-              ))}
+              )})}
             </div>
           )}
         </div>

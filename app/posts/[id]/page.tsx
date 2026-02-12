@@ -17,6 +17,7 @@ interface Post {
   id: string
   title: string
   content: string
+  images?: string | null
   author: { username: string; avatar: string | null }
   category: { name: string } | null
   views: number
@@ -287,6 +288,26 @@ export default function PostDetailPage() {
               <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
                 {post.content}
               </div>
+              {post.images && (() => {
+                try {
+                  const imgArr = JSON.parse(post.images) as string[]
+                  if (Array.isArray(imgArr) && imgArr.length > 0) {
+                    return (
+                      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {imgArr.map((src, i) => (
+                          <img
+                            key={i}
+                            src={src}
+                            alt={`Post image ${i + 1}`}
+                            className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                          />
+                        ))}
+                      </div>
+                    )
+                  }
+                } catch (_) {}
+                return null
+              })()}
             </div>
 
             {/* 点赞和评论按钮 */}

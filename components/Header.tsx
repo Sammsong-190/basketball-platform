@@ -74,16 +74,6 @@ export default function Header() {
             
             {isLoggedIn ? (
               <>
-                <Link 
-                  href="/dashboard" 
-                  className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
-                    pathname === '/dashboard' 
-                      ? 'bg-white/20 text-white font-semibold' 
-                      : 'hover:bg-white/20'
-                  }`}
-                >
-                  Dashboard
-                </Link>
                 {user?.role === 'ADMIN' && (
                   <Link 
                     href="/admin" 
@@ -103,7 +93,14 @@ export default function Header() {
                   >
                     <span className="text-2xl">🛒</span>
                   </Link>
-                  <span className="text-sm mr-3">👤 {user?.username}</span>
+                  <Link
+                    href="/dashboard"
+                    className={`px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                      pathname === '/dashboard' ? 'bg-white/20 text-white font-semibold' : 'hover:bg-white/20'
+                    }`}
+                  >
+                    👤 {user?.username}
+                  </Link>
                   <button 
                     onClick={handleLogout} 
                     className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-all duration-200 text-sm font-medium"
@@ -195,7 +192,7 @@ export default function Header() {
                         : 'hover:bg-white/20'
                     }`}
                   >
-                    Dashboard
+                    👤 {user?.username}
                   </Link>
                   <Link 
                     href="/cart" 
