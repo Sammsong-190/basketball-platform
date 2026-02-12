@@ -61,6 +61,8 @@ export interface NBAMatchFromFetch {
   awayTeam: string
   homeTeamId?: number
   awayTeamId?: number
+  homeLogo?: string
+  awayLogo?: string
   homeScore: number | null
   awayScore: number | null
   status: 'upcoming' | 'live' | 'finished'
@@ -217,12 +219,17 @@ export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
             return null
           }
 
+          const homeLogo = typeof (home.team as { logo?: string })?.logo === 'string' ? (home.team as { logo: string }).logo : undefined
+          const awayLogo = typeof (away.team as { logo?: string })?.logo === 'string' ? (away.team as { logo: string }).logo : undefined
+
           matches.push({
             id: gameId,
             homeTeam,
             awayTeam,
             homeTeamId: toIntOrNull(home.team?.id) ?? undefined,
             awayTeamId: toIntOrNull(away.team?.id) ?? undefined,
+            homeLogo,
+            awayLogo,
             homeScore,
             awayScore,
             status,

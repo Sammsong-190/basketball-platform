@@ -49,6 +49,8 @@ interface Match {
   awayTeam: string
   homeTeamId?: number
   awayTeamId?: number
+  homeLogo?: string
+  awayLogo?: string
   homeScore: number | null
   awayScore: number | null
   status: 'upcoming' | 'live' | 'finished'
@@ -96,7 +98,20 @@ const teamInfo: { [key: string]: { logo: string; abbreviation: string } } = {
   '克利夫兰骑士': { logo: 'https://cdn.nba.com/logos/nba/1610612739/primary/L/logo.svg', abbreviation: 'CLE' },
   '印第安纳步行者': { logo: 'https://cdn.nba.com/logos/nba/1610612754/primary/L/logo.svg', abbreviation: 'IND' },
   '多伦多猛龙': { logo: 'https://cdn.nba.com/logos/nba/1610612761/primary/L/logo.svg', abbreviation: 'TOR' },
-  '布鲁克林篮网': { logo: 'https://cdn.nba.com/logos/nba/1610612751/primary/L/logo.svg', abbreviation: 'BKN' }
+  '布鲁克林篮网': { logo: 'https://cdn.nba.com/logos/nba/1610612751/primary/L/logo.svg', abbreviation: 'BKN' },
+  '洛杉矶快船': { logo: 'https://cdn.nba.com/logos/nba/1610612746/primary/L/logo.svg', abbreviation: 'LAC' }
+}
+
+// 球队名到ID的映射（用于teamId缺失时的回退）
+const teamNameToId: { [key: string]: number } = {
+  '亚特兰大老鹰': 1610612737, '波士顿凯尔特人': 1610612738, '克利夫兰骑士': 1610612739, '新奥尔良鹈鹕': 1610612740,
+  '芝加哥公牛': 1610612741, '达拉斯独行侠': 1610612742, '丹佛掘金': 1610612743, '金州勇士': 1610612744,
+  '休斯顿火箭': 1610612745, '洛杉矶快船': 1610612746, '洛杉矶湖人': 1610612747, '迈阿密热火': 1610612748,
+  '密尔沃基雄鹿': 1610612749, '明尼苏达森林狼': 1610612750, '布鲁克林篮网': 1610612751, '纽约尼克斯': 1610612752,
+  '奥兰多魔术': 1610612753, '印第安纳步行者': 1610612754, '费城76人': 1610612755, '菲尼克斯太阳': 1610612756,
+  '波特兰开拓者': 1610612757, '萨克拉门托国王': 1610612758, '圣安东尼奥马刺': 1610612759, '俄克拉荷马雷霆': 1610612760,
+  '多伦多猛龙': 1610612761, '犹他爵士': 1610612762, '孟菲斯灰熊': 1610612763, '华盛顿奇才': 1610612764,
+  '底特律活塞': 1610612765, '夏洛特黄蜂': 1610612766
 }
 
 // NBA球队ID到队标和缩写的映射
@@ -141,20 +156,26 @@ const getTeamInfo = (teamName: string, teamId?: number) => {
   if (teamInfo[teamName]) {
     return teamInfo[teamName]
   }
-  const defaultTeamId = teamId || 1610612738
-  let abbreviation = teamName.substring(0, 3).toUpperCase()
-
-  if (teamName.includes('洛杉矶')) {
-    if (teamName.includes('湖人')) {
-      abbreviation = 'LAL'
-    } else if (teamName.includes('快船')) {
-      abbreviation = 'LAC'
-    }
+  // 当teamId缺失时，用球队名查找ID
+  const resolvedId = teamId || teamNameToId[teamName]
+  if (resolvedId && teamIdToInfo[resolvedId]) {
+    return teamIdToInfo[resolvedId]
   }
+  // 模糊匹配：部分球队名
+  const partial = Object.keys(teamNameToId).find((k) => teamName.includes(k) || k.includes(teamName))
+  if (partial && teamIdToInfo[teamNameToId[partial]]) {
+    return teamIdToInfo[teamNameToId[partial]]
+  }
+  const defaultTeamId = resolvedId || 1610612738
+  let abbreviation = teamName.length >= 2 ? teamName.substring(0, 3).toUpperCase() : '???'
+
+  if (teamName.includes('湖人')) abbreviation = 'LAL'
+  else if (teamName.includes('快船')) abbreviation = 'LAC'
+  else if (teamName.includes('76') || teamName.includes('76人')) abbreviation = 'PHI'
 
   return {
     logo: `https://cdn.nba.com/logos/nba/${defaultTeamId}/primary/L/logo.svg`,
-    abbreviation: abbreviation
+    abbreviation
   }
 }
 
@@ -230,8 +251,8 @@ export default function EventsPage() {
   const mainArticleRef = useRef<HTMLDivElement>(null)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
-  const fetchData = async () => {
-    setLoading(true)
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       // 添加超时控制
       const controller = new AbortController()
@@ -247,6 +268,7 @@ export default function EventsPage() {
         console.error('NBA API请求失败:', nbaResponse.status, nbaResponse.statusText)
         setMatches([])
         setNews([])
+        if (showLoading) setLoading(false)
         return
       }
 
@@ -255,13 +277,13 @@ export default function EventsPage() {
         console.error('NBA API返回错误:', nbaData.error, nbaData.message)
       }
 
-      // 优化：先显示比赛数据，不等待新闻数据
       if (nbaData.matches && nbaData.matches.length > 0) {
         setMatches(nbaData.matches)
-        setLoading(false) // 先停止loading，让用户看到比赛数据
+        if (showLoading) setLoading(false)
       } else {
         setMatches([])
         console.warn('未获取到NBA比赛数据，可能的原因：', nbaData.message || 'API返回空数据')
+        if (showLoading) setLoading(false)
       }
 
       // 新闻数据异步处理，不阻塞页面显示
@@ -301,36 +323,33 @@ export default function EventsPage() {
       }
       setMatches([])
       setNews([])
-      setLoading(false) // 确保在错误时也停止loading
+      if (showLoading) setLoading(false)
     }
   }
 
-  // 自动更新数据
+  // 初始加载 + 每2分钟自动爬取（长轮询）
   useEffect(() => {
     fetchData()
 
-    // 仅在 Scores tab 自动刷新，避免其它 tab “过一段时间就刷新”的感觉
-    if (activeTab !== 'scores') return
-
-    const updateInterval = 30 * 1000
+    const POLL_INTERVAL = 2 * 60 * 1000 // 2 minutes
 
     const tick = () => {
-      // 页面不可见时不刷新（避免切到别的标签页时也一直刷新）
       if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return
-      fetchData()
+      fetchData(false) // 后台静默刷新，不显示 loading
     }
 
-    const interval = setInterval(tick, updateInterval)
+    const interval = setInterval(tick, POLL_INTERVAL)
 
-    // 回到页面/切回标签页时立刻刷新一次
-    const onVisibility = () => tick()
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') tick()
+    }
     document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
       clearInterval(interval)
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [activeTab])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -678,7 +697,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-1">
                                                 <img
-                                                  src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
+                                                  src={getAvatarSrc(match.homeLogo || getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                                   alt={match.homeTeam}
                                                   className="w-20 h-20 object-contain"
                                                   onError={(e) => {
@@ -699,7 +718,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-1">
                                                 <img
-                                                  src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
+                                                  src={getAvatarSrc(match.awayLogo || getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                                   alt={match.awayTeam}
                                                   className="w-20 h-20 object-contain"
                                                   onError={(e) => {
@@ -772,7 +791,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-2">
                                                 <img
-                                                  src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
+                                                  src={getAvatarSrc(match.homeLogo || getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                                   alt={match.homeTeam}
                                                   className="w-24 h-24 object-contain"
                                                   onError={(e) => {
@@ -795,7 +814,7 @@ export default function EventsPage() {
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-2">
                                                 <img
-                                                  src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
+                                                  src={getAvatarSrc(match.awayLogo || getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                                   alt={match.awayTeam}
                                                   className="w-24 h-24 object-contain"
                                                   onError={(e) => {
@@ -992,7 +1011,7 @@ export default function EventsPage() {
                                     <div className="flex items-center gap-6 flex-1 min-w-0">
                                       <div className="flex items-center gap-3 flex-shrink-0">
                                         <img
-                                          src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
+                                          src={getAvatarSrc(match.homeLogo || getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                           alt={match.homeTeam}
                                           className="w-12 h-12 object-contain"
                                           onError={(e) => {
@@ -1015,7 +1034,7 @@ export default function EventsPage() {
                                           <div className="text-xl font-bold text-gray-900">{match.awayScore ?? '-'}</div>
                                         </div>
                                         <img
-                                          src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
+                                          src={getAvatarSrc(match.awayLogo || getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                           alt={match.awayTeam}
                                           className="w-12 h-12 object-contain"
                                           onError={(e) => {
@@ -1119,7 +1138,7 @@ export default function EventsPage() {
                                                 <div className="text-center flex-1">
                                                   <div className="flex justify-center mb-1">
                                                     <img
-                                                      src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
+                                                      src={getAvatarSrc(match.homeLogo || getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
                                                       alt={match.homeTeam}
                                                       className="w-20 h-20 object-contain"
                                                       onError={(e) => {
@@ -1147,7 +1166,7 @@ export default function EventsPage() {
                                                 <div className="text-center flex-1">
                                                   <div className="flex justify-center mb-1">
                                                     <img
-                                                      src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
+                                                      src={getAvatarSrc(match.awayLogo || getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
                                                       alt={match.awayTeam}
                                                       className="w-20 h-20 object-contain"
                                                       onError={(e) => {
