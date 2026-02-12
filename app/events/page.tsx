@@ -38,6 +38,11 @@ interface PlayerStat {
   assists?: number
 }
 
+interface LinescorePeriod {
+  period: number
+  value: number
+}
+
 interface Match {
   id: string
   homeTeam: string
@@ -51,6 +56,8 @@ interface Match {
   time: string
   league: string
   venue: string
+  homeLinescores?: LinescorePeriod[]
+  awayLinescores?: LinescorePeriod[]
   homeTopScorer?: PlayerStat | null
   homeTopRebounder?: PlayerStat | null
   homeTopAssister?: PlayerStat | null
@@ -149,6 +156,58 @@ const getTeamInfo = (teamName: string, teamId?: number) => {
     logo: `https://cdn.nba.com/logos/nba/${defaultTeamId}/primary/L/logo.svg`,
     abbreviation: abbreviation
   }
+}
+
+function getPeriodLabel(period: number): string {
+  if (period <= 4) return `Q${period}`
+  return `OT${period - 4}`
+}
+
+function QuarterScoresTable({ match, getTeamInfo }: { match: Match; getTeamInfo: (name: string, id?: number) => { abbreviation: string } }) {
+  const home = match.homeLinescores || []
+  const away = match.awayLinescores || []
+  const maxPeriod = Math.max(...home.map((s) => s.period), ...away.map((s) => s.period), 4)
+  const periods = Array.from({ length: maxPeriod }, (_, i) => i + 1)
+
+  const getScore = (arr: LinescorePeriod[], p: number) => arr.find((s) => s.period === p)?.value ?? '-'
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm min-w-[320px]">
+        <thead>
+          <tr className="bg-gray-700 text-white">
+            <th className="text-left font-bold uppercase py-2 px-3">TEAM</th>
+            {periods.map((p) => (
+              <th key={p} className="text-center font-bold uppercase py-2 px-2">
+                {getPeriodLabel(p)}
+              </th>
+            ))}
+            <th className="text-center font-bold uppercase py-2 px-3">FINAL</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          <tr>
+            <td className="font-bold py-2 px-3 text-gray-900">{getTeamInfo(match.homeTeam, match.homeTeamId).abbreviation}</td>
+            {periods.map((p) => (
+              <td key={p} className="text-center py-2 px-2">
+                {getScore(home, p)}
+              </td>
+            ))}
+            <td className="font-bold text-center py-2 px-3 text-gray-900">{match.homeScore ?? '-'}</td>
+          </tr>
+          <tr>
+            <td className="font-bold py-2 px-3 text-gray-900">{getTeamInfo(match.awayTeam, match.awayTeamId).abbreviation}</td>
+            {periods.map((p) => (
+              <td key={p} className="text-center py-2 px-2">
+                {getScore(away, p)}
+              </td>
+            ))}
+            <td className="font-bold text-center py-2 px-3 text-gray-900">{match.awayScore ?? '-'}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  )
 }
 
 interface News {
@@ -690,29 +749,13 @@ export default function EventsPage() {
                             )}
                           </h2>
 
-                          <div className="relative">
+                          <div className="relative group">
                             <div className="overflow-hidden rounded-xl">
                               <div
                                 className="flex transition-transform duration-500 ease-in-out"
                                 style={{ transform: `translateX(-${currentLiveIndex * 100}%)` }}
                               >
-                                {todayLiveMatches.map((match, index) => {
-                                  // 调试：打印球员统计数据
-                                  if (index === 0) {
-                                    console.log('实时比赛球员统计数据:', {
-                                      matchId: match.id,
-                                      homeTeam: match.homeTeam,
-                                      awayTeam: match.awayTeam,
-                                      homeTopScorer: match.homeTopScorer,
-                                      homeTopRebounder: match.homeTopRebounder,
-                                      homeTopAssister: match.homeTopAssister,
-                                      awayTopScorer: match.awayTopScorer,
-                                      awayTopRebounder: match.awayTopRebounder,
-                                      awayTopAssister: match.awayTopAssister
-                                    })
-                                  }
-
-                                  return (
+                                {todayLiveMatches.map((match) => (
                                     <div
                                       key={match.id}
                                       className="w-full flex-shrink-0 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 border-2 border-red-300 hover:shadow-lg transition-shadow"
@@ -881,8 +924,7 @@ export default function EventsPage() {
                                         </div>
                                       </div>
                                     </div>
-                                  )
-                                })}
+                                ))}
                               </div>
                             </div>
 
@@ -891,7 +933,7 @@ export default function EventsPage() {
                               <>
                                 <button
                                   onClick={goToPrevious}
-                                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-10"
+                                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-10 opacity-0 group-hover:opacity-100"
                                   aria-label="上一场比赛"
                                 >
                                   <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -900,7 +942,7 @@ export default function EventsPage() {
                                 </button>
                                 <button
                                   onClick={goToNext}
-                                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-10"
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-10 opacity-0 group-hover:opacity-100"
                                   aria-label="下一场比赛"
                                 >
                                   <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -913,7 +955,7 @@ export default function EventsPage() {
                                     <button
                                       key={index}
                                       onClick={() => goToSlide(index)}
-                                      className={`h-2 rounded-full transition-all ${index === currentLiveIndex
+                                      className={`h-2 rounded-full transition-all duration-300 ease-out ${index === currentLiveIndex
                                         ? 'w-8 bg-red-600'
                                         : 'w-2 bg-gray-300 hover:bg-gray-400'
                                         }`}
@@ -923,6 +965,92 @@ export default function EventsPage() {
                                 </div>
                               </>
                             )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 进行中比赛 - 轮播下方逐行显示 */}
+                      {todayLiveMatches.length > 0 && (
+                        <div className="mb-8">
+                          <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                            Live Now（逐场显示）
+                          </h2>
+                          <div className="space-y-3">
+                            {todayLiveMatches.map((match) => {
+                              const isExpanded = expandedMatchId === match.id
+                              const hasLinescores = (match.homeLinescores?.length ?? 0) > 0 || (match.awayLinescores?.length ?? 0) > 0
+                              return (
+                                <div
+                                  key={match.id}
+                                  className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200 overflow-hidden"
+                                >
+                                  <div
+                                    className={`flex items-center justify-between p-4 hover:shadow-md transition-shadow duration-300 ease-out ${hasLinescores ? 'cursor-pointer' : ''}`}
+                                    onClick={() => hasLinescores && setExpandedMatchId(isExpanded ? null : match.id)}
+                                  >
+                                    <div className="flex items-center gap-6 flex-1 min-w-0">
+                                      <div className="flex items-center gap-3 flex-shrink-0">
+                                        <img
+                                          src={getAvatarSrc(getTeamInfo(match.homeTeam, match.homeTeamId).logo)}
+                                          alt={match.homeTeam}
+                                          className="w-12 h-12 object-contain"
+                                          onError={(e) => {
+                                            const target = e.target as HTMLImageElement
+                                            target.style.display = 'none'
+                                          }}
+                                        />
+                                        <div className="text-center min-w-[80px]">
+                                          <div className="font-semibold text-gray-900">{getTeamInfo(match.homeTeam, match.homeTeamId).abbreviation}</div>
+                                          <div className="text-xl font-bold text-orange-600">{match.homeScore ?? '-'}</div>
+                                        </div>
+                                      </div>
+                                      <div className="flex flex-col items-center flex-shrink-0">
+                                        <span className="text-xs font-medium text-red-600">{match.time}</span>
+                                        <span className="text-gray-400 text-lg">VS</span>
+                                      </div>
+                                      <div className="flex items-center gap-3 flex-shrink-0">
+                                        <div className="text-center min-w-[80px]">
+                                          <div className="font-semibold text-gray-900">{getTeamInfo(match.awayTeam, match.awayTeamId).abbreviation}</div>
+                                          <div className="text-xl font-bold text-orange-600">{match.awayScore ?? '-'}</div>
+                                        </div>
+                                        <img
+                                          src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
+                                          alt={match.awayTeam}
+                                          className="w-12 h-12 object-contain"
+                                          onError={(e) => {
+                                            const target = e.target as HTMLImageElement
+                                            target.style.display = 'none'
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                                      <div className="hidden sm:block text-sm text-gray-600">📍 {match.venue}</div>
+                                      {hasLinescores && (
+                                        <svg
+                                          className={`w-4 h-4 text-gray-500 transition-transform duration-300 ease-out ${isExpanded ? 'rotate-180' : ''}`}
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {hasLinescores && (
+                                    <div
+                                      className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}
+                                    >
+                                      <div className="border-t border-red-200 bg-white px-4 py-4">
+                                        <QuarterScoresTable match={match} getTeamInfo={getTeamInfo} />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
                           </div>
                         </div>
                       )}
@@ -959,9 +1087,9 @@ export default function EventsPage() {
                                     )
 
                                     return (
-                                      <div key={match.id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow overflow-hidden">
+                                      <div key={match.id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-300 ease-out overflow-hidden">
                                         <div
-                                          className="p-3 cursor-pointer hover:bg-gray-50"
+                                          className="p-3 cursor-pointer hover:bg-gray-50 transition-colors duration-300 ease-out"
                                           onClick={() => {
                                             setExpandedMatchId(isExpanded ? null : match.id)
                                           }}
@@ -976,7 +1104,7 @@ export default function EventsPage() {
                                               </div>
                                               {/* 所有已结束的比赛都显示下拉箭头 */}
                                               <svg
-                                                className={`w-4 h-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                                className={`w-4 h-4 text-gray-500 transition-transform duration-300 ease-out ${isExpanded ? 'rotate-180' : ''}`}
                                                 fill="none"
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
@@ -1051,12 +1179,16 @@ export default function EventsPage() {
                                           </div>
                                         </div>
 
-                                        {/* 球员统计下拉框 - 所有已结束的比赛都显示 */}
+                                        {/* 球员统计与每节得分下拉框 - 所有已结束的比赛都显示 */}
                                         <div
-                                          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                                            }`}
+                                          className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}
                                         >
                                           <div className="px-3 pb-3 pt-2 border-t border-gray-200 bg-gray-50">
+                                            {((match.homeLinescores?.length ?? 0) > 0 || (match.awayLinescores?.length ?? 0) > 0) && (
+                                              <div className="mb-4">
+                                                <QuarterScoresTable match={match} getTeamInfo={getTeamInfo} />
+                                              </div>
+                                            )}
                                             {hasPlayerStats ? (
                                               <div className="space-y-2 max-w-[920px] mx-auto">
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6 text-sm font-semibold text-gray-700 mb-2">

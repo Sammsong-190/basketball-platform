@@ -50,6 +50,11 @@ function toIntOrNull(v: unknown): number | null {
   return isNaN(n) ? null : Math.floor(n)
 }
 
+export interface LinescorePeriod {
+  period: number
+  value: number
+}
+
 export interface NBAMatchFromFetch {
   id: string
   homeTeam: string
@@ -63,6 +68,8 @@ export interface NBAMatchFromFetch {
   time: string
   league: string
   venue: string
+  homeLinescores?: LinescorePeriod[]
+  awayLinescores?: LinescorePeriod[]
   homeTopScorer?: { name: string; points?: number; avatar?: string } | null
   homeTopRebounder?: { name: string; rebounds?: number; avatar?: string } | null
   homeTopAssister?: { name: string; assists?: number; avatar?: string } | null
@@ -124,18 +131,23 @@ export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
           const statusText = (stEvent?.type?.state || '').toUpperCase()
           const isCompleted = !!(stEvent?.type as { completed?: boolean })?.completed
           let status: 'upcoming' | 'live' | 'finished' = 'upcoming'
-          if (statusText === 'pre' || statusText === 'post') status = statusText === 'pre' ? 'upcoming' : 'finished'
-          else if (statusText === 'in') status = 'live'
+          if (statusText === 'PRE' || statusText === 'POST') status = statusText === 'PRE' ? 'upcoming' : 'finished'
+          else if (statusText === 'IN') status = 'live'
           else if (isCompleted) status = 'finished'
 
           const homeScore = toIntOrNull(home.score)
           const awayScore = toIntOrNull(away.score)
-          // 有完整比分且 API 标记已结束 → 确保为 finished（防止漏判）
-          if (status === 'upcoming' && homeScore != null && awayScore != null && isCompleted) status = 'finished'
-          // 有完整比分且开赛时间已过 → 视为 finished
-          if (status === 'upcoming' && homeScore != null && awayScore != null && rawDate) {
-            const gameTime = new Date(rawDate).getTime()
-            if (gameTime < Date.now() - 60000) status = 'finished' // 开赛超过 1 分钟
+          // 进行中的比赛（IN）绝不能改为 finished
+          if (status === 'live') {
+            // 保持 live，不做任何覆盖
+          } else {
+            // 有完整比分且 API 标记已结束 → 确保为 finished（防止漏判）
+            if (status === 'upcoming' && homeScore != null && awayScore != null && isCompleted) status = 'finished'
+            // 有完整比分且开赛时间已过 → 视为 finished（仅当 status 仍为 upcoming 时）
+            if (status === 'upcoming' && homeScore != null && awayScore != null && rawDate) {
+              const gameTime = new Date(rawDate).getTime()
+              if (gameTime < Date.now() - 60000) status = 'finished' // 开赛超过 1 分钟
+            }
           }
           const dateObj = rawDate ? new Date(rawDate) : new Date()
           // 使用美东日期，与前端 convertETDateToBeijing 一致
@@ -158,6 +170,13 @@ export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
           }
 
           const venue = comp.venue?.fullName || comp.venue?.address?.city || '未知场馆'
+
+          const parseLinescores = (c: { linescores?: Array<{ period?: number; value?: number; displayValue?: string }> }) => {
+            const arr = c.linescores || []
+            return arr
+              .map((s) => ({ period: s.period ?? 0, value: s.value != null ? Math.floor(s.value) : 0 }))
+              .filter((s) => s.period > 0)
+          }
 
           const takeLeader = (c: Record<string, unknown>, cat: string) => {
             const leaders = (c.leaders as Array<Record<string, unknown>>) || []
@@ -211,6 +230,8 @@ export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
             time: timeStr,
             league: 'NBA',
             venue,
+            homeLinescores: parseLinescores(home),
+            awayLinescores: parseLinescores(away),
             homeTopScorer: takeLeader(home, 'points'),
             homeTopRebounder: takeLeader(home, 'rebounds'),
             homeTopAssister: takeLeader(home, 'assists'),
