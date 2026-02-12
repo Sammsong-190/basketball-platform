@@ -171,7 +171,7 @@ export default function CartPage() {
         <Header />
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
             <p className="mt-4 text-gray-600">Loading...</p>
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function CartPage() {
               <p className="text-gray-600 mb-6">Start shopping to add items to your cart</p>
               <Link
                 href="/products"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold"
+                className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold"
               >
                 Browse Products
               </Link>
@@ -207,7 +207,7 @@ export default function CartPage() {
                   return (
                     <div key={item.id} className="bg-white rounded-2xl shadow-lg p-6">
                       <div className="flex gap-6">
-                        <div className="w-32 h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {images[0] ? (
                             <img
                               src={images[0]}
@@ -224,13 +224,13 @@ export default function CartPage() {
                               <h3 className="text-xl font-bold text-gray-900 mb-2">
                                 {item.product.name}
                               </h3>
-                              <p className="text-2xl font-bold text-orange-600">
+                              <p className="text-2xl font-bold text-gray-900">
                                 ¥{item.product.price.toFixed(2)}
                               </p>
                             </div>
                             <button
                               onClick={() => handleRemoveItem(item.id)}
-                              className="text-red-500 hover:text-red-700 text-xl"
+                              className="text-gray-600 hover:text-gray-800 text-xl"
                             >
                               ×
                             </button>
@@ -291,13 +291,13 @@ export default function CartPage() {
                   </div>
                   <button
                     onClick={handleCheckout}
-                    className="w-full px-6 py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                    className="w-full px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                   >
                     Proceed to Checkout
                   </button>
                   <Link
                     href="/products"
-                    className="block mt-4 text-center text-orange-600 hover:text-orange-700 font-semibold"
+                    className="block mt-4 text-center text-gray-900 hover:text-gray-700 font-semibold"
                   >
                     Continue Shopping
                   </Link>

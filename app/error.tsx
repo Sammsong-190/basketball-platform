@@ -16,7 +16,7 @@ export default function Error({
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
-        <h2 className="text-2xl font-bold text-red-600 mb-4">出现错误</h2>
+        <h2 className="text-2xl font-bold text-gray-700 mb-4">出现错误</h2>
         <p className="text-gray-600 mb-6">
           {error.message || '发生了未知错误'}
         </p>

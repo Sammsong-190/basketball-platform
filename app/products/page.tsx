@@ -50,7 +50,7 @@ function ProductCard({ product }: { product: Product }) {
       onClick={handleClick}
     >
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer">
-        <div className="h-64 bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center relative overflow-hidden">
+        <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
           {images[0] ? (
             <img
               src={images[0]}
@@ -81,12 +81,12 @@ function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-orange-600 pointer-events-none">
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-900 pointer-events-none">
             {product.category.name}
           </div>
         </div>
         <div className="p-6">
-          <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">
+          <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2 group-hover:text-gray-900 transition-colors">
             {product.name}
           </h3>
           <div className="flex items-center mb-3">
@@ -101,7 +101,7 @@ function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-orange-600">
+            <span className="text-2xl font-bold text-gray-900">
               ¥{product.price.toFixed(2)}
             </span>
             <span className="text-sm text-gray-500">
@@ -199,14 +199,14 @@ export default function ProductsPage() {
             <div>
               <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
                 <span className="mr-3">🛒</span>
-                <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Featured Products</span>
+                <span className="text-gray-900">Featured Products</span>
               </h1>
               <p className="text-xl text-gray-600">Discover the finest basketball products</p>
             </div>
             {isSeller && (
               <Link
                 href="/products/new"
-                className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 whitespace-nowrap"
+                className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 whitespace-nowrap"
               >
                 ➕ Add Product
               </Link>
@@ -229,14 +229,14 @@ export default function ProductsPage() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') setAppliedKeyword(keyword.trim())
                     }}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                     placeholder="Search by product name / seller name / category name..."
                   />
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setAppliedKeyword(keyword.trim())}
-                    className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl hover:from-orange-700 hover:to-red-700 transition-all font-semibold shadow-md hover:shadow-lg"
+                    className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all font-semibold shadow-md hover:shadow-lg"
                   >
                     Search
                   </button>
@@ -259,7 +259,7 @@ export default function ProductsPage() {
 
           {loading ? (
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
               <p className="mt-4 text-gray-600">Loading...</p>
             </div>
           ) : products.length === 0 ? (

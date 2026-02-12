@@ -41,14 +41,14 @@ export default function AdminNav() {
                 href={item.href}
                 className={`px-6 py-4 font-semibold text-sm whitespace-nowrap transition-all relative ${
                   isActive
-                    ? 'text-orange-600 bg-orange-50'
+                    ? 'text-gray-900 bg-gray-50'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 <span className="mr-2">{item.icon}</span>
                 {item.label}
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-600 to-red-600"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-gray-600 to-gray-800"></div>
                 )}
               </Link>
             )

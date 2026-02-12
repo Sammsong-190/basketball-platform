@@ -212,7 +212,7 @@ export default function ProductDetailPage() {
         <Header />
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
             <p className="mt-4 text-gray-600">Loading...</p>
           </div>
         </div>
@@ -239,7 +239,7 @@ export default function ProductDetailPage() {
             <div className="flex gap-4 justify-center">
               <Link 
                 href="/products" 
-                className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold"
+                className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold"
               >
                 Browse Products
               </Link>
@@ -265,7 +265,7 @@ export default function ProductDetailPage() {
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 py-12">
-          <Link href="/products" className="text-orange-600 hover:underline mb-6 inline-block">
+          <Link href="/products" className="text-gray-900 hover:underline mb-6 inline-block">
             ← Back to Products
           </Link>
 
@@ -274,7 +274,7 @@ export default function ProductDetailPage() {
               {/* Product Images */}
               <div>
                 {/* 主图片轮播区域 */}
-                <div className="aspect-square bg-gradient-to-br from-orange-100 to-red-100 rounded-lg overflow-hidden mb-4 relative group">
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 relative group">
                   <div className="relative w-full h-full overflow-hidden">
                     {images.map((img: string, index: number) => (
                       <div
@@ -386,8 +386,8 @@ export default function ProductDetailPage() {
                         }}
                         className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative ${
                           selectedImageIndex === index
-                            ? 'border-orange-600 ring-2 ring-orange-200 scale-105'
-                            : 'border-gray-200 hover:border-orange-400 opacity-70 hover:opacity-100'
+                            ? 'border-gray-400 ring-2 ring-gray-200 scale-105'
+                            : 'border-gray-200 hover:border-gray-400 opacity-70 hover:opacity-100'
                         }`}
                       >
                         <img
@@ -400,7 +400,7 @@ export default function ProductDetailPage() {
                           }`}
                         />
                         {selectedImageIndex === index && (
-                          <div className="absolute inset-0 border-2 border-orange-600 rounded-lg pointer-events-none" />
+                          <div className="absolute inset-0 border-2 border-gray-400 rounded-lg pointer-events-none" />
                         )}
                       </button>
                     ))}
@@ -411,7 +411,7 @@ export default function ProductDetailPage() {
               {/* Product Info */}
               <div>
                 <div className="mb-4">
-                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 rounded-full text-sm font-semibold mb-3">
+                  <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold mb-3">
                     {product.category.name}
                   </span>
                   <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
@@ -429,7 +429,7 @@ export default function ProductDetailPage() {
                       {product._count.orderItems} orders
                     </span>
                   </div>
-                  <div className="text-4xl font-bold text-orange-600 mb-6">
+                  <div className="text-4xl font-bold text-gray-900 mb-6">
                     ¥{product.price.toFixed(2)}
                   </div>
                 </div>
@@ -445,7 +445,7 @@ export default function ProductDetailPage() {
                       {user && (user.id === product.seller.id || user.role === 'ADMIN') && (
                         <Link
                           href={`/products/${product.id}/edit`}
-                          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all text-sm font-semibold"
+                          className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all text-sm font-semibold"
                         >
                           ✏️ Edit Product
                         </Link>
@@ -453,7 +453,7 @@ export default function ProductDetailPage() {
                     </div>
                     <div>
                       <span className="text-gray-600 font-semibold">Stock: </span>
-                      <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className={`font-semibold ${product.stock > 0 ? 'text-gray-700' : 'text-gray-500'}`}>
                         {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
                       </span>
                     </div>
@@ -504,14 +504,14 @@ export default function ProductDetailPage() {
                     <button
                       onClick={handleAddToCart}
                       disabled={product.stock === 0}
-                      className="flex-1 px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-6 py-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       🛒 Add to Cart
                     </button>
                     <button
                       onClick={handleBuyNow}
                       disabled={product.stock === 0}
-                      className="flex-1 px-6 py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Buy Now
                     </button>

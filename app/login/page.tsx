@@ -76,7 +76,7 @@ export default function LoginPage() {
                   required
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter username or email"
                 />
               </div>
@@ -90,7 +90,7 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter password"
                 />
               </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                className="w-full py-3 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -115,7 +115,7 @@ export default function LoginPage() {
             <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
               <p className="text-center text-sm text-gray-600">
                 Don't have an account?{' '}
-                <a href="/register" className="text-orange-600 hover:text-orange-700 font-semibold hover:underline">
+                <a href="/register" className="text-gray-900 hover:text-gray-700 font-semibold hover:underline">
                   Register Now
                 </a>
               </p>

@@ -76,14 +76,38 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
     }
   }
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const resizeImage = (file: File, maxSize = 200): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = document.createElement('img')
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      img.onload = () => {
+        let { width, height } = img
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = (height / width) * maxSize
+            width = maxSize
+          } else {
+            width = (width / height) * maxSize
+            height = maxSize
+          }
+        }
+        canvas.width = width
+        canvas.height = height
+        ctx?.drawImage(img, 0, 0, width, height)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+        resolve(dataUrl)
+      }
+      img.onerror = () => resolve('')
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setEditData({ ...editData, avatar: reader.result as string })
-      }
-      reader.readAsDataURL(file)
+      const dataUrl = await resizeImage(file)
+      if (dataUrl) setEditData((prev) => ({ ...prev, avatar: dataUrl }))
     }
   }
 
@@ -94,7 +118,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-semibold"
+            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold"
           >
             Edit Profile
           </button>
@@ -112,7 +136,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
             <button
               onClick={handleSave}
               disabled={loading}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-semibold disabled:opacity-50"
+              className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save'}
             </button>
@@ -123,7 +147,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
       {/* 头像区域 */}
       <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
         <div className="relative">
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-4xl font-bold text-white">
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-4xl font-bold text-white">
             {editData.avatar ? (
               <img src={editData.avatar} alt={user.username} className="w-full h-full object-cover" />
             ) : (
@@ -131,7 +155,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
             )}
           </div>
           {isEditing && (
-            <label className="absolute bottom-0 right-0 w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-orange-700 transition-colors shadow-lg">
+            <label className="absolute bottom-0 right-0 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors shadow-lg">
               <input
                 type="file"
                 accept="image/*"
@@ -175,7 +199,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
               type="tel"
               value={editData.phone}
               onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
               placeholder="Enter phone number"
             />
           ) : (
@@ -191,7 +215,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">
+            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">
               {user.role === 'ADMIN' ? '管理员' : user.isSeller ? '卖家' : '普通用户'}
             </span>
             {user.isSeller && (
@@ -203,9 +227,9 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
         </div>
 
         {user.balance !== undefined && (
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border-2 border-orange-200">
+          <div className="bg-gradient-to-br bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Account Balance</label>
-            <p className="text-gray-900 text-3xl font-bold text-orange-600">¥{user.balance.toFixed(2)}</p>
+            <p className="text-gray-900 text-3xl font-bold">¥{user.balance.toFixed(2)}</p>
             <p className="text-xs text-gray-500 mt-2">Available for purchasing products</p>
           </div>
         )}
@@ -376,7 +400,7 @@ export default function DashboardPage() {
         <Header />
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
             <p className="mt-4 text-gray-600">Loading...</p>
           </div>
         </div>
@@ -390,10 +414,10 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* 用户信息卡片 */}
-          <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-lg p-8 mb-8 text-white">
+          <div className="bg-gray-200 rounded-2xl shadow-lg p-8 mb-8 text-gray-900">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-6">
-                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-4xl font-bold backdrop-blur-sm">
+                <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center text-4xl font-bold">
                   {user.avatar ? (
                     <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
                   ) : (
@@ -402,13 +426,13 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold mb-2">{user.username}</h1>
-                  <p className="text-orange-100">{user.email}</p>
+                  <p className="text-gray-600">{user.email}</p>
                   <div className="mt-2 flex items-center gap-4">
-                    <span className="px-3 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">
+                    <span className="px-3 py-1 bg-gray-300 rounded-full text-sm">
                       {user.role === 'ADMIN' ? 'Admin' : user.isSeller ? 'Seller' : 'User'}
                     </span>
                     {user.balance !== undefined && (
-                      <span className="px-3 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">
+                      <span className="px-3 py-1 bg-gray-300 rounded-full text-sm">
                         Balance: ¥{user.balance.toFixed(2)}
                       </span>
                     )}
@@ -442,8 +466,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-1">My Favorites</p>
                   <p className="text-3xl font-bold text-gray-900">{stats.favorites}</p>
                 </div>
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </div>
@@ -456,9 +480,9 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-1">My Posts</p>
                   <p className="text-3xl font-bold text-gray-900">{stats.posts}</p>
                 </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
               </div>
@@ -470,8 +494,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-1">My Comments</p>
                   <p className="text-3xl font-bold text-gray-900">{stats.comments}</p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
@@ -512,7 +536,7 @@ export default function DashboardPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`px-6 py-4 font-semibold text-sm whitespace-nowrap transition-all ${activeTab === tab.id
-                      ? 'text-orange-600 border-b-2 border-orange-600 bg-white'
+                      ? 'text-gray-900 border-b-2 border-gray-900 bg-white'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                       }`}
                   >
@@ -540,7 +564,7 @@ export default function DashboardPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                       </svg>
                       <p className="text-gray-500 text-lg">No orders</p>
-                      <Link href="/products" className="text-orange-600 hover:underline mt-2 inline-block">
+                      <Link href="/products" className="text-gray-900 hover:underline mt-2 inline-block">
                         Go Shopping →
                       </Link>
                     </div>
@@ -562,7 +586,7 @@ export default function DashboardPage() {
                                   {order.items?.length > 0 ? `${order.items[0].product.name}${order.items.length > 1 ? ` and ${order.items.length - 1} more items` : ''}` : 'Product Information'}
                                 </p>
                               </div>
-                              <p className="text-lg font-bold text-orange-600">¥{order.totalAmount.toFixed(2)}</p>
+                              <p className="text-lg font-bold text-gray-900">¥{order.totalAmount.toFixed(2)}</p>
                             </div>
                           </div>
                         </Link>
@@ -582,7 +606,7 @@ export default function DashboardPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                       <p className="text-gray-500 text-lg">No favorites</p>
-                      <Link href="/products" className="text-orange-600 hover:underline mt-2 inline-block">
+                      <Link href="/products" className="text-gray-900 hover:underline mt-2 inline-block">
                         Browse Products →
                       </Link>
                     </div>
@@ -605,7 +629,7 @@ export default function DashboardPage() {
                                   )}
                                 </div>
                                 <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{favorite.product.name}</h3>
-                                <p className="text-orange-600 font-bold">¥{favorite.product.price.toFixed(2)}</p>
+                                <p className="text-gray-900 font-bold">¥{favorite.product.price.toFixed(2)}</p>
                               </div>
                             </Link>
                           ) : favorite.type === 'POST' && favorite.post ? (
@@ -628,7 +652,7 @@ export default function DashboardPage() {
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-900">My Posts</h2>
-                    <Link href="/posts/new" className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-semibold">
+                    <Link href="/posts/new" className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold">
                       + New Post
                     </Link>
                   </div>
@@ -638,7 +662,7 @@ export default function DashboardPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       <p className="text-gray-500 text-lg">No posts</p>
-                      <Link href="/posts/new" className="text-orange-600 hover:underline mt-2 inline-block">
+                      <Link href="/posts/new" className="text-gray-900 hover:underline mt-2 inline-block">
                         Create Your First Post →
                       </Link>
                     </div>
@@ -684,19 +708,19 @@ export default function DashboardPage() {
                           <div className="flex items-center justify-between text-sm text-gray-500">
                             <div>
                               {comment.post && (
-                                <Link href={`/posts/${comment.post.id}`} className="text-orange-600 hover:underline">
+                                <Link href={`/posts/${comment.post.id}`} className="text-gray-900 hover:underline">
                                   Post: {comment.post.title}
                                 </Link>
                               )}
                               {comment.product && (
-                                <Link href={`/products/${comment.product.id}`} className="text-orange-600 hover:underline">
+                                <Link href={`/products/${comment.product.id}`} className="text-gray-900 hover:underline">
                                   Product: {comment.product.name}
                                 </Link>
                               )}
                             </div>
                             <div className="flex items-center gap-4">
                               <span>{formatDate(comment.createdAt)}</span>
-                              <button className="text-red-500 hover:text-red-700">Delete</button>
+                              <button className="text-gray-600 hover:text-gray-800">Delete</button>
                             </div>
                           </div>
                         </div>
@@ -711,7 +735,7 @@ export default function DashboardPage() {
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-900">My Products</h2>
-                    <Link href="/products/new" className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-colors text-sm font-semibold">
+                    <Link href="/products/new" className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold">
                       ➕ Add Product
                     </Link>
                   </div>
@@ -721,7 +745,7 @@ export default function DashboardPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                       </svg>
                       <p className="text-gray-500 text-lg">No products</p>
-                      <Link href="/products/new" className="text-orange-600 hover:underline mt-2 inline-block">
+                      <Link href="/products/new" className="text-gray-900 hover:underline mt-2 inline-block">
                         Create Your First Product →
                       </Link>
                     </div>
@@ -732,7 +756,7 @@ export default function DashboardPage() {
                         return (
                           <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                             <Link href={`/products/${product.id}`}>
-                              <div className="aspect-square bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center relative overflow-hidden">
+                              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
                                 {images[0] ? (
                                   <img
                                     src={images[0]}
@@ -749,12 +773,12 @@ export default function DashboardPage() {
                             </Link>
                             <div className="p-4">
                               <Link href={`/products/${product.id}`}>
-                                <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2 hover:text-orange-600 transition-colors">
+                                <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2 hover:text-gray-600 transition-colors">
                                   {product.name}
                                 </h3>
                               </Link>
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-2xl font-bold text-orange-600">
+                                <span className="text-2xl font-bold text-gray-900">
                                   ¥{product.price.toFixed(2)}
                                 </span>
                                 <span className="text-sm text-gray-500">
@@ -776,7 +800,7 @@ export default function DashboardPage() {
                                 >
                                   Edit
                                 </Link>
-                                <button className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm font-semibold">
+                                <button className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold">
                                   Delist
                                 </button>
                               </div>

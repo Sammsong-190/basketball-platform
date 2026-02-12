@@ -234,7 +234,7 @@ export default function PostDetailPage() {
         <Header />
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
             <p className="mt-4 text-gray-600">Loading...</p>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function PostDetailPage() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Post not found</h1>
-            <Link href="/posts" className="text-orange-600 hover:underline">
+            <Link href="/posts" className="text-gray-900 hover:underline">
               Back to Posts
             </Link>
           </div>
@@ -263,14 +263,14 @@ export default function PostDetailPage() {
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Link href="/posts" className="text-orange-600 hover:underline mb-6 inline-block">
+          <Link href="/posts" className="text-gray-900 hover:underline mb-6 inline-block">
             ← Back to Posts
           </Link>
 
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="mb-6">
               {post.category && (
-                <span className="inline-block px-4 py-1 bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 rounded-full text-sm font-semibold mb-4">
+                <span className="inline-block px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold mb-4">
                   {post.category.name}
                 </span>
               )}
@@ -316,7 +316,7 @@ export default function PostDetailPage() {
                 onClick={handleLike}
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
                   isLiked
-                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -354,13 +354,13 @@ export default function PostDetailPage() {
                         onChange={(e) => setCommentContent(e.target.value)}
                         placeholder="Write your comment..."
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none resize-none"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none resize-none"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={submittingComment || !commentContent.trim()}
-                      className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed self-end"
+                      className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed self-end"
                     >
                       {submittingComment ? 'Submitting...' : 'Post Comment'}
                     </button>
@@ -374,7 +374,7 @@ export default function PostDetailPage() {
                     <p className="text-gray-600 mb-3">Please login first to post comments</p>
                     <Link
                       href="/login"
-                      className="text-orange-600 hover:text-orange-700 font-semibold"
+                      className="text-gray-900 hover:text-gray-700 font-semibold"
                     >
                       Login Now →
                     </Link>
@@ -389,7 +389,7 @@ export default function PostDetailPage() {
                   {post.comments.map((comment) => (
                     <div key={comment.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
                       <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                        <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
                           {comment.author.avatar ? (
                             <img
                               src={comment.author.avatar}
@@ -420,7 +420,7 @@ export default function PostDetailPage() {
                                 }
                                 setReplyingTo(replyingTo === comment.id ? null : comment.id)
                               }}
-                              className="text-sm text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                              className="text-sm text-gray-900 hover:text-gray-700 font-semibold transition-colors"
                             >
                               {replyingTo === comment.id ? 'Cancel Reply' : 'Reply'}
                             </button>
@@ -434,7 +434,7 @@ export default function PostDetailPage() {
                                 onChange={(e) => setReplyContent({ ...replyContent, [comment.id]: e.target.value })}
                                 placeholder="Write your reply..."
                                 rows={2}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none resize-none mb-3"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none resize-none mb-3"
                               />
                               <div className="flex gap-2 justify-end">
                                 <button
@@ -449,7 +449,7 @@ export default function PostDetailPage() {
                                 <button
                                   onClick={() => handleReplySubmit(comment.id)}
                                   disabled={submittingReply[comment.id] || !replyContent[comment.id]?.trim()}
-                                  className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {submittingReply[comment.id] ? 'Submitting...' : 'Post Reply'}
                                 </button>
@@ -465,7 +465,7 @@ export default function PostDetailPage() {
                             <div className="mt-4 ml-4 pl-4 border-l-2 border-gray-200 space-y-4">
                               {comment.replies.map((reply) => (
                                 <div key={reply.id} className="flex items-start gap-3">
-                                  <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                                  <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                                     {reply.author.avatar ? (
                                       <img
                                         src={reply.author.avatar}

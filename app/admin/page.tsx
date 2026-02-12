@@ -36,28 +36,28 @@ export default function AdminPage() {
       description: 'Review pending, approved, and rejected posts',
       href: '/admin/posts',
       icon: '📋',
-      color: 'from-orange-500 to-red-500'
+      color: 'from-gray-500 to-gray-700'
     },
     {
       title: 'Comment Review',
       description: 'Review and manage comments on posts and products',
       href: '/admin/comments',
       icon: '💬',
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-gray-500 to-gray-700'
     },
     {
       title: 'Product Review',
       description: 'Review and manage platform products, approve or withdraw products',
       href: '/admin/products',
       icon: '🛒',
-      color: 'from-green-500 to-blue-500'
+      color: 'from-gray-600 to-gray-800'
     },
     {
       title: 'Product Scraping',
       description: 'Scrape basketball products from well-known e-commerce websites',
       href: '/admin/scrape-products',
       icon: '🕷️',
-      color: 'from-blue-500 to-purple-500'
+      color: 'from-gray-700 to-gray-900'
     }
   ]
 
@@ -70,7 +70,7 @@ export default function AdminPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">⚙️</span>
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Admin Dashboard</span>
+              <span className="text-gray-900">Admin Dashboard</span>
             </h1>
             <p className="text-xl text-gray-600">Platform management and review functions</p>
           </div>
@@ -87,12 +87,12 @@ export default function AdminPage() {
                     {menu.icon}
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-gray-600 transition-colors">
                       {menu.title}
                     </h2>
                     <p className="text-gray-600">{menu.description}</p>
                   </div>
-                  <div className="text-gray-400 group-hover:text-orange-600 transition-colors">
+                  <div className="text-gray-400 group-hover:text-gray-600 transition-colors">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

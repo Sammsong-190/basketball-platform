@@ -52,7 +52,7 @@ function PostsContent() {
             <div>
               <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
                 <span className="mr-3">{isNews ? '📰' : '💬'}</span>
-                <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                <span className="text-gray-900">
                   {isNews ? 'Event News' : 'Community'}
                 </span>
               </h1>
@@ -63,7 +63,7 @@ function PostsContent() {
             {!isNews && (
               <Link 
                 href="/posts/new" 
-                className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 ✏️ New Post
               </Link>
@@ -72,7 +72,7 @@ function PostsContent() {
           
           {loading ? (
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
               <p className="mt-4 text-gray-600">Loading...</p>
             </div>
           ) : posts.length === 0 ? (
@@ -97,16 +97,16 @@ function PostsContent() {
                 <Link key={post.id} href={`/posts/${post.id}`}>
                   <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 group">
                     <div className="flex items-start justify-between mb-4">
-                      <h2 className="text-2xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 flex-1">
+                      <h2 className="text-2xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors line-clamp-2 flex-1">
                         {post.title}
                       </h2>
                       {post.category && (
-                        <span className="ml-4 px-4 py-1 bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 rounded-full text-sm font-semibold whitespace-nowrap">
+                        <span className="ml-4 px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold whitespace-nowrap">
                           {post.category.name}
                         </span>
                       )}
                       {post.isNews && (
-                        <span className="ml-2 px-3 py-1 bg-red-600 text-white rounded-full text-xs font-semibold">
+                        <span className="ml-2 px-3 py-1 bg-gray-700 text-white rounded-full text-xs font-semibold">
                           📰 News
                         </span>
                       )}
@@ -122,7 +122,7 @@ function PostsContent() {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <div className="flex items-center space-x-6">
                         <div className="flex items-center space-x-2">
-                          <span className="w-8 h-8 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-semibold">
+                          <span className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold">
                             {post.author.username.charAt(0).toUpperCase()}
                           </span>
                           <span className="font-medium">{post.author.username}</span>
@@ -166,7 +166,7 @@ export default function PostsPage() {
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
           <div className="container mx-auto px-4 py-12">
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
               <p className="mt-4 text-gray-600">Loading...</p>
             </div>
           </div>

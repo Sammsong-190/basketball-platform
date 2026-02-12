@@ -72,15 +72,15 @@ export default function NewsCarousel() {
 
   if (loading) {
     return (
-      <div className="h-96 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      <div className="h-96 bg-gradient-to-r from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
       </div>
     )
   }
 
   if (news.length === 0) {
     return (
-      <div className="h-96 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center">
+      <div className="h-96 bg-gradient-to-r from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
         <p className="text-gray-600">No event news available</p>
       </div>
     )
@@ -97,7 +97,7 @@ export default function NewsCarousel() {
 
   return (
     <div
-      className="relative h-96 bg-gradient-to-r from-orange-100 via-red-50 to-orange-100 rounded-2xl overflow-hidden shadow-xl"
+      className="relative h-96 bg-gradient-to-r from-gray-200 via-gray-200 to-gray-300 rounded-2xl overflow-hidden shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -113,7 +113,7 @@ export default function NewsCarousel() {
               target.style.display = 'none'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-600/80 via-red-600/80 to-orange-600/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-500/55 via-gray-400/55 to-gray-500/55"></div>
         </div>
       )}
 
@@ -130,24 +130,24 @@ export default function NewsCarousel() {
       {/* Content */}
       <div className="relative h-full flex flex-col justify-center p-8 md:p-12">
         <div className="flex items-center space-x-2 mb-4">
-          <span className="px-3 py-1 bg-orange-600 text-white rounded-full text-sm font-semibold">
+          <span className="px-3 py-1 bg-gray-500 text-white rounded-full text-sm font-semibold">
             🏀 NBA Events
           </span>
-          <span className="text-white/90 text-sm">
+          <span className="text-gray-900 text-sm">
             {formatDate(currentNews.publishedAt)}
           </span>
         </div>
 
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 line-clamp-2 drop-shadow-lg">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 line-clamp-2">
           {currentNews.title}
         </h2>
 
-        <p className="text-white/90 text-lg mb-6 line-clamp-3 drop-shadow-md">
+        <p className="text-gray-700 text-lg mb-6 line-clamp-3">
           {currentNews.content.substring(0, 150)}...
         </p>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 text-white/90">
+          <div className="flex items-center space-x-4 text-gray-700">
             <span>👤 {currentNews.author}</span>
           </div>
           {currentNews.url ? (
@@ -155,14 +155,14 @@ export default function NewsCarousel() {
               href={currentNews.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-white text-orange-600 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               Read More →
             </a>
           ) : (
             <Link
               href={`/events?tab=news`}
-              className="px-6 py-3 bg-white text-orange-600 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               View Details →
             </Link>
@@ -177,8 +177,8 @@ export default function NewsCarousel() {
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-              ? 'w-8 bg-white shadow-lg'
-              : 'w-2 bg-white/60 hover:bg-white/80'
+              ? 'w-8 bg-gray-600 shadow-lg'
+              : 'w-2 bg-gray-400 hover:bg-gray-500'
               }`}
             aria-label={`Switch to news ${index + 1}`}
           />
@@ -190,21 +190,21 @@ export default function NewsCarousel() {
         <>
           <button
             onClick={() => setCurrentIndex((prev) => (prev - 1 + news.length) % news.length)}
-            className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-white/90 rounded-full hover:bg-white transition-all shadow-xl z-10 backdrop-blur-sm ${isHovered ? 'opacity-100' : 'opacity-0'
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-white/95 rounded-full hover:bg-white transition-all shadow-xl z-10 backdrop-blur-sm border border-gray-200 ${isHovered ? 'opacity-100' : 'opacity-0'
               }`}
             aria-label="Previous news"
           >
-            <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <button
             onClick={() => setCurrentIndex((prev) => (prev + 1) % news.length)}
-            className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-white/90 rounded-full hover:bg-white transition-all shadow-xl z-10 backdrop-blur-sm ${isHovered ? 'opacity-100' : 'opacity-0'
+            className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-white/95 rounded-full hover:bg-white transition-all shadow-xl z-10 backdrop-blur-sm border border-gray-200 ${isHovered ? 'opacity-100' : 'opacity-0'
               }`}
             aria-label="Next news"
           >
-            <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>

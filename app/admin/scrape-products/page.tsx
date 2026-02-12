@@ -101,7 +101,7 @@ export default function ScrapeProductsPage() {
                     <div className="mb-8">
                         <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
                             <span className="mr-3">🕷️</span>
-                            <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">商品爬虫</span>
+                            <span className="bg-gradient-to-r text-gray-900">商品爬虫</span>
                         </h1>
                         <p className="text-xl text-gray-600">从知名篮球用品网站爬取商品信息</p>
                     </div>
@@ -115,7 +115,7 @@ export default function ScrapeProductsPage() {
                                 <select
                                     value={formData.source}
                                     onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                                     required
                                 >
                                     <option value="mock">模拟数据（推荐）</option>
@@ -139,7 +139,7 @@ export default function ScrapeProductsPage() {
                                     max="50"
                                     value={formData.limit}
                                     onChange={(e) => setFormData({ ...formData, limit: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                                     required
                                 />
                                 <p className="mt-2 text-sm text-gray-500">建议数量：10-20 个商品</p>
@@ -166,7 +166,7 @@ export default function ScrapeProductsPage() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {loading ? (
                                         <span className="flex items-center justify-center">

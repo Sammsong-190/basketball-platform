@@ -126,7 +126,7 @@ export default function AdminProductsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">🛒</span>
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Product Review</span>
+              <span className="bg-gradient-to-r text-gray-900">Product Review</span>
             </h1>
             <p className="text-xl text-gray-600">Review and manage platform products</p>
           </div>
@@ -145,14 +145,14 @@ export default function AdminProductsPage() {
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`px-6 py-4 font-semibold text-sm transition-all relative ${
                       activeTab === tab.id
-                        ? 'text-orange-600 bg-white'
+                        ? 'text-gray-900 bg-white'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
                     {tab.name}
                     {tab.count > 0 && (
                       <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                        activeTab === tab.id ? 'bg-orange-100 text-orange-600' : 'bg-gray-200 text-gray-600'
+                        activeTab === tab.id ? 'bg-gray-100 text-gray-700' : 'bg-gray-200 text-gray-600'
                       }`}>
                         {tab.count}
                       </span>
@@ -166,7 +166,7 @@ export default function AdminProductsPage() {
             <div className="p-8">
               {loading ? (
                 <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400 mb-4"></div>
                   <p className="text-gray-600">Loading...</p>
                 </div>
               ) : products.length === 0 ? (
@@ -181,7 +181,7 @@ export default function AdminProductsPage() {
                       <div key={product.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                         <div className="flex gap-6">
                           {/* 商品图片 */}
-                          <div className="w-32 h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                          <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                             {images[0] ? (
                               <img
                                 src={images[0]}
@@ -228,7 +228,7 @@ export default function AdminProductsPage() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                               <div>
                                 <span className="text-gray-500">Price: </span>
-                                <span className="font-semibold text-orange-600">¥{product.price.toFixed(2)}</span>
+                                <span className="font-semibold text-gray-900">¥{product.price.toFixed(2)}</span>
                               </div>
                               <div>
                                 <span className="text-gray-500">Stock: </span>
@@ -255,7 +255,7 @@ export default function AdminProductsPage() {
                                 <button
                                   onClick={() => handleReview(product.id, 'reject')}
                                   disabled={processing === product.id}
-                                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {processing === product.id ? 'Processing...' : 'Withdraw Product'}
                                 </button>

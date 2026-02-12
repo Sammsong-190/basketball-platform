@@ -69,7 +69,7 @@ export default function SellerRegisterPage() {
         <div className="max-w-md mx-auto">
           {/* 标题区域 */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r bg-gray-600 rounded-full mb-4">
               <span className="text-3xl">🏪</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">成为卖家</h1>
@@ -90,12 +90,12 @@ export default function SellerRegisterPage() {
             )}
 
             {/* 卖家特权提示 */}
-            <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+            <div className="mb-6 p-4 bg-gradient-to-r bg-gray-50 border border-gray-200 rounded-lg">
               <div className="flex items-start">
-                <svg className="w-5 h-5 text-orange-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-gray-900 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                <div className="text-sm text-orange-800">
+                <div className="text-sm text-gray-700">
                   <p className="font-semibold mb-1">卖家特权</p>
                   <ul className="list-disc list-inside space-y-1 text-xs">
                     <li>发布和管理商品</li>
@@ -117,7 +117,7 @@ export default function SellerRegisterPage() {
                   required
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="请输入用户名"
                 />
               </div>
@@ -131,7 +131,7 @@ export default function SellerRegisterPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="请输入邮箱地址"
                 />
               </div>
@@ -145,7 +145,7 @@ export default function SellerRegisterPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="请输入密码（至少6位）"
                 />
               </div>
@@ -159,7 +159,7 @@ export default function SellerRegisterPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none ${
                     formData.confirmPassword && formData.password !== formData.confirmPassword
                       ? 'border-red-300 bg-red-50'
                       : 'border-gray-300'
@@ -192,7 +192,7 @@ export default function SellerRegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="请输入手机号（用于接收订单通知）"
                 />
               </div>
@@ -200,7 +200,7 @@ export default function SellerRegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] mt-6"
+                className="w-full py-3 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] mt-6"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -217,11 +217,11 @@ export default function SellerRegisterPage() {
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-center text-sm text-gray-600">
                 已有账号？{' '}
-                <a href="/login" className="text-orange-600 hover:text-orange-700 font-semibold hover:underline">
+                <a href="/login" className="text-gray-900 hover:text-gray-700 font-semibold hover:underline">
                   立即登录
                 </a>
                 {' '}或{' '}
-                <Link href="/register" className="text-orange-600 hover:text-orange-700 font-semibold hover:underline">
+                <Link href="/register" className="text-gray-900 hover:text-gray-700 font-semibold hover:underline">
                   注册普通用户
                 </Link>
               </p>

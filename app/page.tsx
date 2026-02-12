@@ -17,8 +17,7 @@ export default function Home() {
       <Header />
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-r from-orange-600 via-red-600 to-orange-500 text-white py-20">
-          <div className="absolute inset-0 bg-black/10"></div>
+        <section className="relative overflow-hidden bg-white text-gray-900 py-20">
           {/* Smooth basketball-themed wave background */}
           <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
             {/* Main smooth wave layer - basketball themed */}
@@ -34,23 +33,23 @@ export default function Home() {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-5xl md:text-7xl font-extrabold mb-6 animate-fade-in tracking-tight leading-[1.05]">
-                <span className="inline-block bg-gradient-to-b from-white via-orange-50 to-orange-200 bg-clip-text text-transparent drop-shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
+                <span className="inline-block text-gray-900 drop-shadow-sm">
                   Basketball E-commerce Social Platform
                 </span>
               </h1>
-              <p className={`${airySubtitleFont.className} italic text-lg md:text-2xl mb-8 text-orange-50/90 leading-relaxed tracking-wider font-medium`}>
+              <p className={`${airySubtitleFont.className} italic text-lg md:text-2xl mb-8 text-gray-600 leading-relaxed tracking-wider font-medium`}>
                 Integrating commerce, social interaction, and content to create a dedicated platform for basketball enthusiasts
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   href="/products"
-                  className="px-8 py-4 bg-white text-orange-600 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105"
+                  className="px-8 py-4 bg-white text-gray-900 rounded-lg hover:bg-gray-50 border border-gray-300 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   Browse Products
                 </Link>
                 <Link
                   href="/posts"
-                  className="px-8 py-4 bg-orange-700 text-white rounded-lg hover:bg-orange-800 transition-all duration-200 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105"
+                  className="px-8 py-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   Join Community
                 </Link>
@@ -64,7 +63,7 @@ export default function Home() {
           <div className="mb-6">
             <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
               <span className="mr-3">🏀</span>
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              <span className="text-gray-900">
                 NBA Event News
               </span>
             </h2>
@@ -85,7 +84,7 @@ export default function Home() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors group-hover:translate-x-2 duration-200"
+                className="inline-flex items-center text-gray-900 font-semibold hover:text-gray-700 transition-colors group-hover:translate-x-2 duration-200"
               >
                 Browse Products
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +101,7 @@ export default function Home() {
               </p>
               <Link
                 href="/posts"
-                className="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors group-hover:translate-x-2 duration-200"
+                className="inline-flex items-center text-gray-900 font-semibold hover:text-gray-700 transition-colors group-hover:translate-x-2 duration-200"
               >
                 Enter Community
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +118,7 @@ export default function Home() {
               </p>
               <Link
                 href="/events"
-                className="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors group-hover:translate-x-2 duration-200"
+                className="inline-flex items-center text-gray-900 font-semibold hover:text-gray-700 transition-colors group-hover:translate-x-2 duration-200"
               >
                 View News
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,23 +130,23 @@ export default function Home() {
         </section>
 
         {/* Stats Section */}
-        <section className="bg-gradient-to-r from-orange-50 to-red-50 py-16">
+        <section className="bg-gray-50 py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-4xl font-bold text-orange-600 mb-2">1000+</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">1000+</div>
                 <div className="text-gray-600">Quality Products</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-orange-600 mb-2">5000+</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">5000+</div>
                 <div className="text-gray-600">Active Users</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-orange-600 mb-2">10000+</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">10000+</div>
                 <div className="text-gray-600">Community Posts</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-orange-600 mb-2">24/7</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">24/7</div>
                 <div className="text-gray-600">Online Service</div>
               </div>
             </div>
@@ -158,87 +157,87 @@ export default function Home() {
         <section className="container mx-auto px-4 py-16">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">Platform Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-orange-500">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-gray-400">
               <h3 className="font-bold text-lg mb-3 text-gray-900">User Management</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Personal Information Management
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Favorites Management
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Comments Management
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-gray-500">
               <h3 className="font-bold text-lg mb-3 text-gray-900">Community Interaction</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Post Publishing
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Comments & Likes
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Topic Categories
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-orange-500">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-gray-400">
               <h3 className="font-bold text-lg mb-3 text-gray-900">Product Trading</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Product Browsing
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Shopping Cart
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Order Management
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-gray-500">
               <h3 className="font-bold text-lg mb-3 text-gray-900">After-sales Service</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Returns & Exchanges
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Complaints & Suggestions
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-orange-500">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-l-4 border-gray-400">
               <h3 className="font-bold text-lg mb-3 text-gray-900">System Management</h3>
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Content Review
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   Permission Management
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                   System Logs
                 </li>
               </ul>

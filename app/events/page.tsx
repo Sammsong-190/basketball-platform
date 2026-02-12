@@ -587,7 +587,7 @@ export default function EventsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">📰</span>
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Event News</span>
+              <span className="bg-gradient-to-r text-gray-900">Event News</span>
             </h1>
             <p className="text-xl text-gray-600">Latest basketball event news, schedules, and live scores</p>
           </div>
@@ -605,7 +605,7 @@ export default function EventsPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`px-6 py-4 font-semibold text-sm transition-all ${activeTab === tab.id
-                      ? 'text-orange-600 bg-white'
+                      ? 'text-gray-900 bg-white'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                       }`}
                   >
@@ -620,7 +620,7 @@ export default function EventsPage() {
             <div className="p-8">
               {loading ? (
                 <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400 mb-4"></div>
                   <p className="text-gray-600">Loading event data...</p>
                 </div>
               ) : validMatches.length === 0 ? (
@@ -630,7 +630,7 @@ export default function EventsPage() {
                   <p className="text-gray-600 mb-4">Fetching latest data from NBA official website, please refresh later</p>
                   <button
                     onClick={() => fetchData()}
-                    className="px-6 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold"
+                    className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold"
                   >
                     Refresh Data
                   </button>
@@ -650,18 +650,18 @@ export default function EventsPage() {
                           {upcomingByDate.map(({ date, matches: dateMatches }) => (
                             <div key={date} className="space-y-3">
                               <div className="flex items-center gap-3 mb-4">
-                                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-orange-300 to-transparent"></div>
+                                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
                                 <h3 className="text-lg font-bold text-gray-700 px-4">
                                   {formatDate(date)}
                                 </h3>
-                                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-orange-300 to-transparent"></div>
+                                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
                               </div>
                               <div className="space-y-2">
                                 {dateMatches.map((match) => (
-                                  <div key={match.id} className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-3 border border-orange-200 hover:shadow-md transition-shadow">
+                                  <div key={match.id} className="bg-gradient-to-r bg-gray-50 rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow">
                                     <div className="flex items-center justify-between mb-2">
                                       <div className="flex items-center gap-2">
-                                        <span className="px-2 py-0.5 bg-orange-600 text-white rounded-full text-xs font-semibold">
+                                        <span className="px-2 py-0.5 bg-gray-600 text-white rounded-full text-xs font-semibold">
                                           {match.league}
                                         </span>
                                         {getStatusBadge(match.status)}
@@ -740,7 +740,7 @@ export default function EventsPage() {
                       {todayLiveMatches.length > 0 && (
                         <div className="mb-8">
                           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                            <span className="w-3 h-3 bg-gray-600 rounded-full animate-pulse"></span>
                             Live Matches
                             {todayLiveMatches.length > 1 && (
                               <span className="text-sm font-normal text-gray-500 ml-2">
@@ -758,10 +758,10 @@ export default function EventsPage() {
                                 {todayLiveMatches.map((match) => (
                                     <div
                                       key={match.id}
-                                      className="w-full flex-shrink-0 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 border-2 border-red-300 hover:shadow-lg transition-shadow"
+                                      className="w-full flex-shrink-0 bg-gradient-to-r bg-gray-50 rounded-xl p-6 border-2 border-gray-300 hover:shadow-lg transition-shadow"
                                     >
                                       <div className="flex items-center justify-between mb-4">
-                                        <span className="px-3 py-1 bg-red-600 text-white rounded-full text-xs font-semibold">
+                                        <span className="px-3 py-1 bg-gray-600 text-white rounded-full text-xs font-semibold">
                                           {match.league}
                                         </span>
                                         {getStatusBadge(match.status)}
@@ -787,7 +787,7 @@ export default function EventsPage() {
                                                 </div>
                                               </div>
                                               <div className="text-lg font-semibold text-gray-700 mb-1">{getTeamInfo(match.homeTeam, match.homeTeamId).abbreviation}</div>
-                                              <div className="text-4xl font-bold text-orange-600 mt-2">
+                                              <div className="text-4xl font-bold text-gray-900 mt-2">
                                                 {match.homeScore !== null && match.homeScore !== undefined ? match.homeScore : '-'}
                                               </div>
                                             </div>
@@ -810,7 +810,7 @@ export default function EventsPage() {
                                                 </div>
                                               </div>
                                               <div className="text-lg font-semibold text-gray-700 mb-1">{getTeamInfo(match.awayTeam, match.awayTeamId).abbreviation}</div>
-                                              <div className="text-4xl font-bold text-orange-600 mt-2">
+                                              <div className="text-4xl font-bold text-gray-900 mt-2">
                                                 {match.awayScore !== null && match.awayScore !== undefined ? match.awayScore : '-'}
                                               </div>
                                             </div>
@@ -844,12 +844,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-orange-600">{match.homeTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.homeTopScorer?.points ?? '-'} pts</div>
                                                   </div>
                                                   <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Scorer</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-orange-600">{match.awayTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.awayTopScorer?.points ?? '-'} pts</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -956,7 +956,7 @@ export default function EventsPage() {
                                       key={index}
                                       onClick={() => goToSlide(index)}
                                       className={`h-2 rounded-full transition-all duration-300 ease-out ${index === currentLiveIndex
-                                        ? 'w-8 bg-red-600'
+                                        ? 'w-8 bg-gray-600'
                                         : 'w-2 bg-gray-300 hover:bg-gray-400'
                                         }`}
                                       aria-label={`切换到第${index + 1}场比赛`}
@@ -973,7 +973,7 @@ export default function EventsPage() {
                       {todayLiveMatches.length > 0 && (
                         <div className="mb-8">
                           <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                            <span className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></span>
                             Live Now（逐场显示）
                           </h2>
                           <div className="space-y-3">
@@ -983,7 +983,7 @@ export default function EventsPage() {
                               return (
                                 <div
                                   key={match.id}
-                                  className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200 overflow-hidden"
+                                  className="bg-gradient-to-r bg-gray-50 rounded-lg border border-gray-200 overflow-hidden"
                                 >
                                   <div
                                     className={`flex items-center justify-between p-4 hover:shadow-md transition-shadow duration-300 ease-out ${hasLinescores ? 'cursor-pointer' : ''}`}
@@ -1002,17 +1002,17 @@ export default function EventsPage() {
                                         />
                                         <div className="text-center min-w-[80px]">
                                           <div className="font-semibold text-gray-900">{getTeamInfo(match.homeTeam, match.homeTeamId).abbreviation}</div>
-                                          <div className="text-xl font-bold text-orange-600">{match.homeScore ?? '-'}</div>
+                                          <div className="text-xl font-bold text-gray-900">{match.homeScore ?? '-'}</div>
                                         </div>
                                       </div>
                                       <div className="flex flex-col items-center flex-shrink-0">
-                                        <span className="text-xs font-medium text-red-600">{match.time}</span>
+                                        <span className="text-xs font-medium text-gray-700">{match.time}</span>
                                         <span className="text-gray-400 text-lg">VS</span>
                                       </div>
                                       <div className="flex items-center gap-3 flex-shrink-0">
                                         <div className="text-center min-w-[80px]">
                                           <div className="font-semibold text-gray-900">{getTeamInfo(match.awayTeam, match.awayTeamId).abbreviation}</div>
-                                          <div className="text-xl font-bold text-orange-600">{match.awayScore ?? '-'}</div>
+                                          <div className="text-xl font-bold text-gray-900">{match.awayScore ?? '-'}</div>
                                         </div>
                                         <img
                                           src={getAvatarSrc(getTeamInfo(match.awayTeam, match.awayTeamId).logo)}
@@ -1043,7 +1043,7 @@ export default function EventsPage() {
                                     <div
                                       className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}
                                     >
-                                      <div className="border-t border-red-200 bg-white px-4 py-4">
+                                      <div className="border-t border-gray-200 bg-white px-4 py-4">
                                         <QuarterScoresTable match={match} getTeamInfo={getTeamInfo} />
                                       </div>
                                     </div>
@@ -1135,7 +1135,7 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="text-base font-semibold text-gray-700 mb-0.5">{getTeamInfo(match.homeTeam, match.homeTeamId).abbreviation}</div>
                                                   <div className={`text-xl font-bold mt-1 ${match.homeScore !== null && match.awayScore !== null && match.homeScore > match.awayScore
-                                                    ? 'text-orange-600'
+                                                    ? 'text-gray-900'
                                                     : match.homeScore !== null && match.awayScore !== null && match.homeScore < match.awayScore
                                                       ? 'text-gray-400'
                                                       : 'text-gray-600'
@@ -1163,7 +1163,7 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="text-base font-semibold text-gray-700 mb-0.5">{getTeamInfo(match.awayTeam, match.awayTeamId).abbreviation}</div>
                                                   <div className={`text-xl font-bold mt-1 ${match.awayScore !== null && match.homeScore !== null && match.awayScore > match.homeScore
-                                                    ? 'text-orange-600'
+                                                    ? 'text-gray-900'
                                                     : match.awayScore !== null && match.homeScore !== null && match.awayScore < match.homeScore
                                                       ? 'text-gray-400'
                                                       : 'text-gray-600'
@@ -1211,12 +1211,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-orange-600">{match.homeTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.homeTopScorer?.points ?? '-'} pts</div>
                                                   </div>
                                                   <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Scorer</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-orange-600">{match.awayTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.awayTopScorer?.points ?? '-'} pts</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1326,8 +1326,8 @@ export default function EventsPage() {
                                   rel={news[0].url ? 'noopener noreferrer' : undefined}
                                   className="block group"
                                 >
-                                  <div className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-orange-400 hover:shadow-xl transition-all duration-300">
-                                    <div className="aspect-[16/9] bg-gradient-to-br from-orange-100 to-red-100 overflow-hidden relative">
+                                  <div className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-gray-400 hover:shadow-xl transition-all duration-300">
+                                    <div className="aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">
                                       {news[0].image ? (
                                         <img
                                           src={news[0].image}
@@ -1344,18 +1344,18 @@ export default function EventsPage() {
                                           }}
                                         />
                                       ) : null}
-                                      <div className="image-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100" style={{ display: news[0].image ? 'none' : 'flex' }}>
+                                      <div className="image-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200" style={{ display: news[0].image ? 'none' : 'flex' }}>
                                         <div className="text-center">
                                           <div className="text-7xl mb-3">🏀</div>
                                           <div className="text-lg text-gray-500 font-semibold">NBA</div>
                                         </div>
                                       </div>
-                                      <div className="absolute top-4 left-4 px-3 py-1 bg-orange-600 text-white rounded-full text-xs font-semibold shadow-md">
+                                      <div className="absolute top-4 left-4 px-3 py-1 bg-gray-600 text-white rounded-full text-xs font-semibold shadow-md">
                                         Hot
                                       </div>
                                     </div>
                                     <div className="p-6">
-                                      <h3 className="text-3xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                                      <h3 className="text-3xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-gray-600 transition-colors">
                                         {news[0].title}
                                       </h3>
                                       <p className="text-gray-600 mb-4 line-clamp-3 text-base leading-relaxed">
@@ -1381,8 +1381,8 @@ export default function EventsPage() {
                                       rel={item.url ? 'noopener noreferrer' : undefined}
                                       className="block group flex-1 min-h-0"
                                     >
-                                      <div className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all duration-300 flex gap-2 p-2 h-full items-stretch">
-                                        <div className="w-28 h-full flex-shrink-0 bg-gradient-to-br from-orange-100 to-red-100 overflow-hidden rounded-lg relative">
+                                      <div className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all duration-300 flex gap-2 p-2 h-full items-stretch">
+                                        <div className="w-28 h-full flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden rounded-lg relative">
                                           {item.image ? (
                                             <img
                                               src={item.image}
@@ -1399,13 +1399,13 @@ export default function EventsPage() {
                                               }}
                                             />
                                           ) : null}
-                                          <div className="image-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100" style={{ display: item.image ? 'none' : 'flex' }}>
+                                          <div className="image-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200" style={{ display: item.image ? 'none' : 'flex' }}>
                                             <div className="text-xl">🏀</div>
                                           </div>
                                         </div>
                                         <div className="flex-1 min-w-0 flex flex-col justify-between min-h-0">
                                           <div className="min-h-0">
-                                            <h4 className="text-xs font-bold text-gray-900 mb-0.5 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                                            <h4 className="text-xs font-bold text-gray-900 mb-0.5 line-clamp-2 group-hover:text-gray-600 transition-colors">
                                               {item.title}
                                             </h4>
                                             <p className="text-xs text-gray-600 mb-1 line-clamp-1">
@@ -1436,8 +1436,8 @@ export default function EventsPage() {
                                   rel={item.url ? 'noopener noreferrer' : undefined}
                                   className="block group"
                                 >
-                                  <div className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
-                                    <div className="aspect-video bg-gradient-to-br from-orange-100 to-red-100 overflow-hidden relative">
+                                  <div className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">
                                       {item.image ? (
                                         <img
                                           src={item.image}
@@ -1454,12 +1454,12 @@ export default function EventsPage() {
                                           }}
                                         />
                                       ) : null}
-                                      <div className="image-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100" style={{ display: item.image ? 'none' : 'flex' }}>
+                                      <div className="image-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200" style={{ display: item.image ? 'none' : 'flex' }}>
                                         <div className="text-4xl">🏀</div>
                                       </div>
                                     </div>
                                     <div className="p-3 flex-1 flex flex-col">
-                                      <h4 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                                      <h4 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-600 transition-colors">
                                         {item.title}
                                       </h4>
                                       <p className="text-xs text-gray-600 mb-2 line-clamp-2 flex-1">

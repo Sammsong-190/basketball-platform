@@ -45,15 +45,15 @@
   animation: fade-in 0.8s ease-out;
 }
 
-/* Smooth basketball-themed wave background - no grid */
+/* Smooth wave background - light blue */
 .basketball-smooth-wave {
-  opacity: 0.5;
+  opacity: 0.6;
   background-repeat: repeat-x;
   background-size: 2000px 400px;
   background-position: 0 50%;
-  will-change: background-position, filter;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'2000'%20height%3D'400'%20viewBox%3D'0%200%202000%20400'%3E%3Cdefs%3E%3ClinearGradient%20id%3D'basketballWave'%20x1%3D'0%25'%20y1%3D'0%25'%20x2%3D'0%25'%20y2%3D'100%25'%3E%3Cstop%20offset%3D'0%25'%20stop-color%3D'rgba(255%2C255%2C255%2C0.8)'/%3E%3Cstop%20offset%3D'25%25'%20stop-color%3D'rgba(255%2C240%2C180%2C0.6)'/%3E%3Cstop%20offset%3D'50%25'%20stop-color%3D'rgba(255%2C220%2C150%2C0.5)'/%3E%3Cstop%20offset%3D'75%25'%20stop-color%3D'rgba(255%2C180%2C80%2C0.4)'/%3E%3Cstop%20offset%3D'100%25'%20stop-color%3D'transparent'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20fill%3D'url(%23basketballWave)'%20d%3D'M0%20200%20Q250%20100%20500%20200%20T1000%20200%20T1500%20200%20T2000%20200%20V400%20H0%20Z'/%3E%3Cpath%20fill%3D'url(%23basketballWave)'%20opacity%3D'0.8'%20d%3D'M0%20200%20Q250%20300%20500%20200%20T1000%20200%20T1500%20200%20T2000%20200%20V400%20H0%20Z'/%3E%3C/svg%3E");
-  animation: basketball-wave-scroll 10s linear infinite, basketball-wave-hue 8s linear infinite;
+  will-change: background-position;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'2000'%20height%3D'400'%20viewBox%3D'0%200%202000%20400'%3E%3Cdefs%3E%3ClinearGradient%20id%3D'basketballWave'%20x1%3D'0%25'%20y1%3D'0%25'%20x2%3D'0%25'%20y2%3D'100%25'%3E%3Cstop%20offset%3D'0%25'%20stop-color%3D'rgba(224%2C242%2C254%2C0.9)'/%3E%3Cstop%20offset%3D'50%25'%20stop-color%3D'rgba(191%2C219%2C254%2C0.7)'/%3E%3Cstop%20offset%3D'100%25'%20stop-color%3D'transparent'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20fill%3D'url(%23basketballWave)'%20d%3D'M0%20200%20Q250%20100%20500%20200%20T1000%20200%20T1500%20200%20T2000%20200%20V400%20H0%20Z'/%3E%3Cpath%20fill%3D'url(%23basketballWave)'%20opacity%3D'0.8'%20d%3D'M0%20200%20Q250%20300%20500%20200%20T1000%20200%20T1500%20200%20T2000%20200%20V400%20H0%20Z'/%3E%3C/svg%3E");
+  animation: basketball-wave-scroll 10s linear infinite;
 }
 
 @keyframes basketball-wave-scroll {
@@ -62,18 +62,6 @@
   }
   to {
     background-position: -2000px 50%;
-  }
-}
-
-@keyframes basketball-wave-hue {
-  0% {
-    filter: hue-rotate(0deg) saturate(1.4) brightness(1.15);
-  }
-  50% {
-    filter: hue-rotate(20deg) saturate(1.6) brightness(1.25);
-  }
-  100% {
-    filter: hue-rotate(0deg) saturate(1.4) brightness(1.15);
   }
 }
 
@@ -99,11 +87,11 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255,255,255,1) 0%,
-    rgba(255,254,245,0.95) 25%,
-    rgba(255,245,220,0.88) 50%,
-    rgba(255,220,150,0.65) 70%,
-    rgba(255,200,100,0.35) 85%,
+    rgba(255,235,100,1) 0%,
+    rgba(255,220,80,0.95) 25%,
+    rgba(255,195,50,0.9) 50%,
+    rgba(255,165,30,0.75) 70%,
+    rgba(255,140,0,0.5) 85%,
     transparent 100%
   );
   filter: blur(12px);
@@ -120,9 +108,9 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255,252,235,0.65) 0%,
-    rgba(255,245,200,0.5) 35%,
-    rgba(255,220,150,0.25) 55%,
+    rgba(255,220,80,0.5) 0%,
+    rgba(255,180,50,0.35) 35%,
+    rgba(255,140,0,0.2) 55%,
     transparent 75%
   );
   position: absolute;
@@ -184,10 +172,10 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ea580c;
+  background: #6b7280;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #c2410c;
+  background: #4b5563;
 }

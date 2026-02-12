@@ -115,7 +115,7 @@ export default function AdminPostsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">📋</span>
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Post Review</span>
+              <span className="bg-gradient-to-r text-gray-900">Post Review</span>
             </h1>
             <p className="text-xl text-gray-600">Manage pending, approved, and rejected posts</p>
           </div>
@@ -130,7 +130,7 @@ export default function AdminPostsPage() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     statusFilter === status
-                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md'
+                      ? 'bg-gradient-to-r bg-gray-900 text-white shadow-md'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -142,7 +142,7 @@ export default function AdminPostsPage() {
 
           {loading ? (
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
               <p className="mt-4 text-gray-600">Loading...</p>
             </div>
           ) : posts.length === 0 ? (
@@ -158,7 +158,7 @@ export default function AdminPostsPage() {
                       <div className="flex items-center gap-3 mb-3">
                         {getStatusBadge(post.status)}
                         {post.category && (
-                          <span className="px-3 py-1 bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 rounded-full text-xs font-semibold">
+                          <span className="px-3 py-1 bg-gradient-to-r bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
                             {post.category.name}
                           </span>
                         )}
@@ -173,7 +173,7 @@ export default function AdminPostsPage() {
                       </div>
                       <Link
                         href={`/posts/${post.id}`}
-                        className="text-orange-600 hover:text-orange-700 font-semibold text-sm"
+                        className="text-gray-900 hover:text-gray-700 font-semibold text-sm"
                       >
                         View Full Content →
                       </Link>
@@ -190,7 +190,7 @@ export default function AdminPostsPage() {
                       </button>
                       <button
                         onClick={() => handleReview(post.id, 'REJECTED')}
-                        className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        className="flex-1 px-6 py-3 bg-gradient-to-r bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
                         ❌ Reject
                       </button>

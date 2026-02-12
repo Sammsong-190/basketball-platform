@@ -74,7 +74,7 @@ export default function RegisterPage() {
           </div>
 
           {/* 成为卖家选项 */}
-          <div className="mb-8 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4">
+          <div className="mb-8 bg-gradient-to-r bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <span className="text-2xl mr-3">🏪</span>
@@ -85,7 +85,7 @@ export default function RegisterPage() {
               </div>
               <Link
                 href="/register/seller"
-                className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 text-sm font-semibold shadow-md hover:shadow-lg transform hover:scale-105 whitespace-nowrap"
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 text-sm font-semibold shadow-md hover:shadow-lg transform hover:scale-105 whitespace-nowrap"
               >
                 Become Seller
               </Link>
@@ -115,7 +115,7 @@ export default function RegisterPage() {
                 required
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter username"
               />
             </div>
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter email address"
               />
             </div>
@@ -143,7 +143,7 @@ export default function RegisterPage() {
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter password (at least 6 characters)"
               />
             </div>
@@ -157,7 +157,7 @@ export default function RegisterPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none ${
                     formData.confirmPassword && formData.password !== formData.confirmPassword
                       ? 'border-red-300 bg-red-50'
                       : 'border-gray-300'
@@ -190,7 +190,7 @@ export default function RegisterPage() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter phone number"
               />
             </div>
@@ -198,7 +198,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] mt-6"
+                className="w-full py-3 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] mt-6"
             >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -215,7 +215,7 @@ export default function RegisterPage() {
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-center text-sm text-gray-600">
             Already have an account?{' '}
-                <a href="/login" className="text-orange-600 hover:text-orange-700 font-semibold hover:underline">
+                <a href="/login" className="text-gray-900 hover:text-gray-700 font-semibold hover:underline">
               Login Now
             </a>
           </p>

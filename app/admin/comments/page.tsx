@@ -147,7 +147,7 @@ export default function AdminCommentsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">💬</span>
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Comment Review</span>
+              <span className="bg-gradient-to-r text-gray-900">Comment Review</span>
             </h1>
             <p className="text-xl text-gray-600">Review and manage comments on posts and products</p>
           </div>
@@ -162,7 +162,7 @@ export default function AdminCommentsPage() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     statusFilter === status
-                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md'
+                      ? 'bg-gradient-to-r bg-gray-900 text-white shadow-md'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -174,7 +174,7 @@ export default function AdminCommentsPage() {
 
           {loading ? (
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
               <p className="mt-4 text-gray-600">Loading...</p>
             </div>
           ) : comments.length === 0 ? (
@@ -201,7 +201,7 @@ export default function AdminCommentsPage() {
                         {comment.post && (
                           <Link
                             href={`/posts/${comment.post.id}`}
-                            className="text-orange-600 hover:text-orange-700 font-semibold"
+                            className="text-gray-900 hover:text-gray-700 font-semibold"
                           >
                             📝 Post: {comment.post.title}
                           </Link>
@@ -209,7 +209,7 @@ export default function AdminCommentsPage() {
                         {comment.product && (
                           <Link
                             href={`/products/${comment.product.id}`}
-                            className="text-orange-600 hover:text-orange-700 font-semibold"
+                            className="text-gray-900 hover:text-gray-700 font-semibold"
                           >
                             🛒 Product: {comment.product.name}
                           </Link>
@@ -228,7 +228,7 @@ export default function AdminCommentsPage() {
                       </button>
                       <button
                         onClick={() => handleReview(comment.id, 'REJECTED')}
-                        className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        className="flex-1 px-6 py-3 bg-gradient-to-r bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
                         ❌ Reject
                       </button>

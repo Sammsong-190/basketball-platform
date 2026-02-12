@@ -17,7 +17,7 @@ model User {
   email       String   @unique
   password    String
   phone       String?
-  avatar      String?
+  avatar      String?  @db.LongText
   role        String   @default("USER")
   isSeller    Boolean  @default(false)
   balance     Float    @default(0.0)

@@ -235,7 +235,7 @@ export default function NewProductPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                   placeholder="Enter product name"
                 />
               </div>
@@ -249,7 +249,7 @@ export default function NewProductPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={8}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none resize-none"
                   placeholder="Enter detailed product description...&#10;&#10;Include product features, specifications, applicable scenarios, etc."
                 />
               </div>
@@ -268,7 +268,7 @@ export default function NewProductPage() {
                       step="0.01"
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                      className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                       placeholder="0.00"
                     />
                   </div>
@@ -283,7 +283,7 @@ export default function NewProductPage() {
                     min="0"
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                     placeholder="0"
                   />
                 </div>
@@ -302,7 +302,7 @@ export default function NewProductPage() {
                       value={selectedParentId}
                       onChange={(e) => handleParentCategoryChange(e.target.value)}
                       disabled={categoriesLoading || categories.length === 0}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       {categoriesLoading ? (
                         <option value="">Loading categories...</option>
@@ -336,7 +336,7 @@ export default function NewProductPage() {
                       value={formData.categoryId}
                       onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                       disabled={!selectedParentId || (subCategories.length === 0 && formData.categoryId === selectedParentId)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       {!selectedParentId ? (
                         <option value="">Please select main category first</option>
@@ -394,7 +394,7 @@ export default function NewProductPage() {
                   ))}
 
                   {/* 添加图片按钮 */}
-                  <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all group">
+                  <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-all group">
                     <input
                       type="file"
                       accept="image/*"
@@ -403,10 +403,10 @@ export default function NewProductPage() {
                       className="hidden"
                     />
                     <div className="text-center">
-                      <svg className="w-8 h-8 text-gray-400 group-hover:text-orange-500 mx-auto mb-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-8 h-8 text-gray-400 group-hover:text-gray-600 mx-auto mb-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      <span className="text-xs text-gray-500 group-hover:text-orange-500">Add</span>
+                      <span className="text-xs text-gray-500 group-hover:text-gray-600">Add</span>
                     </div>
                   </label>
                 </div>
@@ -417,7 +417,7 @@ export default function NewProductPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">

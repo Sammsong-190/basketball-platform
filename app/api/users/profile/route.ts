@@ -45,6 +45,8 @@ export async function PUT(request: NextRequest) {
     const { password, ...userWithoutPassword } = user
     return NextResponse.json(userWithoutPassword)
   } catch (error) {
-    return NextResponse.json({ error: '更新用户信息失败' }, { status: 500 })
+    console.error('Profile update error:', error)
+    const msg = error instanceof Error ? error.message : '更新用户信息失败'
+    return NextResponse.json({ error: msg || '更新用户信息失败' }, { status: 500 })
   }
 }
