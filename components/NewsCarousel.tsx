@@ -97,7 +97,7 @@ export default function NewsCarousel() {
 
   return (
     <div
-      className="relative h-96 bg-gradient-to-r from-gray-200 via-gray-200 to-gray-300 rounded-2xl overflow-hidden shadow-xl"
+      className="relative h-96 bg-gradient-to-r from-gray-100 via-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -113,7 +113,7 @@ export default function NewsCarousel() {
               target.style.display = 'none'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-500/55 via-gray-400/55 to-gray-500/55"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-400/25 via-gray-300/25 to-gray-400/25"></div>
         </div>
       )}
 

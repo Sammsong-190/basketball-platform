@@ -61,12 +61,12 @@ export default function Home() {
         {/* NBA News Carousel Section */}
         <section className="container mx-auto px-4 py-12">
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-              <span className="mr-3">🏀</span>
-              <span className="text-gray-900">
-                NBA Event News
-              </span>
-            </h2>
+            <Link href="/events" className="inline-block">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center hover:text-gray-600 transition-all duration-200 cursor-pointer transform hover:scale-105">
+                <span className="mr-3">🏀</span>
+                <span>NBA Event News</span>
+              </h2>
+            </Link>
             <p className="text-gray-600">Latest basketball event updates, get NBA news first</p>
           </div>
           <NewsCarousel />

@@ -37,6 +37,9 @@ export default function Header() {
             <span className="text-xl font-bold group-hover:scale-105 transition-transform">
               Basketball Platform
             </span>
+            <span className="ml-1 px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-md group-hover:text-gray-700 group-hover:bg-gray-200 transition-colors">
+              Home
+            </span>
           </Link>
           
           {/* Desktop Navigation */}
