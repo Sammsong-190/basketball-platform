@@ -45,12 +45,12 @@ function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/products/${product.id}`}
-      className="block"
+      className="block h-full"
       prefetch={true}
       onClick={handleClick}
     >
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer">
-        <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
+      <div className="h-full flex flex-col bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer">
+        <div className="h-64 flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
           {images[0] ? (
             <img
               src={images[0]}
@@ -81,11 +81,11 @@ function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-900 pointer-events-none">
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-medium text-gray-900 pointer-events-none">
             {product.category.name}
           </div>
         </div>
-        <div className="p-6">
+        <div className="flex-1 flex flex-col p-6 min-h-[140px]">
           <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2 group-hover:text-gray-900 transition-colors">
             {product.name}
           </h3>
@@ -100,11 +100,11 @@ function ProductCard({ product }: { product: Product }) {
               </span>
             </div>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-auto">
             <span className="text-2xl font-bold text-gray-900">
               ¥{product.price.toFixed(2)}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 truncate max-w-[120px]">
               {product.seller.username}
             </span>
           </div>
@@ -120,6 +120,10 @@ export default function ProductsPage() {
   const [isSeller, setIsSeller] = useState(false)
   const [keyword, setKeyword] = useState('')
   const [appliedKeyword, setAppliedKeyword] = useState('')
+  const [platformExpanded, setPlatformExpanded] = useState(false)
+  const [freeTradeExpanded, setFreeTradeExpanded] = useState(false)
+
+  const DISPLAY_LIMIT = 8
 
   useEffect(() => {
     fetchProducts('')
@@ -158,8 +162,9 @@ export default function ProductsPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams()
+      params.set('limit', '100')
       if (kw) params.set('keyword', kw)
-      const url = params.toString() ? `/api/products?${params.toString()}` : '/api/products'
+      const url = `/api/products?${params.toString()}`
 
       const response = await fetch(url)
       const data = await response.json()
@@ -270,7 +275,7 @@ export default function ProductsPage() {
             </div>
           ) : hasSearchKeyword ? (
             // 搜索时：合并显示所有符合条件的商品
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -288,11 +293,21 @@ export default function ProductsPage() {
                       {platformManagedProducts.length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {platformManagedProducts.map((product) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+                    {(platformExpanded ? platformManagedProducts : platformManagedProducts.slice(0, DISPLAY_LIMIT)).map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
                   </div>
+                  {platformManagedProducts.length > DISPLAY_LIMIT && (
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={() => setPlatformExpanded(!platformExpanded)}
+                        className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-semibold shadow-md"
+                      >
+                        {platformExpanded ? 'Show Less' : `Show More (${platformManagedProducts.length - DISPLAY_LIMIT} more)`}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -306,11 +321,21 @@ export default function ProductsPage() {
                       {freeTradeProducts.length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {freeTradeProducts.map((product) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+                    {(freeTradeExpanded ? freeTradeProducts : freeTradeProducts.slice(0, DISPLAY_LIMIT)).map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
                   </div>
+                  {freeTradeProducts.length > DISPLAY_LIMIT && (
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={() => setFreeTradeExpanded(!freeTradeExpanded)}
+                        className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-semibold shadow-md"
+                      >
+                        {freeTradeExpanded ? 'Show Less' : `Show More (${freeTradeProducts.length - DISPLAY_LIMIT} more)`}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

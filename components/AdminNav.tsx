@@ -23,6 +23,11 @@ export default function AdminNav() {
       icon: '🛒'
     },
     {
+      href: '/admin/comments',
+      label: 'Comment Review',
+      icon: '💬'
+    },
+    {
       href: '/admin/scrape-products',
       label: 'Scrape Products',
       icon: '🕷️'

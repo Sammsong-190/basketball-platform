@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import AdminNav from '@/components/AdminNav'
+import { useToast } from '@/components/Toast'
 
 interface Product {
   id: string
@@ -22,6 +23,7 @@ interface Product {
 
 export default function AdminProductsPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'active' | 'inactive' | 'all'>('active')
@@ -44,6 +46,7 @@ export default function AdminProductsPage() {
   }, [router, activeTab])
 
   const fetchProducts = async () => {
+    setProducts([])
     setLoading(true)
     try {
       const token = localStorage.getItem('token')
@@ -67,8 +70,13 @@ export default function AdminProductsPage() {
     }
   }
 
-  const handleReview = async (productId: string, action: 'approve' | 'reject') => {
-    if (!confirm(action === 'approve' ? 'Are you sure you want to approve this product?' : 'Are you sure you want to withdraw this product?')) {
+  const handleReview = async (productId: string, action: 'approve' | 'reject' | 'delete') => {
+    const messages = {
+      approve: 'Are you sure you want to approve this product?',
+      reject: 'Are you sure you want to withdraw this product?',
+      delete: 'Are you sure you want to permanently delete this product? This cannot be undone.'
+    }
+    if (!confirm(messages[action])) {
       return
     }
 
@@ -85,7 +93,7 @@ export default function AdminProductsPage() {
       })
 
       if (response.ok) {
-        alert(action === 'approve' ? 'Product approved' : 'Product withdrawn')
+        showToast(action === 'approve' ? 'Product approved' : action === 'reject' ? 'Product withdrawn' : 'Product deleted')
         fetchProducts()
       } else {
         const data = await response.json()
@@ -252,13 +260,39 @@ export default function AdminProductsPage() {
                             {/* 操作按钮 */}
                             <div className="flex gap-3">
                               {product.status === 'ACTIVE' ? (
-                                <button
-                                  onClick={() => handleReview(product.id, 'reject')}
-                                  disabled={processing === product.id}
-                                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {processing === product.id ? 'Processing...' : 'Withdraw Product'}
-                                </button>
+                                <>
+                                  <button
+                                    onClick={() => handleReview(product.id, 'reject')}
+                                    disabled={processing === product.id}
+                                    className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {processing === product.id ? 'Processing...' : 'Withdraw Product'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleReview(product.id, 'delete')}
+                                    disabled={processing === product.id}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {processing === product.id ? 'Processing...' : 'Delete'}
+                                  </button>
+                                </>
+                              ) : product.status === 'INACTIVE' ? (
+                                <>
+                                  <button
+                                    onClick={() => handleReview(product.id, 'approve')}
+                                    disabled={processing === product.id}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {processing === product.id ? 'Processing...' : 'Approve Product'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleReview(product.id, 'delete')}
+                                    disabled={processing === product.id}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {processing === product.id ? 'Processing...' : 'Delete'}
+                                  </button>
+                                </>
                               ) : (
                                 <button
                                   onClick={() => handleReview(product.id, 'approve')}

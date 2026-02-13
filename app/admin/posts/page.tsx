@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import AdminNav from '@/components/AdminNav'
+import { useToast } from '@/components/Toast'
 
 interface Post {
   id: string
@@ -18,6 +19,7 @@ interface Post {
 
 export default function AdminPostsPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING')
@@ -43,6 +45,7 @@ export default function AdminPostsPage() {
   }, [statusFilter, router])
 
   const fetchPosts = async () => {
+    setPosts([])
     setLoading(true)
     const token = localStorage.getItem('token')
     try {
@@ -63,7 +66,11 @@ export default function AdminPostsPage() {
     }
   }
 
-  const handleReview = async (postId: string, newStatus: 'APPROVED' | 'REJECTED') => {
+  const handleReview = async (postId: string, newStatus: 'APPROVED' | 'REJECTED' | 'DELETED') => {
+    if (newStatus === 'DELETED' && !confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+      return
+    }
+
     const token = localStorage.getItem('token')
     try {
       const response = await fetch('/api/admin/posts', {
@@ -76,7 +83,7 @@ export default function AdminPostsPage() {
       })
 
       if (response.ok) {
-        alert(newStatus === 'APPROVED' ? 'Post approved' : 'Post rejected')
+        showToast(newStatus === 'APPROVED' ? 'Post approved' : newStatus === 'REJECTED' ? 'Post rejected' : 'Post deleted')
         fetchPosts() // 刷新列表
       } else {
         const data = await response.json()
@@ -130,7 +137,7 @@ export default function AdminPostsPage() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     statusFilter === status
-                      ? 'bg-gradient-to-r bg-gray-900 text-white shadow-md'
+                      ? 'bg-gray-900 text-white shadow-md'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -194,16 +201,30 @@ export default function AdminPostsPage() {
                       >
                         ❌ Reject
                       </button>
+                      <button
+                        onClick={() => handleReview(post.id, 'DELETED')}
+                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold"
+                      >
+                        🗑️ Delete
+                      </button>
                     </div>
                   )}
 
-                  {post.status === 'REJECTED' && (
-                    <div className="pt-4 border-t border-gray-200">
+                  {(post.status === 'APPROVED' || post.status === 'REJECTED') && (
+                    <div className="flex gap-3 pt-4 border-t border-gray-200">
+                      {post.status === 'REJECTED' && (
+                        <button
+                          onClick={() => handleReview(post.id, 'APPROVED')}
+                          className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        >
+                          ✅ Re-approve
+                        </button>
+                      )}
                       <button
-                        onClick={() => handleReview(post.id, 'APPROVED')}
-                        className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        onClick={() => handleReview(post.id, 'DELETED')}
+                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold"
                       >
-                        ✅ Re-approve
+                        🗑️ Delete
                       </button>
                     </div>
                   )}

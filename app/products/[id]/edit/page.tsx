@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
+import { useToast } from '@/components/Toast'
 
 interface Category {
   id: string | null
@@ -15,6 +16,7 @@ interface Category {
 export default function EditProductPage() {
   const params = useParams()
   const router = useRouter()
+  const { showToast } = useToast()
   const productId = Array.isArray(params.id) ? params.id[0] : params.id
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -266,7 +268,7 @@ export default function EditProductPage() {
       const data = await response.json()
 
       if (response.ok) {
-        alert('Product updated successfully!')
+        showToast('Product updated successfully!')
         router.push(`/products/${productId}`)
       } else {
         console.error('Failed to update product:', data)

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
+import { useToast } from '@/components/Toast'
 
 interface CartItem {
   id: string
@@ -19,6 +20,7 @@ interface CartItem {
 
 export default function CartPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -153,7 +155,7 @@ export default function CartPage() {
 
       if (response.ok) {
         const order = await response.json()
-        alert('Order created successfully!')
+        showToast('Order created successfully!')
         router.push(`/orders/${order.id}`)
       } else {
         const data = await response.json()

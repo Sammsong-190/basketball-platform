@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
+import { Bebas_Neue } from 'next/font/google'
 import './globals.css'
+import { Providers } from './Providers'
+
+const bebasNeue = Bebas_Neue({ weight: '400', subsets: ['latin'], variable: '--font-events' })
 
 export const metadata: Metadata = {
   title: '篮球用品电商社交平台',
@@ -13,7 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body className={bebasNeue.variable}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

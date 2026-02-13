@@ -66,6 +66,10 @@ export async function GET(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
+    if (product.status === 'DELETED') {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    }
+
     // Check if product is active (allow viewing inactive products but show warning)
     if (product.status !== 'ACTIVE') {
       console.warn('Product is not active:', productId, 'Status:', product.status)

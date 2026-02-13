@@ -7,6 +7,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const existing = await prisma.post.findUnique({ where: { id: params.id }, select: { status: true } })
+    if (!existing || existing.status === 'DELETED') {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    }
     const post = await prisma.post.update({
       where: { id: params.id },
       data: { views: { increment: 1 } },

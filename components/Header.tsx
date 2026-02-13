@@ -72,7 +72,7 @@ export default function Header() {
                   : 'hover:bg-gray-100'
               }`}
             >
-              📰 Events
+              <span className="font-events text-xl tracking-wider">📰 Events</span>
             </Link>
             
             {isLoggedIn ? (
@@ -183,7 +183,7 @@ export default function Header() {
                     : 'hover:bg-gray-100'
                 }`}
               >
-                📰 Events
+                <span className="font-events text-xl tracking-wider">📰 Events</span>
               </Link>
               {isLoggedIn ? (
                 <>

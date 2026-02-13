@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
 
     try {
         const where: any = {}
-        if (status !== 'all') {
+        if (status === 'all') {
+            where.status = { not: 'DELETED' }
+        } else {
             where.status = status
         }
 
@@ -57,8 +59,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: '参数不完整' }, { status: 400 })
         }
 
-        if (action !== 'approve' && action !== 'reject') {
+        if (action !== 'approve' && action !== 'reject' && action !== 'delete') {
             return NextResponse.json({ error: '无效的操作' }, { status: 400 })
+        }
+
+        if (action === 'delete') {
+            await prisma.product.update({
+                where: { id: productId },
+                data: { status: 'DELETED' }
+            })
+            return NextResponse.json({ message: 'Product deleted', productId })
         }
 
         // 更新商品状态

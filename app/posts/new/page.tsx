@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
+import { useToast } from '@/components/Toast'
 
 export default function NewPostPage() {
     const router = useRouter()
+    const { showToast } = useToast()
     const [loading, setLoading] = useState(false)
     const [previewImages, setPreviewImages] = useState<string[]>([])
     const [formData, setFormData] = useState({
@@ -95,7 +97,7 @@ export default function NewPostPage() {
             const data = await response.json()
 
             if (response.ok) {
-                alert('Post published successfully! Awaiting review')
+                showToast('Post published, awaiting review')
                 router.push('/posts')
             } else {
                 alert(data.error || 'Failed to publish')

@@ -39,6 +39,11 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: '帖子ID和状态为必填项' }, { status: 400 })
     }
 
+    const validStatuses = ['PENDING', 'APPROVED', 'REJECTED', 'DELETED']
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+
     const post = await prisma.post.update({
       where: { id },
       data: { status }

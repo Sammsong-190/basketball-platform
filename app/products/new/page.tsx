@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
+import { useToast } from '@/components/Toast'
 
 interface Category {
   id: string | null
@@ -13,6 +14,7 @@ interface Category {
 
 export default function NewProductPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
@@ -197,7 +199,7 @@ export default function NewProductPage() {
       const data = await response.json()
 
       if (response.ok) {
-        alert('Product added successfully!')
+        showToast('Product added successfully!')
         router.push('/products')
       } else {
         console.error('Failed to add product:', data)

@@ -42,7 +42,16 @@ export async function PUT(request: NextRequest) {
     }
 
     if (status === 'DELETED') {
-      await prisma.comment.delete({ where: { id } })
+      await prisma.$transaction(async (tx) => {
+        async function deleteCommentAndReplies(commentId: string) {
+          const replies = await tx.comment.findMany({ where: { parentId: commentId } })
+          for (const reply of replies) {
+            await deleteCommentAndReplies(reply.id)
+          }
+          await tx.comment.delete({ where: { id: commentId } })
+        }
+        await deleteCommentAndReplies(id)
+      })
       return NextResponse.json({ message: 'Deleted successfully' })
     }
 
@@ -52,8 +61,8 @@ export async function PUT(request: NextRequest) {
     })
 
     return NextResponse.json(comment)
-  } catch (error) {
-    console.error('Failed to update comment:', error)
+  } catch (error: any) {
+    console.error('Failed to update/delete comment:', error)
     return NextResponse.json({ error: 'Operation failed' }, { status: 500 })
   }
 }

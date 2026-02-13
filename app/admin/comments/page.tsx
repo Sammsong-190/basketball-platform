@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import AdminNav from '@/components/AdminNav'
+import { useToast } from '@/components/Toast'
 
 interface Comment {
   id: string
@@ -18,6 +19,7 @@ interface Comment {
 
 export default function AdminCommentsPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING')
@@ -42,6 +44,7 @@ export default function AdminCommentsPage() {
   }, [statusFilter, router])
 
   const fetchComments = async () => {
+    setComments([])
     setLoading(true)
     const token = localStorage.getItem('token')
     try {
@@ -75,7 +78,7 @@ export default function AdminCommentsPage() {
       })
 
       if (response.ok) {
-        alert(newStatus === 'APPROVED' ? 'Comment approved' : 'Comment rejected')
+        showToast(newStatus === 'APPROVED' ? 'Comment approved' : 'Comment rejected')
         fetchComments()
       } else {
         const data = await response.json()
@@ -104,7 +107,7 @@ export default function AdminCommentsPage() {
       })
 
       if (response.ok) {
-        alert('Comment deleted')
+        showToast('Comment deleted')
         fetchComments()
       } else {
         const data = await response.json()
@@ -162,7 +165,7 @@ export default function AdminCommentsPage() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     statusFilter === status
-                      ? 'bg-gradient-to-r bg-gray-900 text-white shadow-md'
+                      ? 'bg-gray-900 text-white shadow-md'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -234,20 +237,28 @@ export default function AdminCommentsPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(comment.id)}
-                        className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 font-semibold"
+                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold"
                       >
                         🗑️ Delete
                       </button>
                     </div>
                   )}
 
-                  {comment.status === 'REJECTED' && (
-                    <div className="pt-4 border-t border-gray-200">
+                  {(comment.status === 'APPROVED' || comment.status === 'REJECTED') && (
+                    <div className="flex gap-3 pt-4 border-t border-gray-200">
+                      {comment.status === 'REJECTED' && (
+                        <button
+                          onClick={() => handleReview(comment.id, 'APPROVED')}
+                          className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        >
+                          ✅ Re-approve
+                        </button>
+                      )}
                       <button
-                        onClick={() => handleReview(comment.id, 'APPROVED')}
-                        className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        onClick={() => handleDelete(comment.id)}
+                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold"
                       >
-                        ✅ Re-approve
+                        🗑️ Delete
                       </button>
                     </div>
                   )}

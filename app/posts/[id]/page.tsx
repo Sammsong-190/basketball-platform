@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
+import { useToast } from '@/components/Toast'
 
 interface Comment {
   id: string
@@ -30,6 +31,7 @@ interface Post {
 export default function PostDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { showToast } = useToast()
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [isLiked, setIsLiked] = useState(false)
@@ -158,9 +160,9 @@ export default function PostDetailPage() {
         // 管理员发布的评论立即显示，普通用户需要审核
         const userRole = user?.role
         if (userRole === 'ADMIN') {
-          alert('Comment posted successfully!')
+          showToast('Comment posted')
         } else {
-          alert('Comment submitted, awaiting review')
+          showToast('Comment submitted, awaiting review')
         }
         fetchPost(params.id as string) // 刷新帖子数据
         // 保持评论输入框显示，方便继续评论
@@ -211,9 +213,9 @@ export default function PostDetailPage() {
         // 管理员发布的回复立即显示，普通用户需要审核
         const userRole = user?.role
         if (userRole === 'ADMIN') {
-          alert('Reply posted successfully!')
+          showToast('Reply posted')
         } else {
-          alert('Reply submitted, awaiting review')
+          showToast('Reply submitted, awaiting review')
         }
         fetchPost(params.id as string) // 刷新帖子数据
       } else {

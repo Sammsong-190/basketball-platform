@@ -13,6 +13,9 @@
 }
 
 @layer utilities {
+  .font-events {
+    font-family: var(--font-events), sans-serif;
+  }
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
