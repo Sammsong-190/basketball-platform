@@ -32,11 +32,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {toast && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] transition-all duration-300"
+          className="fixed inset-0 flex items-center justify-center z-[9999] pointer-events-none"
           role="status"
           aria-live="polite"
         >
-          <div className="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2">
+          <div
+            className="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2 animate-toast-fade"
+            key={toast.id}
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
             {toast.message}
           </div>
