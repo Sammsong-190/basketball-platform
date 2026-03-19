@@ -32,9 +32,9 @@ function parseUrl(url) {
 }
 
 async function main() {
-  let dataPath = path.join(__dirname, '..', 'prisma', 'data_with_columns.sql')
+  let dataPath = path.join(__dirname, '..', 'apps', 'web', 'prisma', 'data_with_columns.sql')
   if (!fs.existsSync(dataPath)) {
-    dataPath = path.join(__dirname, '..', 'prisma', 'data_only.sql')
+    dataPath = path.join(__dirname, '..', 'apps', 'web', 'prisma', 'data_only.sql')
   }
   if (!fs.existsSync(dataPath)) {
     console.error('请先运行: mysqldump --no-create-info --complete-insert ... > prisma/data_with_columns.sql')

@@ -4,8 +4,8 @@
 const fs = require('fs')
 const path = require('path')
 
-const dumpPath = path.join(__dirname, '..', 'prisma', 'dump.sql')
-const outPath = path.join(__dirname, '..', 'prisma', 'tidb_schema.sql')
+const dumpPath = path.join(__dirname, '..', 'apps', 'web', 'prisma', 'dump.sql')
+const outPath = path.join(__dirname, '..', 'apps', 'web', 'prisma', 'tidb_schema.sql')
 
 let content = fs.readFileSync(dumpPath, 'utf8')
 

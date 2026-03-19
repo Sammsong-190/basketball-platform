@@ -52,8 +52,4 @@ else
 fi
 
 echo ""
-echo "3️⃣ 测试数据库连接..."
-npm run db:test
-
-echo ""
 echo "🎉 数据库设置完成！"

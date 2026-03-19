@@ -1,45 +1,68 @@
 # 篮球用品电商社交平台
 
-一个整合电商交易、社交互动与媒体内容三大功能的篮球用品平台，具有"内容—社群—消费"联动机制。
+一个整合电商交易、社交互动与媒体内容三大功能的篮球用品平台，具有「内容—社群—消费」联动机制。
 
 ## 功能模块
 
 ### 1. 用户信息管理模块
-- 个人信息管理
-- 收藏管理（商品/帖子）
-- 评论管理
-- 支付订单管理
-- 发布信息管理
-- 支出信息管理
-- 收入信息管理（卖家）
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 个人信息管理 | ✅ 已实现 | 头像、手机号编辑，个人中心展示 |
+| 收藏管理（商品/帖子） | ✅ 已实现 | 仪表盘收藏列表，可查看商品/帖子 |
+| 评论管理 | ✅ 已实现 | 仪表盘我的评论，支持帖子/商品评论 |
+| 发布信息管理 | ✅ 已实现 | 仪表盘我的帖子 |
+| 收入信息管理（卖家） | ⚠️ 未实现 | API 已存在，无前端页面 |
+| 支出信息管理 | ⚠️ 未实现 | API 已存在，无前端页面 |
 
 ### 2. 社群互动模块
-- 社区帖子管理（发布、编辑、删除）
-- 评论与互动（点赞、分享）
-- 赛事资讯管理
-- 热门内容推荐
-- 主题分类管理
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 社区帖子管理 | ✅ 已实现 | 发布、编辑、删除、审核流程 |
+| 评论与互动 | ✅ 已实现 | 点赞、评论、回复，支持审核 |
+| 赛事资讯管理 | ✅ 已实现 | NBA 赛程、比分、新闻（ESPN API） |
+| 热门内容推荐 | ⚠️ 部分实现 | 帖子有 isHot 字段，推荐逻辑待完善 |
+| 主题分类管理 | ✅ 已实现 | 帖子分类、商品分类，管理员可维护 |
 
 ### 3. 商品管理模块
-- 商品信息管理（上架、编辑、下架）
-- 商品类别管理
-- 商品评价管理
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 商品信息管理 | ✅ 已实现 | 上架、编辑、下架，Platform Managed / Free Trade |
+| 商品类别管理 | ✅ 已实现 | 分类管理，支持父子级 |
+| 商品评价管理 | ✅ 已实现 | 商品详情页评价展示，API 支持 |
+| 商品爬取 | ✅ 已实现 | 管理员可爬取电商商品入库 |
 
 ### 4. 交易订单模块
-- 购物车管理
-- 订单状态管理
-- 订单支付管理
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 购物车管理 | ✅ 已实现 | 增删改查，结算下单 |
+| 订单创建 | ✅ 已实现 | 购物车结算、立即购买 |
+| 订单列表 | ✅ 已实现 | 仪表盘我的订单 |
+| 订单详情页 | ⚠️ 未实现 | 链接存在但 `/orders/[id]` 页面缺失 |
+| 订单支付 | ⚠️ 部分实现 | 支付 API 存在，前端流程待完善 |
+| 订单状态管理 | ⚠️ 部分实现 | 状态流转逻辑待完善 |
 
 ### 5. 售后服务模块
-- 退换货管理
-- 投诉与建议管理
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 退换货管理 | ⚠️ 未实现 | API 已存在，无前端页面 |
+| 投诉与建议管理 | ⚠️ 未实现 | API 已存在，无前端页面 |
 
 ### 6. 系统管理模块
-- 用户权限管理
-- 帖子审核管理
-- 评论审核管理
-- 商品数据管理
-- 维护日志管理
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 帖子审核管理 | ✅ 已实现 | 通过/拒绝/删除，支持已发布内容 |
+| 评论审核管理 | ✅ 已实现 | 通过/拒绝/删除，支持已发布评论 |
+| 商品审核管理 | ✅ 已实现 | 上架/下架/删除 |
+| 用户权限管理 | ⚠️ 未实现 | 用户管理 API 存在，无管理界面 |
+| 维护日志管理 | ⚠️ 未实现 | 日志 API 存在，无查看界面 |
+
+---
 
 ## 技术栈
 
@@ -47,6 +70,8 @@
 - **后端**: Next.js API Routes
 - **数据库**: Prisma ORM + MySQL
 - **认证**: JWT
+
+---
 
 ## 快速开始
 
@@ -85,7 +110,7 @@ EXIT;
 
 **3. 配置环境变量**
 
-创建 `.env` 文件：
+在根目录或 `apps/web/` 下创建 `.env` 文件：
 ```env
 DATABASE_URL="mysql://root:your_password@localhost:3306/basketball_platform"
 JWT_SECRET="basketball-platform-secret-key-change-in-production-2024"
@@ -94,10 +119,7 @@ JWT_SECRET="basketball-platform-secret-key-change-in-production-2024"
 **4. 初始化数据库**
 
 ```bash
-# 生成 Prisma 客户端
 npm run db:generate
-
-# 推送数据库模式到 MySQL
 npm run db:push
 ```
 
@@ -112,59 +134,73 @@ npm run dev
 ### 其他命令
 
 ```bash
-# 数据库迁移
-npm run db:migrate
-
-# 打开 Prisma Studio（数据库管理界面）
-npm run db:studio
-
-# 构建生产版本
-npm run build
-
-# 启动生产服务器
-npm start
+npm run dev:web       # 仅启动主站 (apps/web)
+npm run dev:admin     # 仅启动管理后台 (apps/admin)
+npm run dev:backend   # 仅启动 Express 后端
+npm run db:migrate    # 数据库迁移
+npm run db:studio     # Prisma Studio 数据库管理
+npm run build         # 构建主站生产版本
+npm start             # 启动主站生产服务器
+npm run create-admin  # 创建管理员账户
 ```
 
-## 项目结构
+---
+
+## 项目结构 (Monorepo)
 
 ```
-├── app/                    # Next.js App Router
-│   ├── api/               # API 路由
-│   │   ├── auth/          # 认证相关
-│   │   ├── users/         # 用户管理
-│   │   ├── posts/         # 帖子管理
-│   │   ├── products/      # 商品管理
-│   │   ├── orders/        # 订单管理
-│   │   ├── cart/          # 购物车
-│   │   └── admin/         # 系统管理
-│   └── (auth)/            # 认证页面
-├── lib/                    # 工具函数
-│   ├── prisma.ts          # Prisma 客户端
-│   ├── auth.ts            # 认证工具
-│   ├── middleware.ts      # 中间件
-│   └── utils.ts           # 通用工具
-├── prisma/                 # 数据库模式
-│   └── schema.prisma      # Prisma 模式定义
-└── components/             # React 组件
+/ (根目录)
+├── apps/
+│   ├── web/                 # [主站] Next.js 篮球电商社交平台 (SSR)
+│   │   ├── app/             # 路由与 API
+│   │   │   ├── api/         # API 路由 (auth, users, posts, products, orders...)
+│   │   │   ├── admin/       # 管理员后台
+│   │   │   ├── dashboard/   # 用户仪表盘
+│   │   │   ├── products/    # 商品
+│   │   │   ├── posts/       # 帖子
+│   │   │   ├── events/      # NBA 赛事
+│   │   │   └── ...
+│   │   ├── components/      # 公共组件
+│   │   ├── lib/             # 工具与逻辑
+│   │   └── prisma/          # 数据库 Schema
+│   │
+│   └── admin/               # [后台] Vite React 管理应用 (CSR)
+│       └── src/
+│
+├── backend/                 # Express.js 后端 API 服务
+│   ├── src/
+│   └── prisma/
+│
+├── scripts/                 # Python 爬虫与维护脚本
+│   └── nba_scraper.py
+│
+├── package.json             # 根配置 (Workspaces)
+└── .gitignore
 ```
+
+---
 
 ## 环境变量
 
-创建 `.env` 文件：
+| 变量 | 说明 |
+|------|------|
+| `DATABASE_URL` | MySQL 连接字符串，格式: `mysql://用户:密码@主机:端口/数据库名` |
+| `JWT_SECRET` | JWT 签名密钥，生产环境务必更换 |
 
-```
-# MySQL 连接字符串
-# 格式: mysql://用户名:密码@主机:端口/数据库名
-DATABASE_URL="mysql://root:your_password@localhost:3306/basketball_platform"
+---
 
-# JWT Secret
-JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
-```
+## 未实现功能清单（待开发）
 
-**注意**: 
-- 将 `your_password` 替换为您的 MySQL root 密码
-- 确保 MySQL 服务正在运行
-- 数据库需要先创建: `CREATE DATABASE basketball_platform;`
+- [ ] 订单详情页 `/orders/[id]`
+- [ ] 订单支付完整流程（含支付结果页）
+- [ ] 退换货申请与处理界面
+- [ ] 投诉与建议提交与查看界面
+- [ ] 卖家收入/支出统计与展示
+- [ ] 管理员用户管理界面
+- [ ] 系统维护日志查看界面
+- [ ] 热门内容推荐算法与展示优化
+
+---
 
 ## 许可证
 
