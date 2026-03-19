@@ -15,6 +15,6 @@ export async function GET(request: NextRequest) {
     const total = expenses.reduce((sum, e) => sum + e.amount, 0)
     return NextResponse.json({ expenses, total })
   } catch (error) {
-    return NextResponse.json({ error: '获取支出信息失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get expense info' }, { status: 500 })
   }
 }

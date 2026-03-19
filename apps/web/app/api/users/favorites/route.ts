@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     })
     return NextResponse.json(favorites)
   } catch (error) {
-    return NextResponse.json({ error: '获取收藏列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get favorites list' }, { status: 500 })
   }
 }
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { type, targetId } = body
     if (!type || !targetId) {
-      return NextResponse.json({ error: '类型和目标ID为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Type and target ID are required' }, { status: 400 })
     }
     const favorite = await prisma.favorite.create({
       data: { userId, type, targetId }
@@ -39,9 +39,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(favorite, { status: 201 })
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return NextResponse.json({ error: '已收藏' }, { status: 400 })
+      return NextResponse.json({ error: 'Already favorited' }, { status: 400 })
     }
-    return NextResponse.json({ error: '添加收藏失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to add favorite' }, { status: 500 })
   }
 }
 
@@ -53,13 +53,13 @@ export async function DELETE(request: NextRequest) {
   const id = searchParams.get('id')
 
   if (!id) {
-    return NextResponse.json({ error: '收藏ID为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Favorite ID is required' }, { status: 400 })
   }
 
   try {
     await prisma.favorite.delete({ where: { id, userId } })
-    return NextResponse.json({ message: '取消收藏成功' })
+    return NextResponse.json({ message: 'Unfavorited successfully' })
   } catch (error) {
-    return NextResponse.json({ error: '取消收藏失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to unfavorite' }, { status: 500 })
   }
 }

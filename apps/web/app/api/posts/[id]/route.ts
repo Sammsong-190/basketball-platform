@@ -36,7 +36,7 @@ export async function GET(
 
     return NextResponse.json(post)
   } catch (error) {
-    return NextResponse.json({ error: '获取帖子详情失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get post details' }, { status: 500 })
   }
 }
 
@@ -94,7 +94,7 @@ export async function DELETE(
   try {
     const post = await prisma.post.findUnique({ where: { id: params.id } })
     if (!post || post.authorId !== userId) {
-      return NextResponse.json({ error: '无权限删除此帖子' }, { status: 403 })
+      return NextResponse.json({ error: 'No permission to delete this post' }, { status: 403 })
     }
 
     await prisma.post.update({
@@ -102,8 +102,8 @@ export async function DELETE(
       data: { status: 'DELETED' }
     })
 
-    return NextResponse.json({ message: '删除成功' })
+    return NextResponse.json({ message: 'Deleted successfully' })
   } catch (error) {
-    return NextResponse.json({ error: '删除帖子失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 })
   }
 }

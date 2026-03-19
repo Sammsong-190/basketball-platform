@@ -30,6 +30,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(payments)
   } catch (error) {
-    return NextResponse.json({ error: '获取支付记录失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get payment records' }, { status: 500 })
   }
 }

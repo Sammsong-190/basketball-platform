@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const categoryId = searchParams.get('categoryId')
   const isNews = searchParams.get('isNews')
   const isHot = searchParams.get('isHot')
+  const sortByHot = searchParams.get('sortByHot') === 'true'
   const page = parseInt(searchParams.get('page') || '1')
   const limit = parseInt(searchParams.get('limit') || '10')
 
@@ -27,12 +28,13 @@ export async function GET(request: NextRequest) {
           views: true,
           likes: true,
           isNews: true,
+          isHot: true,
           createdAt: true,
           author: { select: { id: true, username: true, avatar: true } },
           category: true,
           _count: { select: { comments: true, likesList: true } }
         },
-        orderBy: isHot ? { likes: 'desc' } : { createdAt: 'desc' },
+        orderBy: (isHot || sortByHot) ? { likes: 'desc' } : { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit
       }),
@@ -41,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ posts, total, page, limit })
   } catch (error) {
-    return NextResponse.json({ error: '获取帖子列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get posts list' }, { status: 500 })
   }
 }
 

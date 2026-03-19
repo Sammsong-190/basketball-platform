@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(posts)
   } catch (error) {
-    return NextResponse.json({ error: '获取帖子列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get posts list' }, { status: 500 })
   }
 }
 
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     const { id, status } = body
 
     if (!id || !status) {
-      return NextResponse.json({ error: '帖子ID和状态为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Post ID and status are required' }, { status: 400 })
     }
 
     const validStatuses = ['PENDING', 'APPROVED', 'REJECTED', 'DELETED']
@@ -51,6 +51,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(post)
   } catch (error) {
-    return NextResponse.json({ error: '审核失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Review failed' }, { status: 500 })
   }
 }

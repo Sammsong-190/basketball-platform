@@ -13,12 +13,12 @@ export async function GET(request: NextRequest) {
       include: { profile: true }
     })
     if (!user) {
-      return NextResponse.json({ error: '用户不存在' }, { status: 404 })
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
     const { password, ...userWithoutPassword } = user
     return NextResponse.json(userWithoutPassword)
   } catch (error) {
-    return NextResponse.json({ error: '获取用户信息失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get user info' }, { status: 500 })
   }
 }
 
@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(userWithoutPassword)
   } catch (error) {
     console.error('Profile update error:', error)
-    const msg = error instanceof Error ? error.message : '更新用户信息失败'
-    return NextResponse.json({ error: msg || '更新用户信息失败' }, { status: 500 })
+    const msg = error instanceof Error ? error.message : 'Failed to update user info'
+    return NextResponse.json({ error: msg || 'Failed to update user info' }, { status: 500 })
   }
 }

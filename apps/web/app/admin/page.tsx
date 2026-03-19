@@ -58,6 +58,34 @@ export default function AdminPage() {
       href: '/admin/scrape-products',
       icon: '🕷️',
       color: 'from-gray-700 to-gray-900'
+    },
+    {
+      title: 'Refunds',
+      description: 'Process user refund and return requests',
+      href: '/admin/refunds',
+      icon: '↩️',
+      color: 'from-orange-500 to-orange-700'
+    },
+    {
+      title: 'Complaints',
+      description: 'View and reply to user complaints and suggestions',
+      href: '/admin/complaints',
+      icon: '📢',
+      color: 'from-blue-500 to-blue-700'
+    },
+    {
+      title: 'User Management',
+      description: 'Manage user roles and seller permissions',
+      href: '/admin/users',
+      icon: '👥',
+      color: 'from-green-500 to-green-700'
+    },
+    {
+      title: 'System Logs',
+      description: 'View system maintenance and operation logs',
+      href: '/admin/logs',
+      icon: '📋',
+      color: 'from-gray-600 to-gray-800'
     }
   ]
 

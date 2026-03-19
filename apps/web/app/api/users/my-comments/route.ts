@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     })
     return NextResponse.json(comments)
   } catch (error) {
-    return NextResponse.json({ error: '获取评论列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get comments list' }, { status: 500 })
   }
 }
 
@@ -30,13 +30,13 @@ export async function DELETE(request: NextRequest) {
   const id = searchParams.get('id')
 
   if (!id) {
-    return NextResponse.json({ error: '评论ID为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Comment ID is required' }, { status: 400 })
   }
 
   try {
     await prisma.comment.delete({ where: { id, authorId: userId } })
-    return NextResponse.json({ message: '删除评论成功' })
+    return NextResponse.json({ message: 'Comment deleted successfully' })
   } catch (error) {
-    return NextResponse.json({ error: '删除评论失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 })
   }
 }

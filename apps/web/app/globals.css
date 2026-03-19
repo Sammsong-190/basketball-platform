@@ -58,6 +58,14 @@
   animation: fade-in 0.8s ease-out;
 }
 
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
 /* Smooth wave background - light blue */
 .basketball-smooth-wave {
   opacity: 0.6;

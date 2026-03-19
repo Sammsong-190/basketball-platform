@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ users, total, page, limit })
   } catch (error) {
-    return NextResponse.json({ error: '获取用户列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get users list' }, { status: 500 })
   }
 }
 
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest) {
     const { id, role, isSeller } = body
 
     if (!id) {
-      return NextResponse.json({ error: '用户ID为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
     const updateData: any = {}
@@ -78,6 +78,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(user)
   } catch (error) {
-    return NextResponse.json({ error: '更新用户权限失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update user permissions' }, { status: 500 })
   }
 }

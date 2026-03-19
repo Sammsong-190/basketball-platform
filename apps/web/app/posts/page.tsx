@@ -24,15 +24,19 @@ function PostsContent() {
   const [loading, setLoading] = useState(true)
   const searchParams = useSearchParams()
   const isNews = searchParams.get('isNews') === 'true'
+  const isHot = searchParams.get('isHot') === 'true'
 
   useEffect(() => {
-    fetchPosts(isNews)
-  }, [isNews])
+    fetchPosts(isNews, isHot)
+  }, [isNews, isHot])
 
-  const fetchPosts = async (isNews?: boolean) => {
+  const fetchPosts = async (news?: boolean, hot?: boolean) => {
     setLoading(true)
     try {
-      const url = isNews ? '/api/posts?isNews=true' : '/api/posts'
+      const params = new URLSearchParams()
+      if (news) params.set('isNews', 'true')
+      if (hot) params.set('sortByHot', 'true')
+      const url = params.toString() ? `/api/posts?${params}` : '/api/posts'
       const response = await fetch(url)
       const data = await response.json()
       setPosts(data.posts || [])
@@ -51,13 +55,13 @@ function PostsContent() {
           <div className="flex justify-between items-center mb-12">
             <div>
               <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
-                <span className="mr-3">{isNews ? '📰' : '💬'}</span>
+                <span className="mr-3">{isNews ? '📰' : isHot ? '🔥' : '💬'}</span>
                 <span className="text-gray-900">
-                  {isNews ? 'Event News' : 'Community'}
+                  {isNews ? 'Event News' : isHot ? 'Trending' : 'Community'}
                 </span>
               </h1>
               <p className="text-xl text-gray-600">
-                {isNews ? 'Latest basketball event news and score analysis' : 'Share and interact with basketball enthusiasts'}
+                {isNews ? 'Latest basketball event news and score analysis' : isHot ? 'Most liked and popular community content' : 'Share and interact with basketball enthusiasts'}
               </p>
             </div>
             {!isNews && (
@@ -69,6 +73,23 @@ function PostsContent() {
               </Link>
             )}
           </div>
+
+          {!isNews && (
+            <div className="flex gap-2 mb-8">
+              <Link
+                href="/posts"
+                className={`px-4 py-2 rounded-lg font-medium ${!isHot ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                All
+              </Link>
+              <Link
+                href="/posts?isHot=true"
+                className={`px-4 py-2 rounded-lg font-medium ${isHot ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                🔥 Trending
+              </Link>
+            </div>
+          )}
           
           {loading ? (
             <div className="text-center py-20">
@@ -108,6 +129,11 @@ function PostsContent() {
                       {post.isNews && (
                         <span className="ml-2 px-3 py-1 bg-gray-700 text-white rounded-full text-xs font-semibold">
                           📰 News
+                        </span>
+                      )}
+                      {(post as any).isHot && (
+                        <span className="ml-2 px-3 py-1 bg-orange-500 text-white rounded-full text-xs font-semibold">
+                          🔥 Hot
                         </span>
                       )}
                     </div>

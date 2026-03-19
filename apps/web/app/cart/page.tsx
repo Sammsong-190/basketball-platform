@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import { useToast } from '@/components/Toast'
+import CheckoutDrawer from '@/components/CheckoutDrawer'
 
 interface CartItem {
   id: string
@@ -25,6 +26,8 @@ export default function CartPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
@@ -119,22 +122,21 @@ export default function CartPage() {
     }
   }
 
-  const handleCheckout = async () => {
+  const handleCheckoutClick = () => {
     if (cartItems.length === 0) {
       alert('Your cart is empty')
       return
     }
+    setCheckoutOpen(true)
+  }
 
-    const shippingAddress = prompt('Please enter your shipping address:')
-    const shippingName = prompt('Please enter your name:')
-    const shippingPhone = prompt('Please enter your phone number:')
-
-    if (!shippingAddress || !shippingName || !shippingPhone) {
-      alert('Please fill in all shipping information')
+  const handleCheckoutSubmit = async (form: { shippingName: string; shippingPhone: string; shippingAddress: string }) => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/login')
       return
     }
-
-    const token = localStorage.getItem('token')
+    setCheckoutLoading(true)
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -147,23 +149,28 @@ export default function CartPage() {
             productId: item.product.id,
             quantity: item.quantity
           })),
-          shippingAddress,
-          shippingName,
-          shippingPhone
+          shippingAddress: form.shippingAddress,
+          shippingName: form.shippingName,
+          shippingPhone: form.shippingPhone
         })
       })
 
       if (response.ok) {
         const order = await response.json()
         showToast('Order created successfully!')
+        setCheckoutOpen(false)
         router.push(`/orders/${order.id}`)
       } else {
         const data = await response.json()
         alert(data.error || 'Failed to create order')
+        throw new Error(data.error)
       }
     } catch (error) {
       console.error('Failed to create order:', error)
       alert('Failed to create order, please try again')
+      throw error
+    } finally {
+      setCheckoutLoading(false)
     }
   }
 
@@ -292,7 +299,7 @@ export default function CartPage() {
                     </div>
                   </div>
                   <button
-                    onClick={handleCheckout}
+                    onClick={handleCheckoutClick}
                     className="w-full px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                   >
                     Proceed to Checkout
@@ -309,6 +316,15 @@ export default function CartPage() {
           )}
         </div>
       </div>
+
+      <CheckoutDrawer
+        open={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        onSubmit={handleCheckoutSubmit}
+        loading={checkoutLoading}
+        totalAmount={total}
+        itemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+      />
     </>
   )
 }

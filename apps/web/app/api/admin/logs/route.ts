@@ -33,6 +33,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ logs, total, page, limit })
   } catch (error) {
-    return NextResponse.json({ error: '获取日志失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get logs' }, { status: 500 })
   }
 }

@@ -216,7 +216,7 @@ function ProfileSection({ user, onUpdate, formatDate, onTabChange }: { user: any
           <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">
-              {user.role === 'ADMIN' ? '管理员' : user.isSeller ? '卖家' : '普通用户'}
+              {user.role === 'ADMIN' ? 'Admin' : user.isSeller ? 'Seller' : 'User'}
             </span>
             {user.isSeller && (
               <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
@@ -255,6 +255,12 @@ export default function DashboardPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [comments, setComments] = useState<Comment[]>([])
   const [sellerProducts, setSellerProducts] = useState<any[]>([])
+  const [incomes, setIncomes] = useState<{ incomes: Array<{ amount: number; description?: string; createdAt: string }>; total: number }>({ incomes: [], total: 0 })
+  const [expenses, setExpenses] = useState<{ expenses: Array<{ amount: number; description?: string; createdAt: string }>; total: number }>({ expenses: [], total: 0 })
+  const [complaints, setComplaints] = useState<Array<{ id: string; type: string; title: string; content: string; status: string; reply?: string; createdAt: string }>>([])
+  const [refunds, setRefunds] = useState<Array<{ id: string; orderId: string; type: string; reason: string; amount: number; status: string; createdAt: string; order?: { orderNumber: string } }>>([])
+  const [showComplaintForm, setShowComplaintForm] = useState(false)
+  const [complaintForm, setComplaintForm] = useState({ type: 'COMPLAINT', title: '', content: '', orderId: '' })
   const [stats, setStats] = useState({
     orders: 0,
     favorites: 0,
@@ -340,7 +346,7 @@ export default function DashboardPage() {
         setComments(Array.isArray(commentsData) ? commentsData : [])
       }
 
-      // 如果是卖家，获取卖出的商品
+      // 如果是卖家，获取卖出的商品和收入
       if (user.isSeller) {
         const productsRes = await fetch('/api/users/my-products', {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -349,6 +355,37 @@ export default function DashboardPage() {
           const productsData = await productsRes.json()
           setSellerProducts(Array.isArray(productsData) ? productsData : [])
         }
+        const incomesRes = await fetch('/api/users/incomes', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (incomesRes.ok) {
+          const incomesData = await incomesRes.json()
+          setIncomes(incomesData)
+        }
+      }
+      // 获取支出
+      const expensesRes = await fetch('/api/users/expenses', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (expensesRes.ok) {
+        const expensesData = await expensesRes.json()
+        setExpenses(expensesData)
+      }
+      // 获取投诉建议
+      const complaintsRes = await fetch('/api/complaints', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (complaintsRes.ok) {
+        const complaintsData = await complaintsRes.json()
+        setComplaints(Array.isArray(complaintsData) ? complaintsData : [])
+      }
+      // 获取退款记录
+      const refundsRes = await fetch('/api/refunds', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (refundsRes.ok) {
+        const refundsData = await refundsRes.json()
+        setRefunds(Array.isArray(refundsData) ? refundsData : [])
       }
     } catch (error) {
       console.error('Failed to fetch data:', error)
@@ -384,7 +421,10 @@ export default function DashboardPage() {
       'CANCELLED': { text: 'Cancelled', color: 'bg-gray-100 text-gray-800' },
       'PENDING': { text: 'Pending Review', color: 'bg-yellow-100 text-yellow-800' },
       'APPROVED': { text: 'Approved', color: 'bg-green-100 text-green-800' },
-      'REJECTED': { text: 'Rejected', color: 'bg-red-100 text-red-800' }
+      'REJECTED': { text: 'Rejected', color: 'bg-red-100 text-red-800' },
+      'RESOLVED': { text: 'Resolved', color: 'bg-green-100 text-green-800' },
+      'REFUNDING': { text: 'Refunding', color: 'bg-orange-100 text-orange-800' },
+      'REFUNDED': { text: 'Refunded', color: 'bg-gray-100 text-gray-800' }
     }
     const statusInfo = statusMap[status] || { text: status, color: 'bg-gray-100 text-gray-800' }
     return (
@@ -530,7 +570,10 @@ export default function DashboardPage() {
                   { id: 'favorites', name: 'My Favorites', icon: '❤️' },
                   { id: 'posts', name: 'My Posts', icon: '📝' },
                   { id: 'comments', name: 'My Comments', icon: '💬' },
-                  ...(user.isSeller ? [{ id: 'products', name: 'My Products', icon: '🏪' }] : [])
+                  ...(user.isSeller ? [{ id: 'products', name: 'My Products', icon: '🏪' }, { id: 'incomes', name: 'Income', icon: '💰' }] : []),
+                  { id: 'expenses', name: 'Expenses', icon: '📊' },
+                  { id: 'complaints', name: 'Complaints', icon: '📢' },
+                  { id: 'refunds', name: 'Refunds', icon: '↩️' }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -808,6 +851,193 @@ export default function DashboardPage() {
                           </div>
                         )
                       })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 收入统计（卖家） */}
+              {activeTab === 'incomes' && user.isSeller && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Income</h2>
+                  <div className="bg-green-50 rounded-xl p-6 mb-6">
+                    <p className="text-sm text-gray-600 mb-1">Total Income</p>
+                    <p className="text-3xl font-bold text-green-700">¥{incomes.total?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  {(!incomes.incomes || incomes.incomes.length === 0) ? (
+                    <p className="text-gray-500">No income records</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {incomes.incomes.map((i: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-gray-900">¥{i.amount.toFixed(2)}</p>
+                            <p className="text-sm text-gray-500">{i.description || '-'}</p>
+                          </div>
+                          <div className="text-sm text-gray-500">{formatDate(i.createdAt)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 支出记录 */}
+              {activeTab === 'expenses' && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Expenses</h2>
+                  <div className="bg-orange-50 rounded-xl p-6 mb-6">
+                    <p className="text-sm text-gray-600 mb-1">Total Expenses</p>
+                    <p className="text-3xl font-bold text-orange-700">¥{expenses.total?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  {(!expenses.expenses || expenses.expenses.length === 0) ? (
+                    <p className="text-gray-500">No expense records</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {expenses.expenses.map((e: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-gray-900">¥{e.amount.toFixed(2)}</p>
+                            <p className="text-sm text-gray-500">{e.description || '-'}</p>
+                          </div>
+                          <div className="text-sm text-gray-500">{formatDate(e.createdAt)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 投诉建议 */}
+              {activeTab === 'complaints' && (
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Complaints & Suggestions</h2>
+                    <button
+                      onClick={() => setShowComplaintForm(true)}
+                      className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold"
+                    >
+                      + Submit Complaint/Suggestion
+                    </button>
+                  </div>
+                  {showComplaintForm && (
+                    <div className="mb-6 p-6 bg-gray-50 rounded-xl border border-gray-200">
+                      <h3 className="font-semibold text-gray-900 mb-4">Submit Complaint or Suggestion</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                          <select
+                            value={complaintForm.type}
+                            onChange={(e) => setComplaintForm({ ...complaintForm, type: e.target.value })}
+                            className="w-full px-3 py-2 border rounded-lg"
+                          >
+                            <option value="COMPLAINT">Complaint</option>
+                            <option value="SUGGESTION">Suggestion</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                          <input
+                            type="text"
+                            value={complaintForm.title}
+                            onChange={(e) => setComplaintForm({ ...complaintForm, title: e.target.value })}
+                            placeholder="Enter title"
+                            className="w-full px-3 py-2 border rounded-lg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+                          <textarea
+                            value={complaintForm.content}
+                            onChange={(e) => setComplaintForm({ ...complaintForm, content: e.target.value })}
+                            placeholder="Describe your issue or suggestion..."
+                            rows={4}
+                            className="w-full px-3 py-2 border rounded-lg"
+                          />
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={async () => {
+                              if (!complaintForm.title || !complaintForm.content) {
+                                alert('Please fill in title and content')
+                                return
+                              }
+                              const token = localStorage.getItem('token')
+                              const res = await fetch('/api/complaints', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                                body: JSON.stringify(complaintForm)
+                              })
+                              if (res.ok) {
+                                setShowComplaintForm(false)
+                                setComplaintForm({ type: 'COMPLAINT', title: '', content: '', orderId: '' })
+                                fetchData()
+                              } else {
+                                const err = await res.json()
+                                alert(err.error || 'Submit failed')
+                              }
+                            }}
+                            className="px-4 py-2 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800"
+                          >
+                            Submit
+                          </button>
+                          <button
+                            onClick={() => setShowComplaintForm(false)}
+                            className="px-4 py-2 border rounded-lg"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {complaints.length === 0 ? (
+                    <p className="text-gray-500">No complaints or suggestions</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {complaints.map((c) => (
+                        <div key={c.id} className="border border-gray-200 rounded-lg p-6">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-semibold text-gray-900">{c.title}</h3>
+                            {getStatusBadge(c.status)}
+                          </div>
+                          <p className="text-gray-600">{c.content}</p>
+                          {c.reply && (
+                            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                              <p className="text-sm font-medium text-gray-600 mb-1">Reply:</p>
+                              <p className="text-gray-800">{c.reply}</p>
+                            </div>
+                          )}
+                          <p className="text-sm text-gray-500 mt-2">{formatDate(c.createdAt)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 退款记录 */}
+              {activeTab === 'refunds' && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Refunds</h2>
+                  {refunds.length === 0 ? (
+                    <p className="text-gray-500">No refund records</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {refunds.map((r) => (
+                        <Link key={r.id} href={`/orders/${r.orderId}`}>
+                          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start mb-2">
+                              <p className="font-semibold text-gray-900">{r.order?.orderNumber ? `Order: ${r.order.orderNumber}` : 'Refund Request'}</p>
+                              {getStatusBadge(r.status)}
+                            </div>
+                            <p className="text-gray-600 mb-1">Type: {r.type === 'REFUND' ? 'Refund Only' : 'Return & Refund'}</p>
+                            <p className="text-gray-600 mb-1">Reason: {r.reason}</p>
+                            <p className="text-gray-900 font-bold">¥{r.amount.toFixed(2)}</p>
+                            <p className="text-sm text-gray-500 mt-2">{formatDate(r.createdAt)}</p>
+                          </div>
+                        </Link>
+                      ))}
                     </div>
                   )}
                 </div>

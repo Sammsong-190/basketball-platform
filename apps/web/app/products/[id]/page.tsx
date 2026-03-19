@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import { useToast } from '@/components/Toast'
+import CheckoutDrawer from '@/components/CheckoutDrawer'
+import FlyToCart from '@/components/FlyToCart'
 
 interface Product {
   id: string
@@ -32,6 +34,10 @@ export default function ProductDetailPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [autoPlay, setAutoPlay] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [flyToCart, setFlyToCart] = useState<{ imageSrc: string; fromRect: DOMRect } | null>(null)
+  const productImageRef = useRef<HTMLDivElement>(null)
 
   const productId = Array.isArray(params.id) ? params.id[0] : params.id
 
@@ -133,6 +139,14 @@ export default function ProductDetailPage() {
       return
     }
 
+    const images = product?.images ? JSON.parse(product.images) : []
+    const imageSrc = images[selectedImageIndex] || (images[0] ?? '')
+    const rect = productImageRef.current?.getBoundingClientRect()
+
+    if (imageSrc && rect) {
+      setFlyToCart({ imageSrc, fromRect: rect })
+    }
+
     const token = localStorage.getItem('token')
     try {
       const response = await fetch('/api/cart', {
@@ -148,35 +162,38 @@ export default function ProductDetailPage() {
       })
 
       if (response.ok) {
-        showToast('Added to cart')
+        if (!imageSrc || !rect) showToast('Added to cart')
       } else {
+        setFlyToCart(null)
         const data = await response.json()
         alert(data.error || 'Failed to add to cart')
       }
     } catch (error) {
+      setFlyToCart(null)
       console.error('Failed to add to cart:', error)
       alert('Failed to add to cart, please try again')
     }
   }
 
-  const handleBuyNow = async () => {
+  const handleFlyToCartComplete = () => {
+    setFlyToCart(null)
+    showToast('Added to cart')
+  }
+
+  const handleBuyNowClick = () => {
     if (!user) {
       alert('Please login first')
       router.push('/login')
       return
     }
+    setCheckoutOpen(true)
+  }
 
+  const handleBuyNowSubmit = async (form: { shippingName: string; shippingPhone: string; shippingAddress: string }) => {
     const token = localStorage.getItem('token')
+    if (!token || !product) return
+    setCheckoutLoading(true)
     try {
-      const shippingAddress = prompt('Please enter your shipping address:')
-      const shippingName = prompt('Please enter your name:')
-      const shippingPhone = prompt('Please enter your phone number:')
-
-      if (!shippingAddress || !shippingName || !shippingPhone) {
-        alert('Please fill in all shipping information')
-        return
-      }
-
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -184,27 +201,29 @@ export default function ProductDetailPage() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          items: [{
-            productId: product?.id,
-            quantity
-          }],
-          shippingAddress,
-          shippingName,
-          shippingPhone
+          items: [{ productId: product.id, quantity }],
+          shippingAddress: form.shippingAddress,
+          shippingName: form.shippingName,
+          shippingPhone: form.shippingPhone
         })
       })
 
       if (response.ok) {
         const order = await response.json()
         showToast('Order created successfully!')
+        setCheckoutOpen(false)
         router.push(`/orders/${order.id}`)
       } else {
         const data = await response.json()
         alert(data.error || 'Failed to create order')
+        throw new Error(data.error)
       }
     } catch (error) {
       console.error('Failed to create order:', error)
       alert('Failed to create order, please try again')
+      throw error
+    } finally {
+      setCheckoutLoading(false)
     }
   }
 
@@ -276,7 +295,10 @@ export default function ProductDetailPage() {
               {/* Product Images */}
               <div>
                 {/* 主图片轮播区域 */}
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 relative group">
+                <div
+                  ref={productImageRef}
+                  className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 relative group"
+                >
                   <div className="relative w-full h-full overflow-hidden">
                     {images.map((img: string, index: number) => (
                       <div
@@ -511,7 +533,7 @@ export default function ProductDetailPage() {
                       🛒 Add to Cart
                     </button>
                     <button
-                      onClick={handleBuyNow}
+                      onClick={handleBuyNowClick}
                       disabled={product.stock === 0}
                       className="flex-1 px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -532,6 +554,22 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      <CheckoutDrawer
+        open={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        onSubmit={handleBuyNowSubmit}
+        loading={checkoutLoading}
+        totalAmount={product ? product.price * quantity : 0}
+        itemCount={quantity}
+      />
+
+      <FlyToCart
+        active={!!flyToCart}
+        imageSrc={flyToCart?.imageSrc ?? ''}
+        fromRect={flyToCart?.fromRect ?? null}
+        onComplete={handleFlyToCartComplete}
+      />
     </>
   )
 }

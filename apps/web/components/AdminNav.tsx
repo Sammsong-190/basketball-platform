@@ -31,6 +31,26 @@ export default function AdminNav() {
       href: '/admin/scrape-products',
       label: 'Scrape Products',
       icon: '🕷️'
+    },
+    {
+      href: '/admin/refunds',
+      label: 'Refunds',
+      icon: '↩️'
+    },
+    {
+      href: '/admin/complaints',
+      label: 'Complaints',
+      icon: '📢'
+    },
+    {
+      href: '/admin/users',
+      label: 'Users',
+      icon: '👥'
+    },
+    {
+      href: '/admin/logs',
+      label: 'System Logs',
+      icon: '📋'
     }
   ]
 

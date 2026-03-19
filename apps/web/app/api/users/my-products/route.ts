@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     })
 
     if (!user || !user.isSeller) {
-      return NextResponse.json({ error: '您不是卖家' }, { status: 403 })
+      return NextResponse.json({ error: 'You are not a seller' }, { status: 403 })
     }
 
     const products = await prisma.product.findMany({
@@ -45,6 +45,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(productsWithSales)
   } catch (error) {
     console.error('获取商品列表失败:', error)
-    return NextResponse.json({ error: '获取商品列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get products list' }, { status: 500 })
   }
 }

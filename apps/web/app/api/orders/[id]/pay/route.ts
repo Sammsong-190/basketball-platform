@@ -16,11 +16,11 @@ export async function POST(
     })
 
     if (!order) {
-      return NextResponse.json({ error: '订单不存在' }, { status: 404 })
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
     if (order.status !== 'PENDING_PAYMENT') {
-      return NextResponse.json({ error: '订单状态不允许支付' }, { status: 400 })
+      return NextResponse.json({ error: 'Order status does not allow payment' }, { status: 400 })
     }
 
     const body = await request.json()
@@ -54,6 +54,6 @@ export async function POST(
 
     return NextResponse.json({ order: updatedOrder, payment }, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: '支付失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Payment failed' }, { status: 500 })
   }
 }

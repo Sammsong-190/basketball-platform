@@ -6,8 +6,8 @@ import { Providers } from './Providers'
 const bebasNeue = Bebas_Neue({ weight: '400', subsets: ['latin'], variable: '--font-events' })
 
 export const metadata: Metadata = {
-  title: '篮球用品电商社交平台',
-  description: '整合交易、社交、内容三大功能的篮球用品平台',
+  title: 'Basketball E-commerce Social Platform',
+  description: 'Basketball products platform integrating commerce, social and content',
 }
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body className={bebasNeue.variable}>
         <Providers>{children}</Providers>
       </body>

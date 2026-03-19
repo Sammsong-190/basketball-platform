@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { orderId, type, reason, amount } = body
 
     if (!orderId || !type || !reason) {
-      return NextResponse.json({ error: '订单ID、类型和原因为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Order ID, type and reason are required' }, { status: 400 })
     }
 
     const order = await prisma.order.findUnique({
@@ -21,11 +21,11 @@ export async function POST(request: NextRequest) {
     })
 
     if (!order) {
-      return NextResponse.json({ error: '订单不存在' }, { status: 404 })
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
     if (order.status !== 'COMPLETED' && order.status !== 'SHIPPED') {
-      return NextResponse.json({ error: '该订单状态不允许退换货' }, { status: 400 })
+      return NextResponse.json({ error: 'Order status does not allow refund' }, { status: 400 })
     }
 
     const refund = await prisma.refund.create({
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(refund, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: '申请退换货失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to submit refund request' }, { status: 500 })
   }
 }
 
@@ -82,6 +82,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(refunds)
   } catch (error) {
-    return NextResponse.json({ error: '获取退换货列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch refund list' }, { status: 500 })
   }
 }

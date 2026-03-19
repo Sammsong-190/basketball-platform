@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ products, total, page, limit, stats })
   } catch (error) {
-    return NextResponse.json({ error: '获取商品数据失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get products data' }, { status: 500 })
   }
 }
 
@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
     const { id, status } = body
 
     if (!id || !status) {
-      return NextResponse.json({ error: '商品ID和状态为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Product ID and status are required' }, { status: 400 })
     }
 
     const product = await prisma.product.update({
@@ -70,6 +70,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(product)
   } catch (error) {
-    return NextResponse.json({ error: '操作失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 })
   }
 }

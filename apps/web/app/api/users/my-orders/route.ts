@@ -18,6 +18,6 @@ export async function GET(request: NextRequest) {
     })
     return NextResponse.json(orders)
   } catch (error) {
-    return NextResponse.json({ error: '获取订单列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get orders list' }, { status: 500 })
   }
 }

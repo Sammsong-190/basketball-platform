@@ -60,7 +60,7 @@ export default function AdminPostsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch post list:', error)
-      alert('获取帖子列表失败')
+      alert('Failed to fetch posts')
     } finally {
       setLoading(false)
     }

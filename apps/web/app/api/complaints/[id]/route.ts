@@ -24,6 +24,6 @@ export async function PUT(
 
     return NextResponse.json(complaint)
   } catch (error) {
-    return NextResponse.json({ error: '更新失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   }
 }

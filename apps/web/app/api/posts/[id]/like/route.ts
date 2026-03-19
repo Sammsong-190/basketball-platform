@@ -35,6 +35,6 @@ export async function POST(
       return NextResponse.json({ liked: true })
     }
   } catch (error) {
-    return NextResponse.json({ error: '点赞失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Like failed' }, { status: 500 })
   }
 }

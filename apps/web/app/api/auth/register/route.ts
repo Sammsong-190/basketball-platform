@@ -10,21 +10,21 @@ export async function POST(request: NextRequest) {
 
     if (!username || !email || !password) {
       return NextResponse.json(
-        { error: '用户名、邮箱和密码为必填项' },
+        { error: 'Username, email and password are required' },
         { status: 400 }
       )
     }
 
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { error: '邮箱格式不正确' },
+        { error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
     if (phone && !isValidPhone(phone)) {
       return NextResponse.json(
-        { error: '手机号格式不正确' },
+        { error: 'Invalid phone format' },
         { status: 400 }
       )
     }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: '用户名或邮箱已存在' },
+        { error: 'Username or email already exists' },
         { status: 400 }
       )
     }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // 开发/预览环境返回详细错误，便于排查 Vercel 部署问题
     const isDev = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview'
     return NextResponse.json(
-      { error: isDev ? `注册失败: ${msg}` : '注册失败，请稍后重试' },
+      { error: isDev ? `Registration failed: ${msg}` : 'Registration failed, please try again later' },
       { status: 500 }
     )
   }

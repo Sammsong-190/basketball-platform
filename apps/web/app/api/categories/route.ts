@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     if (orphanChildren.length > 0) {
       structuredCategories.push({
         id: 'other',
-        name: '其他',
+        name: 'Other',
         parentId: null,
         children: orphanChildren.map(child => ({
           id: child.id,
@@ -62,6 +62,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(structuredCategories)
   } catch (error: any) {
     console.error('获取分类列表失败:', error)
-    return NextResponse.json({ error: '获取分类列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get categories list' }, { status: 500 })
   }
 }

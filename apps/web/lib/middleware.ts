@@ -7,7 +7,7 @@ export async function authenticate(request: NextRequest): Promise<NextResponse |
   
   if (!token) {
     return NextResponse.json(
-      { error: '未授权，请先登录' },
+      { error: 'Unauthorized, please login first' },
       { status: 401 }
     )
   }
@@ -15,7 +15,7 @@ export async function authenticate(request: NextRequest): Promise<NextResponse |
   const payload = verifyToken(token)
   if (!payload) {
     return NextResponse.json(
-      { error: 'Token无效或已过期' },
+      { error: 'Token invalid or expired' },
       { status: 401 }
     )
   }
@@ -34,7 +34,7 @@ export function requireRole(allowedRoles: string[]) {
     const payload = authResult as TokenPayload
     if (!allowedRoles.includes(payload.role)) {
       return NextResponse.json(
-        { error: '权限不足' },
+        { error: 'Insufficient permissions' },
         { status: 403 }
       )
     }
@@ -70,7 +70,7 @@ export async function requireSeller(request: NextRequest): Promise<NextResponse 
 
     if (!user) {
       return NextResponse.json(
-        { error: '用户不存在' },
+        { error: 'User not found' },
         { status: 404 }
       )
     }
@@ -81,12 +81,12 @@ export async function requireSeller(request: NextRequest): Promise<NextResponse 
     }
 
     return NextResponse.json(
-      { error: '权限不足，您不是卖家，无法发布商品' },
+      { error: 'Insufficient permissions, you are not a seller' },
       { status: 403 }
     )
   } catch (error) {
     return NextResponse.json(
-      { error: '验证权限失败' },
+      { error: 'Permission verification failed' },
       { status: 500 }
     )
   }

@@ -14,7 +14,7 @@ export async function POST(
   try {
     const post = await prisma.post.findUnique({ where: { id: params.id } })
     if (!post) {
-      return NextResponse.json({ error: '帖子不存在' }, { status: 404 })
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
     }
 
     // 创建分享记录
@@ -33,6 +33,6 @@ export async function POST(
 
     return NextResponse.json(share, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: '分享失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Share failed' }, { status: 500 })
   }
 }

@@ -19,7 +19,7 @@ export async function PUT(
     })
 
     if (!refund) {
-      return NextResponse.json({ error: '退换货申请不存在' }, { status: 404 })
+      return NextResponse.json({ error: 'Refund request not found' }, { status: 404 })
     }
 
     const updateData: any = { adminNote }
@@ -40,6 +40,6 @@ export async function PUT(
 
     return NextResponse.json(updated)
   } catch (error) {
-    return NextResponse.json({ error: '审核失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Review failed' }, { status: 500 })
   }
 }

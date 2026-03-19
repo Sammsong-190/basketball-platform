@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { type, title, content, orderId } = body
 
     if (!type || !title || !content) {
-      return NextResponse.json({ error: '类型、标题和内容为必填项' }, { status: 400 })
+      return NextResponse.json({ error: 'Type, title and content are required' }, { status: 400 })
     }
 
     const complaint = await prisma.complaint.create({
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(complaint, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: '提交失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Submit failed' }, { status: 500 })
   }
 }
 
@@ -56,6 +56,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(complaints)
   } catch (error) {
-    return NextResponse.json({ error: '获取列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch list' }, { status: 500 })
   }
 }

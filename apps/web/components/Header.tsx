@@ -91,6 +91,7 @@ export default function Header() {
                 )}
                 <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-3">
                   <Link
+                    id="header-cart-icon"
                     href="/cart"
                     className="relative p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
                   >
@@ -115,6 +116,7 @@ export default function Header() {
             ) : (
               <div className="ml-4 pl-4 border-l border-gray-200 flex items-center space-x-2">
                 <Link
+                  id="header-cart-icon"
                   href="/cart"
                   className="relative p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
                 >

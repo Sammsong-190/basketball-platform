@@ -27,7 +27,7 @@ export async function GET(
 
     return NextResponse.json({ reviews, total, page, limit })
   } catch (error) {
-    return NextResponse.json({ error: '获取评价列表失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to get reviews list' }, { status: 500 })
   }
 }
 
@@ -45,7 +45,7 @@ export async function POST(
     const { rating, content, orderId, images } = body
 
     if (!rating || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: '评分必须在1-5之间' }, { status: 400 })
+      return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 })
     }
 
     // 检查是否已评价
@@ -60,7 +60,7 @@ export async function POST(
     })
 
     if (existing) {
-      return NextResponse.json({ error: '您已评价过此商品' }, { status: 400 })
+      return NextResponse.json({ error: 'You have already reviewed this product' }, { status: 400 })
     }
 
     const review = await prisma.productReview.create({
@@ -96,8 +96,8 @@ export async function POST(
     return NextResponse.json(review, { status: 201 })
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return NextResponse.json({ error: '您已评价过此商品' }, { status: 400 })
+      return NextResponse.json({ error: 'You have already reviewed this product' }, { status: 400 })
     }
-    return NextResponse.json({ error: '创建评价失败' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create review' }, { status: 500 })
   }
 }

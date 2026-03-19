@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!username || !password) {
       return NextResponse.json(
-        { error: '用户名和密码为必填项' },
+        { error: 'Username and password are required' },
         { status: 400 }
       )
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: '用户名或密码错误' },
+        { error: 'Invalid username or password' },
         { status: 401 }
       )
     }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const isValid = await comparePassword(password, user.password)
     if (!isValid) {
       return NextResponse.json(
-        { error: '用户名或密码错误' },
+        { error: 'Invalid username or password' },
         { status: 401 }
       )
     }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     // 开发/预览环境返回详细错误，便于排查 Vercel 部署问题
     const isDev = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview'
     return NextResponse.json(
-      { error: isDev ? `登录失败: ${msg}` : '登录失败，请稍后重试' },
+      { error: isDev ? `Login failed: ${msg}` : 'Login failed, please try again later' },
       { status: 500 }
     )
   }

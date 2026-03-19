@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
     // 检查是否为管理员
     if (user.role !== 'ADMIN') {
-        return NextResponse.json({ error: '无权限访问' }, { status: 403 })
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ products })
     } catch (error) {
-        return NextResponse.json({ error: '获取商品列表失败' }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to get products list' }, { status: 500 })
     }
 }
 
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     // 检查是否为管理员
     if (user.role !== 'ADMIN') {
-        return NextResponse.json({ error: '无权限访问' }, { status: 403 })
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     try {
@@ -56,11 +56,11 @@ export async function POST(request: NextRequest) {
         const { productId, action, reason } = body // action: 'approve' 或 'reject'
 
         if (!productId || !action) {
-            return NextResponse.json({ error: '参数不完整' }, { status: 400 })
+            return NextResponse.json({ error: 'Incomplete parameters' }, { status: 400 })
         }
 
         if (action !== 'approve' && action !== 'reject' && action !== 'delete') {
-            return NextResponse.json({ error: '无效的操作' }, { status: 400 })
+            return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
         }
 
         if (action === 'delete') {
@@ -84,10 +84,10 @@ export async function POST(request: NextRequest) {
         })
 
         return NextResponse.json({
-            message: action === 'approve' ? '商品已批准' : '商品已撤回',
+            message: action === 'approve' ? 'Product approved' : 'Product rejected',
             product
         })
     } catch (error) {
-        return NextResponse.json({ error: '审核失败' }, { status: 500 })
+        return NextResponse.json({ error: 'Review failed' }, { status: 500 })
     }
 }
