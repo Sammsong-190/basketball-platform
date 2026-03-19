@@ -331,7 +331,7 @@ export default function OrderDetailPage() {
                   </button>
                 </>
               )}
-              {(order.status === 'SHIPPED' || order.status === 'PAID') && order.status !== 'REFUNDING' && (
+              {(order.status === 'SHIPPED' || order.status === 'PAID') && (
                 <button
                   onClick={handleConfirmReceipt}
                   className="px-6 py-2 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800"
@@ -339,7 +339,7 @@ export default function OrderDetailPage() {
                   Confirm Receipt
                 </button>
               )}
-              {(order.status === 'SHIPPED' || order.status === 'COMPLETED') && order.status !== 'REFUNDING' && order.status !== 'REFUNDED' && (
+              {(order.status === 'SHIPPED' || order.status === 'COMPLETED') && (
                 <button
                   onClick={() => setShowRefundModal(true)}
                   className="px-6 py-2 bg-white border border-orange-300 text-orange-600 rounded-lg font-semibold hover:bg-orange-50"
