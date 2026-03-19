@@ -493,53 +493,65 @@ export default function ProductDetailPage() {
 
                 {/* Quantity and Actions */}
                 <div className="border-t border-gray-200 pt-6">
-                  <div className="flex items-center gap-4 mb-6">
-                    <label className="text-gray-700 font-semibold">Quantity:</label>
-                    <div className="flex items-center border border-gray-300 rounded-lg">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-4 py-2 hover:bg-gray-100 transition-colors"
-                        disabled={quantity <= 1}
-                      >
-                        −
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        max={product.stock}
-                        value={quantity}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value) || 1
-                          setQuantity(Math.max(1, Math.min(val, product.stock)))
-                        }}
-                        className="w-20 text-center border-0 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button
-                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                        className="px-4 py-2 hover:bg-gray-100 transition-colors"
-                        disabled={quantity >= product.stock}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
+                  {user ? (
+                    <>
+                      <div className="flex items-center gap-4 mb-6">
+                        <label className="text-gray-700 font-semibold">Quantity:</label>
+                        <div className="flex items-center border border-gray-300 rounded-lg">
+                          <button
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                            disabled={quantity <= 1}
+                          >
+                            −
+                          </button>
+                          <input
+                            type="number"
+                            min="1"
+                            max={product.stock}
+                            value={quantity}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 1
+                              setQuantity(Math.max(1, Math.min(val, product.stock)))
+                            }}
+                            className="w-20 text-center border-0 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <button
+                            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                            className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                            disabled={quantity >= product.stock}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
 
-                  <div className="flex gap-4">
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={product.stock === 0}
-                      className="flex-1 px-6 py-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      🛒 Add to Cart
-                    </button>
-                    <button
-                      onClick={handleBuyNowClick}
-                      disabled={product.stock === 0}
-                      className="flex-1 px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Buy Now
-                    </button>
-                  </div>
+                      <div className="flex gap-4">
+                        <button
+                          onClick={handleAddToCart}
+                          disabled={product.stock <= 0}
+                          className="flex-1 px-6 py-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          🛒 Add to Cart
+                        </button>
+                        <button
+                          onClick={handleBuyNowClick}
+                          disabled={product.stock <= 0}
+                          className="flex-1 px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Buy Now
+                        </button>
+                      </div>
+                      {product.stock <= 0 && (
+                        <p className="text-amber-600 font-medium mt-2">Out of stock</p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-600 py-2">
+                      <Link href="/login" className="text-gray-900 font-semibold hover:underline">Login</Link>
+                      {' '}to add to cart or purchase
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

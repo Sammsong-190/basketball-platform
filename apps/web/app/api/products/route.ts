@@ -69,11 +69,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid price' }, { status: 400 })
     }
 
-    // 验证库存
-    const parsedStock = parseInt(stock || '0')
-    if (isNaN(parsedStock) || parsedStock < 0) {
-      return NextResponse.json({ error: 'Invalid stock' }, { status: 400 })
-    }
+    // 验证库存（自由交易商品默认至少 1，否则无法购买）
+    const parsedStock = Math.max(0, parseInt(stock || '1') || 1)
 
     // 验证分类是否存在
     const category = await prisma.category.findUnique({

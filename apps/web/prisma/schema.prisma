@@ -86,7 +86,7 @@ model Post {
   author      User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   categoryId  String?
   category    PostCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  images      String?      @db.Text  // JSON数组，存储图片URL或base64
+  images      String?      @db.LongText  // JSON数组，存储图片URL或base64
   views       Int          @default(0)
   likes       Int          @default(0)
   shares      Int          @default(0)

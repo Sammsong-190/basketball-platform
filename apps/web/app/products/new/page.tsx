@@ -25,7 +25,7 @@ export default function NewProductPage() {
     name: '',
     description: '',
     price: '',
-    stock: '',
+    stock: '1',
     categoryId: ''
   })
 
@@ -278,15 +278,15 @@ export default function NewProductPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    Stock <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                    Stock <span className="text-gray-400 text-xs font-normal">(Default: 1)</span>
                   </label>
                   <input
                     type="number"
-                    min="0"
+                    min="1"
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                    placeholder="0"
+                    placeholder="1"
                   />
                 </div>
               </div>

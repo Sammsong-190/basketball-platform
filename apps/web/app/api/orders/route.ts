@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
       if (!product || product.stock < item.quantity) {
         return NextResponse.json({ error: `Product ${product?.name || ''} is out of stock` }, { status: 400 })
       }
+      if (product.sellerId === userId) {
+        return NextResponse.json({ error: 'You cannot purchase your own product' }, { status: 400 })
+      }
       const itemPrice = product.price * item.quantity
       totalAmount += itemPrice
       orderItems.push({ productId: item.productId, quantity: item.quantity, price: product.price })

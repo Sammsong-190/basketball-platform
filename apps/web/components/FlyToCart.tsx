@@ -14,7 +14,12 @@ const CART_ICON_ID = 'header-cart-icon'
 
 export default function FlyToCart({ active, imageSrc, fromRect, onComplete }: FlyToCartProps) {
   const [phase, setPhase] = useState<'start' | 'flying'>('start')
+  const [mounted, setMounted] = useState(false)
   const elRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!active || !fromRect || typeof document === 'undefined') return
@@ -27,7 +32,6 @@ export default function FlyToCart({ active, imageSrc, fromRect, onComplete }: Fl
       return
     }
 
-    // Force reflow so browser applies initial styles before animating
     setPhase('start')
     const raf = requestAnimationFrame(() => {
       requestAnimationFrame(() => setPhase('flying'))
@@ -44,11 +48,10 @@ export default function FlyToCart({ active, imageSrc, fromRect, onComplete }: Fl
     }
   }, [active, fromRect, onComplete])
 
-  if (!active || !fromRect || !imageSrc) return null
+  if (!mounted || !active || !fromRect || !imageSrc) return null
 
-  const cartEl = typeof document !== 'undefined' ? document.getElementById(CART_ICON_ID) : null
+  const cartEl = document.getElementById(CART_ICON_ID)
   const toRect = cartEl?.getBoundingClientRect()
-
   if (!toRect) return null
 
   const fromStyle: React.CSSProperties = {
@@ -94,7 +97,6 @@ export default function FlyToCart({ active, imageSrc, fromRect, onComplete }: Fl
     </div>
   )
 
-  return typeof document !== 'undefined' && document.body
-    ? createPortal(flyEl, document.body)
-    : null
+  const portalRoot = typeof document !== 'undefined' ? document.getElementById('fly-to-cart-portal') : null
+  return portalRoot ? createPortal(flyEl, portalRoot) : null
 }

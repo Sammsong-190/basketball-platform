@@ -6,6 +6,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
+    "dev:3002": "next dev -p 3002",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,6 +16,7 @@
     "db:studio": "prisma studio",
     "create-admin": "node create-admin.js",
     "init-categories": "node init-categories.js",
+    "fix-zero-stock": "node fix-zero-stock.js",
     "upgrade-admin": "node update-user-to-admin.js"
   },
   "dependencies": {

@@ -87,8 +87,12 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(post, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to create post:', error)
+    const msg = error?.message || ''
+    if (msg.includes('Data too long') || msg.includes('packet') || msg.includes('max_allowed_packet')) {
+      return NextResponse.json({ error: 'Images are too large. Please use fewer or smaller images.' }, { status: 413 })
+    }
     return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
   }
 }

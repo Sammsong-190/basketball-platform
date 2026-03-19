@@ -17,38 +17,70 @@ export default function NewPostPage() {
         images: ''
     })
 
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(file)
+            const img = new Image()
+            img.onload = () => {
+                URL.revokeObjectURL(url)
+                const canvas = document.createElement('canvas')
+                let { width, height } = img
+                if (width > maxWidth || height > maxWidth) {
+                    if (width > height) {
+                        height = (height / width) * maxWidth
+                        width = maxWidth
+                    } else {
+                        width = (width / height) * maxWidth
+                        height = maxWidth
+                    }
+                }
+                canvas.width = width
+                canvas.height = height
+                const ctx = canvas.getContext('2d')
+                if (!ctx) return reject(new Error('Canvas not supported'))
+                ctx.drawImage(img, 0, 0, width, height)
+                resolve(canvas.toDataURL('image/jpeg', quality))
+            }
+            img.onerror = () => {
+                URL.revokeObjectURL(url)
+                reject(new Error('Failed to load image'))
+            }
+            img.src = url
+        })
+    }
+
+    const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files) return
 
         const fileArray = Array.from(files).filter(file => file.type.startsWith('image/'))
         if (fileArray.length === 0) return
 
-        const newImages: string[] = []
-        let loadedCount = 0
+        const maxImages = 9
+        const currentCount = previewImages.length
+        if (currentCount >= maxImages) {
+            alert(`Maximum ${maxImages} images allowed`)
+            e.target.value = ''
+            return
+        }
 
-        fileArray.forEach((file) => {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                const result = reader.result as string
-                newImages.push(result)
-                loadedCount++
+        const toProcess = fileArray.slice(0, maxImages - currentCount)
 
-                if (loadedCount === fileArray.length) {
-                    setPreviewImages((prev) => {
-                        const updated = [...prev, ...newImages]
-                        setFormData((prevData) => ({
-                            ...prevData,
-                            images: updated.join(',')
-                        }))
-                        return updated
-                    })
-                }
-            }
-            reader.readAsDataURL(file)
-        })
+        try {
+            const newImages = await Promise.all(toProcess.map(file => compressImage(file)))
+            setPreviewImages((prev) => {
+                const updated = [...prev, ...newImages].slice(0, maxImages)
+                setFormData((prevData) => ({
+                    ...prevData,
+                    images: updated.join(',')
+                }))
+                return updated
+            })
+        } catch (err) {
+            console.error(err)
+            alert('Failed to process images. Please try smaller files.')
+        }
 
-        // 重置input，允许重复选择同一文件
         e.target.value = ''
     }
 

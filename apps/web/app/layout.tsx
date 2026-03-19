@@ -16,9 +16,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" translate="no" className="notranslate">
       <body className={bebasNeue.variable}>
         <Providers>{children}</Providers>
+        <div id="fly-to-cart-portal" suppressHydrationWarning />
       </body>
     </html>
   )

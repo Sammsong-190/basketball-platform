@@ -36,6 +36,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Product ID and quantity are required' }, { status: 400 })
     }
 
+    const product = await prisma.product.findUnique({ where: { id: productId }, select: { sellerId: true } })
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    }
+    if (product.sellerId === userId) {
+      return NextResponse.json({ error: 'You cannot add your own product to cart' }, { status: 400 })
+    }
+
     const existing = await prisma.cartItem.findUnique({
       where: { userId_productId: { userId, productId } }
     })
