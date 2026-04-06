@@ -13,12 +13,25 @@ interface OrderItem {
     id: string
     name: string
     images: string
+    sellerId: string
+    sourceType?: string
     seller: { username: string }
   }
 }
 
+interface RefundInfo {
+  id: string
+  status: string
+  type: string
+  reason: string
+  amount: number
+  createdAt: string
+  user?: { username: string }
+}
+
 interface Order {
   id: string
+  userId: string
   orderNumber: string
   status: string
   totalAmount: number
@@ -32,6 +45,28 @@ interface Order {
   completedAt?: string
   createdAt: string
   items: OrderItem[]
+  refunds?: RefundInfo[]
+}
+
+function viewerCanProcessRefund(
+  order: Order,
+  viewer: { id: string; role: string; isSeller?: boolean }
+): boolean {
+  if (viewer.role === 'ADMIN') return true
+  if (!viewer.isSeller) return false
+  const items = order.items || []
+  if (!items.length) return false
+  let hasPlatform = false
+  const sellerIds = new Set<string>()
+  for (const item of items) {
+    const p = item.product
+    const st = p.sourceType || 'FREE_TRADE'
+    if (st === 'PLATFORM_MANAGED') hasPlatform = true
+    else if (p.sellerId) sellerIds.add(p.sellerId)
+  }
+  if (hasPlatform) return false
+  if (sellerIds.size !== 1) return false
+  return sellerIds.has(viewer.id)
 }
 
 export default function OrderDetailPage() {
@@ -44,12 +79,23 @@ export default function OrderDetailPage() {
   const [refundReason, setRefundReason] = useState('')
   const [refundType, setRefundType] = useState('REFUND')
   const [refunding, setRefunding] = useState(false)
+  const [viewer, setViewer] = useState<{ id: string; role: string; isSeller?: boolean } | null>(null)
+  const [refundProcessNote, setRefundProcessNote] = useState('')
+  const [refundProcessing, setRefundProcessing] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
       router.push('/login')
       return
+    }
+    const userRaw = localStorage.getItem('user')
+    if (userRaw) {
+      try {
+        setViewer(JSON.parse(userRaw))
+      } catch {
+        setViewer(null)
+      }
     }
     fetchOrder()
   }, [params.id, router])
@@ -189,6 +235,37 @@ export default function OrderDetailPage() {
     }
   }
 
+  const handleRefundProcess = async (refundId: string, status: 'APPROVED' | 'REJECTED') => {
+    const label = status === 'APPROVED' ? '同意该退款/退货申请' : '拒绝该申请'
+    if (!confirm(`确认要${label}吗？`)) return
+    setRefundProcessing(true)
+    const token = localStorage.getItem('token')
+    try {
+      const res = await fetch(`/api/refunds/${refundId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status,
+          adminNote: refundProcessNote.trim() || undefined
+        })
+      })
+      if (res.ok) {
+        setRefundProcessNote('')
+        fetchOrder()
+      } else {
+        const err = await res.json()
+        alert(err.error || '操作失败')
+      }
+    } catch {
+      alert('操作失败')
+    } finally {
+      setRefundProcessing(false)
+    }
+  }
+
   const formatDate = (d: string) =>
     new Date(d).toLocaleString('en-US', {
       year: 'numeric',
@@ -237,6 +314,11 @@ export default function OrderDetailPage() {
     )
   }
 
+  const pendingRefund = order.refunds?.find((r) => r.status === 'PENDING')
+  const canProcessRefund =
+    viewer && order ? viewerCanProcessRefund(order, viewer) : false
+  const isBuyer = viewer && order.userId === viewer.id
+
   return (
     <>
       <Header />
@@ -244,7 +326,7 @@ export default function OrderDetailPage() {
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 font-medium">
-              ← Back to My Orders
+              {isBuyer ? '← Back to My Orders' : '← Back to Dashboard'}
             </Link>
             {getStatusBadge(order.status)}
           </div>
@@ -281,6 +363,71 @@ export default function OrderDetailPage() {
                 )
               })}
             </div>
+
+            {pendingRefund && (
+              <div className="p-6 border-t border-orange-200 bg-orange-50/90">
+                <h2 className="font-semibold text-gray-900 mb-3">退款 / 退货申请</h2>
+                <div className="text-sm text-gray-700 space-y-1 mb-3">
+                  <p>
+                    <span className="font-medium">类型：</span>
+                    {pendingRefund.type === 'REFUND' ? '仅退款' : '退货退款'}
+                  </p>
+                  <p>
+                    <span className="font-medium">金额：</span>¥{pendingRefund.amount.toFixed(2)}
+                  </p>
+                  <p>
+                    <span className="font-medium">原因：</span>
+                    {pendingRefund.reason}
+                  </p>
+                  <p className="text-gray-500">
+                    申请时间：{formatDate(pendingRefund.createdAt)}
+                    {pendingRefund.user?.username && (
+                      <span className="ml-2">· 买家 {pendingRefund.user.username}</span>
+                    )}
+                  </p>
+                </div>
+                {isBuyer && !canProcessRefund && (
+                  <p className="text-sm text-amber-800 bg-amber-100/80 rounded-lg px-3 py-2">
+                    已提交申请，请等待卖家或平台处理。
+                  </p>
+                )}
+                {canProcessRefund && (
+                  <div className="mt-4 space-y-3">
+                    <label className="block text-xs font-medium text-gray-600">
+                      处理备注（可选）
+                    </label>
+                    <textarea
+                      value={refundProcessNote}
+                      onChange={(e) => setRefundProcessNote(e.target.value)}
+                      rows={2}
+                      placeholder="给买家的说明（同意或拒绝时可填写）"
+                      className="w-full px-3 py-2 border border-orange-200 rounded-lg text-sm"
+                    />
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        disabled={refundProcessing}
+                        onClick={() => handleRefundProcess(pendingRefund.id, 'APPROVED')}
+                        className="px-5 py-2.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
+                      >
+                        {refundProcessing ? '处理中…' : '确认同意退款 / 退货'}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={refundProcessing}
+                        onClick={() => handleRefundProcess(pendingRefund.id, 'REJECTED')}
+                        className="px-5 py-2.5 bg-white border-2 border-red-300 text-red-700 rounded-lg font-semibold hover:bg-red-50 disabled:opacity-50"
+                      >
+                        拒绝申请
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      自由交易订单由卖家处理；含平台自营商品时由管理员处理。
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="p-6 border-t border-gray-200 space-y-2">
               <div className="flex justify-between text-gray-600">

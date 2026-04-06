@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { authenticate, requireAdmin } from '@/lib/middleware'
+import { authenticate } from '@/lib/middleware'
 
 // 用户申请退换货
 export async function POST(request: NextRequest) {
@@ -16,8 +16,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Order ID, type and reason are required' }, { status: 400 })
     }
 
-    const order = await prisma.order.findUnique({
-      where: { id: orderId, userId }
+    const order = await prisma.order.findFirst({
+      where: { id: orderId, userId },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                sellerId: true,
+                sourceType: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     if (!order) {
@@ -28,13 +42,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Order status does not allow refund' }, { status: 400 })
     }
 
+    const refundAmount = typeof amount === 'number' ? amount : order.totalAmount
+
     const refund = await prisma.refund.create({
       data: {
         orderId,
         userId,
         type,
         reason,
-        amount: amount || order.totalAmount
+        amount: refundAmount
       },
       include: {
         order: true
@@ -46,6 +62,73 @@ export async function POST(request: NextRequest) {
       where: { id: orderId },
       data: { status: 'REFUNDING' }
     })
+
+    // 站内通知：自由交易 → 卖家；平台自营 → 管理员
+    try {
+      const typeLabel = type === 'REFUND' ? '仅退款' : '退货退款'
+      const reasonShort =
+        reason.length > 200 ? reason.slice(0, 200) + '…' : reason
+
+      const sellerIdsToNotify = new Set<string>()
+      let hasPlatformManaged = false
+
+      for (const item of order.items) {
+        const p = item.product
+        if (!p) continue
+        if (p.sourceType === 'PLATFORM_MANAGED') {
+          hasPlatformManaged = true
+        } else if (p.sellerId && p.sellerId !== userId) {
+          sellerIdsToNotify.add(p.sellerId)
+        }
+      }
+
+      const toCreate: Array<{
+        userId: string
+        title: string
+        body: string
+        type: string
+        refundId: string
+        orderId: string
+      }> = []
+
+      for (const sid of sellerIdsToNotify) {
+        toCreate.push({
+          userId: sid,
+          title: '新的退款/售后申请（您的商品）',
+          body: `订单号 ${order.orderNumber}：买家提交了「${typeLabel}」申请，金额 ¥${refundAmount.toFixed(
+            2
+          )}。原因：${reasonShort}\n请在个人中心「处理消息」或订单详情处理该退款。`,
+          type: 'REFUND_REQUEST',
+          refundId: refund.id,
+          orderId,
+        })
+      }
+
+      if (hasPlatformManaged) {
+        const admins = await prisma.user.findMany({
+          where: { role: 'ADMIN' },
+          select: { id: true },
+        })
+        for (const a of admins) {
+          toCreate.push({
+            userId: a.id,
+            title: '新的退款/售后申请（平台自营商品）',
+            body: `订单号 ${order.orderNumber}：订单含平台自营商品，买家提交了「${typeLabel}」申请，金额 ¥${refundAmount.toFixed(
+              2
+            )}。原因：${reasonShort}\n请到管理后台「退款」或订单详情处理。`,
+            type: 'REFUND_REQUEST',
+            refundId: refund.id,
+            orderId,
+          })
+        }
+      }
+
+      if (toCreate.length > 0) {
+        await prisma.userNotification.createMany({ data: toCreate })
+      }
+    } catch (notifyErr) {
+      console.error('Refund notification failed:', notifyErr)
+    }
 
     return NextResponse.json(refund, { status: 201 })
   } catch (error) {

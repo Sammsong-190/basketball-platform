@@ -38,6 +38,7 @@ model User {
   reviews       ProductReview[]
   incomes       Income[]         @relation("SellerIncomes")
   expenses      Expense[]
+  notifications UserNotification[]
   systemLogs    SystemLog[]      @relation("UserLogs")
 
   @@index([username])
@@ -347,6 +348,24 @@ model Expense {
   createdAt   DateTime @default(now())
 
   @@index([userId])
+  @@index([createdAt])
+}
+
+// 站内通知：退款申请等（自由交易→卖家，平台自营→管理员）
+model UserNotification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String   @db.Text
+  type      String   @default("REFUND_REQUEST")
+  refundId  String?
+  orderId   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
   @@index([createdAt])
 }
 

@@ -26,7 +26,13 @@ export async function GET(
             }
           }
         },
-        payments: true
+        payments: true,
+        refunds: {
+          orderBy: { createdAt: 'desc' },
+          include: {
+            user: { select: { id: true, username: true } }
+          }
+        }
       }
     })
 

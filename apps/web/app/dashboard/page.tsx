@@ -259,6 +259,7 @@ export default function DashboardPage() {
   const [expenses, setExpenses] = useState<{ expenses: Array<{ amount: number; description?: string; createdAt: string }>; total: number }>({ expenses: [], total: 0 })
   const [complaints, setComplaints] = useState<Array<{ id: string; type: string; title: string; content: string; status: string; reply?: string; createdAt: string }>>([])
   const [refunds, setRefunds] = useState<Array<{ id: string; orderId: string; type: string; reason: string; amount: number; status: string; createdAt: string; order?: { orderNumber: string } }>>([])
+  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; body: string; read: boolean; refundId?: string | null; orderId?: string | null; createdAt: string }>>([])
   const [showComplaintForm, setShowComplaintForm] = useState(false)
   const [complaintForm, setComplaintForm] = useState({ type: 'COMPLAINT', title: '', content: '', orderId: '' })
   const [stats, setStats] = useState({
@@ -386,6 +387,16 @@ export default function DashboardPage() {
       if (refundsRes.ok) {
         const refundsData = await refundsRes.json()
         setRefunds(Array.isArray(refundsData) ? refundsData : [])
+      }
+
+      if (user.isSeller || user.role === 'ADMIN') {
+        const notifRes = await fetch('/api/users/notifications', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (notifRes.ok) {
+          const notifData = await notifRes.json()
+          setNotifications(Array.isArray(notifData) ? notifData : [])
+        }
       }
     } catch (error) {
       console.error('Failed to fetch data:', error)
@@ -573,6 +584,13 @@ export default function DashboardPage() {
                   ...(user.isSeller ? [{ id: 'products', name: 'My Products', icon: '🏪' }, { id: 'incomes', name: 'Income', icon: '💰' }] : []),
                   { id: 'expenses', name: 'Expenses', icon: '📊' },
                   { id: 'complaints', name: 'Complaints', icon: '📢' },
+                  ...(user.isSeller || user.role === 'ADMIN'
+                    ? [{
+                        id: 'notifications',
+                        name: `Messages${notifications.filter((n) => !n.read).length ? ` (${notifications.filter((n) => !n.read).length})` : ''}`,
+                        icon: '🔔'
+                      }]
+                    : []),
                   { id: 'refunds', name: 'Refunds', icon: '↩️' }
                 ].map((tab) => (
                   <button
@@ -1009,6 +1027,74 @@ export default function DashboardPage() {
                             </div>
                           )}
                           <p className="text-sm text-gray-500 mt-2">{formatDate(c.createdAt)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 处理消息（卖家/管理员） */}
+              {activeTab === 'notifications' && (user.isSeller || user.role === 'ADMIN') && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing messages</h2>
+                  <p className="text-gray-600 text-sm mb-6">
+                    Refund requests for your products or platform-managed orders appear here.
+                  </p>
+                  {notifications.length === 0 ? (
+                    <p className="text-gray-500">No messages</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`border rounded-lg p-6 transition-shadow ${n.read ? 'border-gray-200 bg-white' : 'border-orange-200 bg-orange-50/50'}`}
+                        >
+                          <div className="flex justify-between items-start gap-4 mb-2">
+                            <h3 className="font-semibold text-gray-900">{n.title}</h3>
+                            {!n.read && (
+                              <span className="shrink-0 px-2 py-0.5 text-xs font-semibold bg-orange-200 text-orange-900 rounded">
+                                Unread
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-gray-700 whitespace-pre-wrap text-sm mb-4">{n.body}</p>
+                          <div className="flex flex-wrap items-center gap-3 text-sm">
+                            <span className="text-gray-500">{formatDate(n.createdAt)}</span>
+                            {n.orderId && (
+                              <Link
+                                href={user.role === 'ADMIN' ? '/admin/refunds' : `/orders/${n.orderId}`}
+                                className="text-gray-900 font-semibold underline hover:no-underline"
+                              >
+                                {user.role === 'ADMIN' ? 'Open refunds admin →' : 'View order →'}
+                              </Link>
+                            )}
+                            {!n.read && (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const token = localStorage.getItem('token')
+                                  if (!token) return
+                                  const res = await fetch(`/api/users/notifications/${n.id}`, {
+                                    method: 'PATCH',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      Authorization: `Bearer ${token}`,
+                                    },
+                                    body: JSON.stringify({ read: true }),
+                                  })
+                                  if (res.ok) {
+                                    setNotifications((prev) =>
+                                      prev.map((x) => (x.id === n.id ? { ...x, read: true } : x))
+                                    )
+                                  }
+                                }}
+                                className="px-3 py-1 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300"
+                              >
+                                Mark read
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
