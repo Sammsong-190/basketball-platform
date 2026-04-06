@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         orderId: string
       }> = []
 
-      for (const sid of sellerIdsToNotify) {
+      for (const sid of Array.from(sellerIdsToNotify)) {
         toCreate.push({
           userId: sid,
           title: '新的退款/售后申请（您的商品）',
