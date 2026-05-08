@@ -38,7 +38,7 @@ export default function NewProductPage() {
     }
     const user = JSON.parse(userData)
     if (!user.isSeller) {
-      alert('You are not a seller, cannot add products')
+      alert('您不是卖家，无法发布商品')
       router.push('/products')
       return
     }
@@ -56,19 +56,19 @@ export default function NewProductPage() {
         if (Array.isArray(data)) {
           setCategories(data)
           if (data.length === 0) {
-            console.warn('No product categories available, please contact administrator to add categories')
+            console.warn('系统中暂无商品分类，请联系管理员添加分类')
           }
         } else {
-          console.error('Category data format error:', data)
+          console.error('分类数据格式错误:', data)
           setCategories([])
         }
       } else {
         const errorData = await response.json()
-        console.error('Failed to fetch categories:', errorData.error || response.statusText)
+        console.error('获取分类失败:', errorData.error || response.statusText)
         setCategories([])
       }
     } catch (error) {
-      console.error('Failed to fetch categories:', error)
+      console.error('获取分类失败:', error)
       setCategories([])
     } finally {
       setCategoriesLoading(false)
@@ -105,7 +105,7 @@ export default function NewProductPage() {
     const maxImages = 10
     const remainingSlots = maxImages - previewImages.length
     if (remainingSlots <= 0) {
-      alert(`Maximum ${maxImages} images allowed`)
+      alert(`最多只能上传 ${maxImages} 张图片`)
       e.target.value = ''
       return
     }
@@ -119,7 +119,7 @@ export default function NewProductPage() {
       // 限制文件大小（例如5MB）
       const maxSize = 5 * 1024 * 1024 // 5MB
       if (file.size > maxSize) {
-        alert(`Image "${file.name}" is too large (max 5MB). Please compress or use a smaller image.`)
+        alert(`图片「${file.name}"」过大（最大 5MB）。请压缩或更换图片。`)
         errorCount++
         if (errorCount === filesToProcess.length) {
           e.target.value = ''
@@ -132,7 +132,7 @@ export default function NewProductPage() {
         const result = reader.result as string
         // 检查base64长度（约500KB的base64数据）
         if (result.length > 700000) {
-          alert(`Image "${file.name}" is too large after encoding. Please use a smaller image.`)
+          alert(`图片「${file.name}"」编码后仍过大，请换用更小的图片。`)
           errorCount++
         } else {
           newImages.push(result)
@@ -147,7 +147,7 @@ export default function NewProductPage() {
         }
       }
       reader.onerror = () => {
-        alert(`Failed to load image "${file.name}"`)
+        alert(`加载图片失败「${file.name}"`)
         errorCount++
         loadedCount++
         if (loadedCount === filesToProcess.length) {
@@ -169,13 +169,13 @@ export default function NewProductPage() {
     try {
       const token = localStorage.getItem('token')
       if (!token) {
-        alert('Please login first')
+        alert('请先登录')
         router.push('/login')
         return
       }
 
       if (!formData.name || !formData.description || !formData.price || !formData.categoryId) {
-        alert('Please fill in all required fields')
+        alert('请填写所有必填项')
         setLoading(false)
         return
       }
@@ -199,16 +199,16 @@ export default function NewProductPage() {
       const data = await response.json()
 
       if (response.ok) {
-        showToast('Product added successfully!')
+        showToast('商品发布成功！')
         router.push('/products')
       } else {
-        console.error('Failed to add product:', data)
-        const errorMsg = data.error || data.details || 'Failed to add product'
-        alert(`Failed to add product: ${errorMsg}`)
+        console.error('添加商品失败:', data)
+        const errorMsg = data.error || data.details || '发布商品失败'
+        alert(`添加商品失败：${errorMsg}`)
       }
     } catch (error: any) {
-      console.error('Failed to add product:', error)
-      alert(`Failed to add product: ${error.message || 'Please try again'}`)
+      console.error('添加商品失败:', error)
+      alert(`添加商品失败：${error.message || '请重试'}`)
     } finally {
       setLoading(false)
     }
@@ -221,8 +221,8 @@ export default function NewProductPage() {
         <div className="max-w-4xl mx-auto">
           {/* 标题区域 */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Add Product</h1>
-            <p className="text-gray-600">Publish your basketball products</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">发布商品</h1>
+            <p className="text-gray-600">上架你的篮球相关商品</p>
           </div>
 
           {/* 表单卡片 */}
@@ -230,7 +230,7 @@ export default function NewProductPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Name <span className="text-red-500">*</span>
+                  商品名称 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -238,13 +238,13 @@ export default function NewProductPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter product name"
+                  placeholder="请输入商品名称"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Description <span className="text-red-500">*</span>
+                  商品描述 <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
@@ -252,14 +252,14 @@ export default function NewProductPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={8}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none resize-none"
-                  placeholder="Enter detailed product description...&#10;&#10;Include product features, specifications, applicable scenarios, etc."
+                  placeholder={`请填写商品详情…\n\n可包含特点、规格参数、适用场景等。`}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    Price <span className="text-red-500">*</span>
+                    价格 <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
@@ -278,7 +278,7 @@ export default function NewProductPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    Stock <span className="text-gray-400 text-xs font-normal">(Default: 1)</span>
+                    库存 <span className="text-gray-400 text-xs font-normal">（默认 1）</span>
                   </label>
                   <input
                     type="number"
@@ -293,12 +293,12 @@ export default function NewProductPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Category <span className="text-red-500">*</span>
+                  商品分类 <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* 第一级：父分类 */}
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Select Main Category</label>
+                    <label className="block text-xs text-gray-600 mb-1">选择一级分类</label>
                     <select
                       required
                       value={selectedParentId}
@@ -307,12 +307,12 @@ export default function NewProductPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       {categoriesLoading ? (
-                        <option value="">Loading categories...</option>
+                        <option value="">加载分类中…</option>
                       ) : categories.length === 0 ? (
-                        <option value="">No categories available, please contact administrator</option>
+                        <option value="">暂无可用分类，请联系管理员</option>
                       ) : (
                         <>
-                          <option value="">Select main category</option>
+                          <option value="">请选择一级分类</option>
                           {categories
                             .filter(cat => cat.id) // 只显示有效的父分类
                             .map((category) => (
@@ -328,9 +328,9 @@ export default function NewProductPage() {
                   {/* 第二级：子分类 */}
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">
-                      Select Sub-category
+                      选择子分类
                       {selectedParentId && subCategories.length === 0 && (
-                        <span className="ml-2 text-xs text-gray-500">(This category has no sub-categories, main category selected automatically)</span>
+                        <span className="ml-2 text-xs text-gray-500">（该一级下无子分类，将使用一级分类）</span>
                       )}
                     </label>
                     <select
@@ -341,12 +341,12 @@ export default function NewProductPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       {!selectedParentId ? (
-                        <option value="">Please select main category first</option>
+                        <option value="">请先选择主分类</option>
                       ) : subCategories.length === 0 ? (
-                        <option value={selectedParentId}>Use main category: {categories.find(c => c.id === selectedParentId)?.name}</option>
+                        <option value={selectedParentId}>使用一级分类：{categories.find(c => c.id === selectedParentId)?.name}</option>
                       ) : (
                         <>
-                          <option value="">Select sub-category</option>
+                          <option value="">请选择子分类</option>
                           {subCategories
                             .filter(child => child.id) // 只显示有效的子分类
                             .map((child) => (
@@ -364,14 +364,14 @@ export default function NewProductPage() {
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
-                    No product categories available in the system, please contact administrator to add categories before publishing products
+                    系统中暂无商品分类，发布前请联系管理员添加分类
                   </p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Images <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                  商品图片 <span className="text-gray-400 text-xs font-normal">（选填）</span>
                 </label>
 
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
@@ -380,7 +380,7 @@ export default function NewProductPage() {
                     <div key={index} className="relative group aspect-square">
                       <img
                         src={image}
-                        alt={`Preview ${index + 1}`}
+                        alt={`预览图 ${index + 1}`}
                         className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
                       />
                       <button
@@ -408,11 +408,11 @@ export default function NewProductPage() {
                       <svg className="w-8 h-8 text-gray-400 group-hover:text-gray-600 mx-auto mb-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      <span className="text-xs text-gray-500 group-hover:text-gray-600">Add</span>
+                      <span className="text-xs text-gray-500 group-hover:text-gray-600">添加</span>
                     </div>
                   </label>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">Supports multiple images, recommend uploading clear product photos (optional)</p>
+                <p className="mt-2 text-xs text-gray-500">支持多张图片，建议上传清晰的商品实拍图（可选）</p>
               </div>
 
               <div className="flex gap-4 pt-4 border-t border-gray-200">
@@ -427,16 +427,16 @@ export default function NewProductPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Adding...
+                      发布中…
                     </span>
-                  ) : 'Publish Product'}
+                  ) : '发布商品'}
                 </button>
                 <button
                   type="button"
                   onClick={() => router.back()}
                   className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold"
                 >
-                  Cancel
+                  取消
                 </button>
               </div>
 
@@ -446,8 +446,8 @@ export default function NewProductPage() {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <div className="text-sm text-green-700">
-                    <p className="font-semibold mb-1">Tip</p>
-                    <p>Products will be displayed in the product list immediately after publishing. Administrators have the right to review products, and products with violations will be withdrawn.</p>
+                    <p className="font-semibold mb-1">提示</p>
+                    <p>商品发布后会在列表中即时展示。管理员有权审核商品，违规内容可能会被下架。</p>
                   </div>
                 </div>
               </div>

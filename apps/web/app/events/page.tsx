@@ -180,8 +180,8 @@ const getTeamInfo = (teamName: string, teamId?: number) => {
 }
 
 function getPeriodLabel(period: number): string {
-  if (period <= 4) return `Q${period}`
-  return `OT${period - 4}`
+  if (period <= 4) return `第${period}节`
+  return `加时${period - 4}`
 }
 
 function QuarterScoresTable({ match, getTeamInfo }: { match: Match; getTeamInfo: (name: string, id?: number) => { abbreviation: string } }) {
@@ -197,13 +197,13 @@ function QuarterScoresTable({ match, getTeamInfo }: { match: Match; getTeamInfo:
       <table className="w-full text-sm min-w-[320px]">
         <thead>
           <tr className="bg-gray-700 text-white">
-            <th className="text-left font-bold uppercase py-2 px-3">TEAM</th>
+            <th className="text-left font-bold uppercase py-2 px-3">球队</th>
             {periods.map((p) => (
               <th key={p} className="text-center font-bold uppercase py-2 px-2">
                 {getPeriodLabel(p)}
               </th>
             ))}
-            <th className="text-center font-bold uppercase py-2 px-3">FINAL</th>
+            <th className="text-center font-bold uppercase py-2 px-3">总分</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
@@ -353,7 +353,7 @@ export default function EventsPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('zh-CN', {
       month: 'long',
       day: 'numeric',
       weekday: 'short'
@@ -362,9 +362,9 @@ export default function EventsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { text: string; color: string } } = {
-      'upcoming': { text: 'Upcoming', color: 'bg-blue-100 text-blue-800' },
-      'live': { text: 'Live', color: 'bg-red-100 text-red-800' },
-      'finished': { text: 'Finished', color: 'bg-gray-100 text-gray-800' }
+      'upcoming': { text: '未开始', color: 'bg-blue-100 text-blue-800' },
+      'live': { text: '进行中', color: 'bg-red-100 text-red-800' },
+      'finished': { text: '已结束', color: 'bg-gray-100 text-gray-800' }
     }
     const statusInfo = statusMap[status] || { text: status, color: 'bg-gray-100 text-gray-800' }
     return (
@@ -606,9 +606,9 @@ export default function EventsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">📰</span>
-              <span className="bg-gradient-to-r text-gray-900">Event News</span>
+              <span className="bg-gradient-to-r text-gray-900">赛事资讯</span>
             </h1>
-            <p className="text-xl text-gray-600">Latest basketball event news, schedules, and live scores</p>
+            <p className="text-xl text-gray-600">赛事新闻、赛程安排与实时比分</p>
           </div>
 
           {/* 标签导航 */}
@@ -616,9 +616,9 @@ export default function EventsPage() {
             <div className="border-b border-gray-200 bg-gray-50">
               <nav className="flex space-x-1 px-6">
                 {[
-                  { id: 'schedule', name: 'Schedule', icon: '📅' },
-                  { id: 'scores', name: 'Live Scores', icon: '🏀' },
-                  { id: 'news', name: 'News', icon: '📰' }
+                  { id: 'schedule', name: '赛程', icon: '📅' },
+                  { id: 'scores', name: '实时比分', icon: '🏀' },
+                  { id: 'news', name: '新闻', icon: '📰' }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -640,18 +640,18 @@ export default function EventsPage() {
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400 mb-4"></div>
-                  <p className="text-gray-600">Loading event data...</p>
+                  <p className="text-gray-600">正在加载赛事数据…</p>
                 </div>
               ) : validMatches.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">🏀</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No match data available</h3>
-                  <p className="text-gray-600 mb-4">Fetching latest data from NBA official website, please refresh later</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">暂无比赛数据</h3>
+                  <p className="text-gray-600 mb-4">正在从 NBA 官网获取数据，请稍后刷新再试</p>
                   <button
                     onClick={() => fetchData()}
                     className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold"
                   >
-                    Refresh Data
+                    刷新数据
                   </button>
                 </div>
               ) : (
@@ -659,10 +659,10 @@ export default function EventsPage() {
                   {/* 赛程安排 */}
                   {activeTab === 'schedule' && (
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Matches</h2>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-6">即将开始的比赛</h2>
                       {upcomingMatches.length === 0 ? (
                         <div className="text-center py-12">
-                          <p className="text-gray-500 text-lg">No upcoming matches</p>
+                          <p className="text-gray-500 text-lg">暂无即将开始的比赛</p>
                         </div>
                       ) : (
                         <div className="space-y-8">
@@ -712,9 +712,9 @@ export default function EventsPage() {
                                                 </div>
                                               </div>
                                               <div className="text-base font-semibold text-gray-700">{getTeamInfo(match.homeTeam, match.homeTeamId).abbreviation}</div>
-                                              <div className="text-xs text-gray-500 mt-0.5">Home</div>
+                                              <div className="text-xs text-gray-500 mt-0.5">主场</div>
                                             </div>
-                                            <div className="text-xl font-bold text-gray-400">VS</div>
+                                            <div className="text-xl font-bold text-gray-400">对阵</div>
                                             <div className="text-center flex-1">
                                               <div className="flex justify-center mb-1">
                                                 <img
@@ -733,7 +733,7 @@ export default function EventsPage() {
                                                 </div>
                                               </div>
                                               <div className="text-base font-semibold text-gray-700">{getTeamInfo(match.awayTeam, match.awayTeamId).abbreviation}</div>
-                                              <div className="text-xs text-gray-500 mt-0.5">Away</div>
+                                              <div className="text-xs text-gray-500 mt-0.5">客场</div>
                                             </div>
                                           </div>
                                         </div>
@@ -760,7 +760,7 @@ export default function EventsPage() {
                         <div className="mb-8">
                           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                             <span className="w-3 h-3 bg-gray-600 rounded-full animate-pulse"></span>
-                            Live Matches
+                            进行中比赛
                             {todayLiveMatches.length > 1 && (
                               <span className="text-sm font-normal text-gray-500 ml-2">
                                 ({currentLiveIndex + 1} / {todayLiveMatches.length})
@@ -851,7 +851,7 @@ export default function EventsPage() {
                                                   <div />
                                                 </div>
 
-                                                {/* Top Scorer */}
+                                                {/* 得分王 */}
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6">
                                                   <div className="relative w-14 h-14 flex-shrink-0">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -863,12 +863,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-gray-900">{match.homeTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.homeTopScorer?.points ?? '-'} 分</div>
                                                   </div>
-                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Scorer</div>
+                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">得分王</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-gray-900">{match.awayTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.awayTopScorer?.points ?? '-'} 分</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -880,7 +880,7 @@ export default function EventsPage() {
                                                   </div>
                                                 </div>
 
-                                                {/* Top Rebounder */}
+                                                {/* 篮板王 */}
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6">
                                                   <div className="relative w-14 h-14 flex-shrink-0">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -892,12 +892,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopRebounder?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-blue-600">{match.homeTopRebounder?.rebounds ?? '-'} reb</div>
+                                                    <div className="text-sm font-semibold text-blue-600">{match.homeTopRebounder?.rebounds ?? '-'} 板</div>
                                                   </div>
-                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Rebounder</div>
+                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">篮板王</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopRebounder?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-blue-600">{match.awayTopRebounder?.rebounds ?? '-'} reb</div>
+                                                    <div className="text-sm font-semibold text-blue-600">{match.awayTopRebounder?.rebounds ?? '-'} 板</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -909,7 +909,7 @@ export default function EventsPage() {
                                                   </div>
                                                 </div>
 
-                                                {/* Top Assister */}
+                                                {/* 助攻王 */}
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6">
                                                   <div className="relative w-14 h-14 flex-shrink-0">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -921,12 +921,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopAssister?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-green-600">{match.homeTopAssister?.assists ?? '-'} ast</div>
+                                                    <div className="text-sm font-semibold text-green-600">{match.homeTopAssister?.assists ?? '-'} 助</div>
                                                   </div>
-                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Assister</div>
+                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">助攻王</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopAssister?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-green-600">{match.awayTopAssister?.assists ?? '-'} ast</div>
+                                                    <div className="text-sm font-semibold text-green-600">{match.awayTopAssister?.assists ?? '-'} 助</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -993,7 +993,7 @@ export default function EventsPage() {
                         <div className="mb-8">
                           <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <span className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></span>
-                            Live Now（逐场显示）
+                            正在直播（逐场显示）
                           </h2>
                           <div className="space-y-3">
                             {todayLiveMatches.map((match) => {
@@ -1026,7 +1026,7 @@ export default function EventsPage() {
                                       </div>
                                       <div className="flex flex-col items-center flex-shrink-0">
                                         <span className="text-xs font-medium text-gray-700">{match.time}</span>
-                                        <span className="text-gray-400 text-lg">VS</span>
+                                        <span className="text-gray-400 text-lg">对阵</span>
                                       </div>
                                       <div className="flex items-center gap-3 flex-shrink-0">
                                         <div className="text-center min-w-[80px]">
@@ -1076,10 +1076,10 @@ export default function EventsPage() {
 
                       {/* 已结束的比赛 */}
                       <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Finished Matches</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">已结束比赛</h2>
                         {finishedMatches.length === 0 ? (
                           <div className="text-center py-12">
-                            <p className="text-gray-500 text-lg">No finished matches</p>
+                            <p className="text-gray-500 text-lg">暂无已结束比赛</p>
                           </div>
                         ) : (
                           <div className="space-y-8">
@@ -1218,7 +1218,7 @@ export default function EventsPage() {
                                                   <div />
                                                 </div>
 
-                                                {/* Top Scorer */}
+                                                {/* 得分王 */}
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6">
                                                   <div className="relative w-14 h-14 flex-shrink-0">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1230,12 +1230,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-gray-900">{match.homeTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.homeTopScorer?.points ?? '-'} 分</div>
                                                   </div>
-                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Scorer</div>
+                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">得分王</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopScorer?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-gray-900">{match.awayTopScorer?.points ?? '-'} pts</div>
+                                                    <div className="text-sm font-semibold text-gray-900">{match.awayTopScorer?.points ?? '-'} 分</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1247,7 +1247,7 @@ export default function EventsPage() {
                                                   </div>
                                                 </div>
 
-                                                {/* Top Rebounder */}
+                                                {/* 篮板王 */}
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6">
                                                   <div className="relative w-14 h-14 flex-shrink-0">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1259,12 +1259,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopRebounder?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-blue-600">{match.homeTopRebounder?.rebounds ?? '-'} reb</div>
+                                                    <div className="text-sm font-semibold text-blue-600">{match.homeTopRebounder?.rebounds ?? '-'} 板</div>
                                                   </div>
-                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Rebounder</div>
+                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">篮板王</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopRebounder?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-blue-600">{match.awayTopRebounder?.rebounds ?? '-'} reb</div>
+                                                    <div className="text-sm font-semibold text-blue-600">{match.awayTopRebounder?.rebounds ?? '-'} 板</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1276,7 +1276,7 @@ export default function EventsPage() {
                                                   </div>
                                                 </div>
 
-                                                {/* Top Assister */}
+                                                {/* 助攻王 */}
                                                 <div className="grid grid-cols-[72px,1fr,auto,1fr,72px] items-center gap-6">
                                                   <div className="relative w-14 h-14 flex-shrink-0">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1288,12 +1288,12 @@ export default function EventsPage() {
                                                   </div>
                                                   <div className="min-w-0">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.homeTopAssister?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-green-600">{match.homeTopAssister?.assists ?? '-'} ast</div>
+                                                    <div className="text-sm font-semibold text-green-600">{match.homeTopAssister?.assists ?? '-'} 助</div>
                                                   </div>
-                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">Top Assister</div>
+                                                  <div className="px-3 text-base font-extrabold text-gray-800 text-center whitespace-nowrap">助攻王</div>
                                                   <div className="min-w-0 text-right">
                                                     <div className="text-base font-semibold text-gray-900 truncate">{match.awayTopAssister?.name || '-'}</div>
-                                                    <div className="text-sm font-semibold text-green-600">{match.awayTopAssister?.assists ?? '-'} ast</div>
+                                                    <div className="text-sm font-semibold text-green-600">{match.awayTopAssister?.assists ?? '-'} 助</div>
                                                   </div>
                                                   <div className="relative w-14 h-14 flex-shrink-0 justify-self-end">
                                                     <div className="absolute inset-0 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
@@ -1307,7 +1307,7 @@ export default function EventsPage() {
                                               </div>
                                             ) : (
                                               <div className="text-center py-4 text-gray-500 text-sm">
-                                                No player stats available
+                                                暂无球员数据
                                               </div>
                                             )}
                                           </div>
@@ -1327,10 +1327,10 @@ export default function EventsPage() {
                   {/* 赛事新闻 */}
                   {activeTab === 'news' && (
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Event News</h2>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-6">最新赛事新闻</h2>
                       {news.length === 0 ? (
                         <div className="text-center py-12">
-                          <p className="text-gray-500 text-lg">No event news available</p>
+                          <p className="text-gray-500 text-lg">暂无赛事新闻</p>
                         </div>
                       ) : (
                         <div className="space-y-8">
@@ -1370,7 +1370,7 @@ export default function EventsPage() {
                                         </div>
                                       </div>
                                       <div className="absolute top-4 left-4 px-3 py-1 bg-gray-600 text-white rounded-full text-xs font-semibold shadow-md">
-                                        Hot
+                                        热门
                                       </div>
                                     </div>
                                     <div className="p-6">

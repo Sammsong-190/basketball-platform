@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/middleware'
+import { getRequestLogContext, writeSystemLog } from '@/lib/system-log'
 
 // 获取用户列表
 export async function GET(request: NextRequest) {
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ users, total, page, limit })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to get users list' }, { status: 500 })
+    return NextResponse.json({ error: '获取用户列表失败' }, { status: 500 })
   }
 }
 
@@ -57,7 +58,7 @@ export async function PUT(request: NextRequest) {
     const { id, role, isSeller } = body
 
     if (!id) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
+      return NextResponse.json({ error: '用户 ID 为必填项' }, { status: 400 })
     }
 
     const updateData: any = {}
@@ -76,8 +77,18 @@ export async function PUT(request: NextRequest) {
       }
     })
 
+    const admin = authResult as { userId: string }
+    const ctx = getRequestLogContext(request)
+    void writeSystemLog({
+      userId: admin.userId,
+      action: '更新用户权限',
+      module: 'ADMIN_USER',
+      description: `target=${user.id} ${user.username} role=${user.role} isSeller=${user.isSeller}`,
+      ...ctx,
+    })
+
     return NextResponse.json(user)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update user permissions' }, { status: 500 })
+    return NextResponse.json({ error: '更新用户权限失败' }, { status: 500 })
   }
 }

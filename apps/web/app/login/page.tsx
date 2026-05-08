@@ -8,7 +8,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     username: '',
-    password: ''
+    password: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,13 +22,13 @@ export default function LoginPage() {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Login failed')
+        setError(data.error || '登录失败')
         return
       }
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(data.user))
       router.push('/')
     } catch (err) {
-      setError('Network error, please try again later')
+      setError('网络异常，请稍后重试')
     } finally {
       setLoading(false)
     }
@@ -47,19 +47,21 @@ export default function LoginPage() {
       <Header />
       <div className="min-h-screen bg-white py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
-          {/* 标题区域 */}
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-            <p className="text-gray-600">Sign in to your account to continue</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">欢迎回来</h1>
+            <p className="text-gray-600">登录账号以继续使用</p>
           </div>
 
-          {/* 表单卡片 */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg">
                 <div className="flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <span>{error}</span>
                 </div>
@@ -68,30 +70,26 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Username/Email
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">用户名 / 邮箱</label>
                 <input
                   type="text"
                   required
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter username or email"
+                  placeholder="请输入用户名或邮箱"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Password
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">密码</label>
                 <input
                   type="password"
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter password"
+                  placeholder="请输入密码"
                 />
               </div>
 
@@ -102,26 +100,37 @@ export default function LoginPage() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
-                    Logging in...
+                    登录中…
                   </span>
-                ) : 'Login'}
+                ) : (
+                  '登录'
+                )}
               </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
               <p className="text-center text-sm text-gray-600">
-                Don't have an account?{' '}
+                还没有账号？{' '}
                 <a href="/register" className="text-gray-900 hover:text-gray-700 font-semibold hover:underline">
-                  Register Now
+                  立即注册
                 </a>
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-xs text-blue-700 text-center">
-                  💡 Want to become a seller? Check "Become a Seller" option when registering to publish products
+                  💡 想成为卖家？注册时可选择「成为卖家」以发布商品
                 </p>
               </div>
             </div>

@@ -23,12 +23,12 @@ export default function CheckoutDrawer({
   onSubmit,
   loading = false,
   totalAmount = 0,
-  itemCount = 0
+  itemCount = 0,
 }: CheckoutDrawerProps) {
   const [form, setForm] = useState<ShippingForm>({
     shippingName: '',
     shippingPhone: '',
-    shippingAddress: ''
+    shippingAddress: '',
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -43,7 +43,7 @@ export default function CheckoutDrawer({
       setForm({ shippingName: '', shippingPhone: '', shippingAddress: '' })
       onClose()
     } catch (_err) {
-      // Error handled by parent
+      // 错误由父组件处理
     } finally {
       setSubmitting(false)
     }
@@ -62,14 +62,14 @@ export default function CheckoutDrawer({
         className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-slide-in-right"
         role="dialog"
         aria-modal="true"
-        aria-label="Checkout"
+        aria-label="结算"
       >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Shipping Information</h2>
+          <h2 className="text-xl font-bold text-gray-900">收货信息</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
-            aria-label="Close"
+            aria-label="关闭"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -80,33 +80,33 @@ export default function CheckoutDrawer({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Recipient Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">收件人姓名 *</label>
               <input
                 type="text"
                 value={form.shippingName}
                 onChange={(e) => setForm({ ...form, shippingName: e.target.value })}
-                placeholder="Enter your name"
+                placeholder="请输入姓名"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">手机号码 *</label>
               <input
                 type="tel"
                 value={form.shippingPhone}
                 onChange={(e) => setForm({ ...form, shippingPhone: e.target.value })}
-                placeholder="Enter your phone number"
+                placeholder="请输入手机号"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Address *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">详细地址 *</label>
               <textarea
                 value={form.shippingAddress}
                 onChange={(e) => setForm({ ...form, shippingAddress: e.target.value })}
-                placeholder="Enter your full shipping address"
+                placeholder="请输入完整收货地址"
                 rows={3}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none resize-none"
                 required
@@ -116,11 +116,9 @@ export default function CheckoutDrawer({
 
           {(totalAmount > 0 || itemCount > 0) && (
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              {itemCount > 0 && (
-                <p className="text-sm text-gray-600">{itemCount} item(s)</p>
-              )}
+              {itemCount > 0 && <p className="text-sm text-gray-600">共 {itemCount} 件商品</p>}
               {totalAmount > 0 && (
-                <p className="text-xl font-bold text-gray-900 mt-1">Total: ¥{totalAmount.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900 mt-1">合计：¥{totalAmount.toFixed(2)}</p>
               )}
             </div>
           )}
@@ -131,14 +129,14 @@ export default function CheckoutDrawer({
               onClick={onClose}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              取消
             </button>
             <button
               type="submit"
               disabled={submitting || loading}
               className="flex-1 px-4 py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50"
             >
-              {submitting || loading ? 'Processing...' : 'Place Order'}
+              {submitting || loading ? '处理中…' : '提交订单'}
             </button>
           </div>
         </form>

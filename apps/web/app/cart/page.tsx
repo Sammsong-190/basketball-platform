@@ -56,7 +56,7 @@ export default function CartPage() {
         setTotal(data.total || 0)
       }
     } catch (error) {
-      console.error('Failed to fetch cart:', error)
+      console.error('获取购物车失败:', error)
     } finally {
       setLoading(false)
     }
@@ -73,7 +73,7 @@ export default function CartPage() {
     if (!cartItem) return
 
     if (newQuantity > cartItem.product.stock) {
-      alert(`Only ${cartItem.product.stock} items available in stock`)
+      alert(`库存仅剩 ${cartItem.product.stock} 件，无法增加数量`)
       return
     }
 
@@ -101,8 +101,8 @@ export default function CartPage() {
         fetchCart()
       }
     } catch (error) {
-      console.error('Failed to update quantity:', error)
-      alert('Failed to update quantity')
+      console.error('更新数量失败:', error)
+      alert('更新数量失败')
     }
   }
 
@@ -117,14 +117,14 @@ export default function CartPage() {
         fetchCart()
       }
     } catch (error) {
-      console.error('Failed to remove item:', error)
-      alert('Failed to remove item')
+      console.error('移除商品失败:', error)
+      alert('移除商品失败')
     }
   }
 
   const handleCheckoutClick = () => {
     if (cartItems.length === 0) {
-      alert('Your cart is empty')
+      alert('购物车是空的')
       return
     }
     setCheckoutOpen(true)
@@ -157,17 +157,17 @@ export default function CartPage() {
 
       if (response.ok) {
         const order = await response.json()
-        showToast('Order created successfully!')
+        showToast('订单创建成功！')
         setCheckoutOpen(false)
         router.push(`/orders/${order.id}`)
       } else {
         const data = await response.json()
-        alert(data.error || 'Failed to create order')
+        alert(data.error || '创建订单失败')
         throw new Error(data.error)
       }
     } catch (error) {
-      console.error('Failed to create order:', error)
-      alert('Failed to create order, please try again')
+      console.error('创建订单失败:', error)
+      alert('创建订单失败，请稍后重试')
       throw error
     } finally {
       setCheckoutLoading(false)
@@ -181,7 +181,7 @@ export default function CartPage() {
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+            <p className="mt-4 text-gray-600">加载中…</p>
           </div>
         </div>
       </>
@@ -193,18 +193,18 @@ export default function CartPage() {
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-8">购物车</h1>
 
           {cartItems.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
               <span className="text-6xl mb-4 block">🛒</span>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-              <p className="text-gray-600 mb-6">Start shopping to add items to your cart</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">购物车是空的</h2>
+              <p className="text-gray-600 mb-6">去挑选心仪商品加入购物车吧</p>
               <Link
                 href="/products"
                 className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold"
               >
-                Browse Products
+                浏览商品
               </Link>
             </div>
           ) : (
@@ -245,7 +245,7 @@ export default function CartPage() {
                             </button>
                           </div>
                           <div className="flex items-center gap-4">
-                            <label className="text-gray-700 font-semibold">Quantity:</label>
+                            <label className="text-gray-700 font-semibold">数量：</label>
                             <div className="flex items-center border border-gray-300 rounded-lg">
                               <button
                                 onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
@@ -265,11 +265,11 @@ export default function CartPage() {
                               </button>
                             </div>
                             <span className="text-gray-500">
-                              Stock: {item.product.stock}
+                              库存：{item.product.stock}
                             </span>
                           </div>
                           <div className="mt-4 text-lg font-semibold text-gray-900">
-                            Subtotal: ¥{(item.product.price * item.quantity).toFixed(2)}
+                            小计：¥{(item.product.price * item.quantity).toFixed(2)}
                           </div>
                         </div>
                       </div>
@@ -278,22 +278,22 @@ export default function CartPage() {
                 })}
               </div>
 
-              {/* Order Summary */}
+              {/* 订单摘要 */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">订单摘要</h2>
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-gray-600">
-                      <span>Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                      <span>商品小计（共 {cartItems.reduce((sum, item) => sum + item.quantity, 0)} 件）</span>
                       <span>¥{total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
-                      <span>Shipping</span>
-                      <span>Free</span>
+                      <span>运费</span>
+                      <span>免运费</span>
                     </div>
                     <div className="border-t border-gray-200 pt-4">
                       <div className="flex justify-between text-2xl font-bold text-gray-900">
-                        <span>Total</span>
+                        <span>合计</span>
                         <span>¥{total.toFixed(2)}</span>
                       </div>
                     </div>
@@ -302,13 +302,13 @@ export default function CartPage() {
                     onClick={handleCheckoutClick}
                     className="w-full px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                   >
-                    Proceed to Checkout
+                    去结算
                   </button>
                   <Link
                     href="/products"
                     className="block mt-4 text-center text-gray-900 hover:text-gray-700 font-semibold"
                   >
-                    Continue Shopping
+                    继续逛
                   </Link>
                 </div>
               </div>

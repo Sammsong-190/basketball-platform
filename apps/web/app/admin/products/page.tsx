@@ -37,7 +37,7 @@ export default function AdminProductsPage() {
     }
     const user = JSON.parse(userData)
     if (user.role !== 'ADMIN') {
-      alert('You do not have permission to access this page')
+      alert('无权访问此页面')
       router.push('/dashboard')
       return
     }
@@ -61,10 +61,10 @@ export default function AdminProductsPage() {
         const data = await response.json()
         setProducts(data.products || [])
       } else {
-        console.error('Failed to fetch product list')
+        console.error('获取商品列表失败')
       }
     } catch (error) {
-      console.error('Failed to fetch product list:', error)
+      console.error('获取商品列表失败:', error)
     } finally {
       setLoading(false)
     }
@@ -72,9 +72,9 @@ export default function AdminProductsPage() {
 
   const handleReview = async (productId: string, action: 'approve' | 'reject' | 'delete') => {
     const messages = {
-      approve: 'Are you sure you want to approve this product?',
-      reject: 'Are you sure you want to withdraw this product?',
-      delete: 'Are you sure you want to permanently delete this product? This cannot be undone.'
+      approve: '确定要通过审核并上架该商品吗？',
+      reject: '确定要下架（撤回）该商品吗？',
+      delete: '确定要永久删除该商品吗？此操作不可撤销。'
     }
     if (!confirm(messages[action])) {
       return
@@ -93,29 +93,29 @@ export default function AdminProductsPage() {
       })
 
       if (response.ok) {
-        showToast(action === 'approve' ? 'Product approved' : action === 'reject' ? 'Product withdrawn' : 'Product deleted')
+        showToast(action === 'approve' ? '商品已通过审核' : action === 'reject' ? '商品已下架' : '商品已删除')
         fetchProducts()
       } else {
         const data = await response.json()
-        alert(data.error || 'Operation failed')
+        alert(data.error || '操作失败')
       }
     } catch (error) {
-      console.error('Review failed:', error)
-      alert('Operation failed, please try again')
+      console.error('审核失败:', error)
+      alert('操作失败，请稍后重试')
     } finally {
       setProcessing(null)
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US')
+    return new Date(dateString).toLocaleString('zh-CN')
   }
 
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { text: string; color: string } } = {
-      'ACTIVE': { text: 'Active', color: 'bg-green-100 text-green-800' },
-      'INACTIVE': { text: 'Withdrawn', color: 'bg-red-100 text-red-800' },
-      'PENDING': { text: 'Pending Review', color: 'bg-yellow-100 text-yellow-800' }
+      'ACTIVE': { text: '在售', color: 'bg-green-100 text-green-800' },
+      'INACTIVE': { text: '已下架', color: 'bg-red-100 text-red-800' },
+      'PENDING': { text: '待审核', color: 'bg-yellow-100 text-yellow-800' }
     }
     const statusInfo = statusMap[status] || { text: status, color: 'bg-gray-100 text-gray-800' }
     return (
@@ -134,9 +134,9 @@ export default function AdminProductsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">🛒</span>
-              <span className="bg-gradient-to-r text-gray-900">Product Review</span>
+              <span className="bg-gradient-to-r text-gray-900">商品审核</span>
             </h1>
-            <p className="text-xl text-gray-600">Review and manage platform products</p>
+            <p className="text-xl text-gray-600">审核并管理平台商品</p>
           </div>
 
           {/* 标签导航 */}
@@ -144,9 +144,9 @@ export default function AdminProductsPage() {
             <div className="border-b border-gray-200 bg-gray-50">
               <nav className="flex space-x-1 px-6">
                 {[
-                  { id: 'active', name: 'Active', count: products.filter(p => p.status === 'ACTIVE').length },
-                  { id: 'inactive', name: 'Withdrawn', count: products.filter(p => p.status === 'INACTIVE').length },
-                  { id: 'all', name: 'All Products', count: products.length }
+                  { id: 'active', name: '在售', count: products.filter(p => p.status === 'ACTIVE').length },
+                  { id: 'inactive', name: '已下架', count: products.filter(p => p.status === 'INACTIVE').length },
+                  { id: 'all', name: '全部商品', count: products.length }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -175,11 +175,11 @@ export default function AdminProductsPage() {
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400 mb-4"></div>
-                  <p className="text-gray-600">Loading...</p>
+                  <p className="text-gray-600">加载中…</p>
                 </div>
               ) : products.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No products</p>
+                  <p className="text-gray-500 text-lg">暂无商品</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -218,11 +218,11 @@ export default function AdminProductsPage() {
                                   <h3 className="text-xl font-bold text-gray-900">{product.name}</h3>
                                   {product.sourceType === 'PLATFORM_MANAGED' ? (
                                     <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
-                                      Platform Managed
+                                      平台自营
                                     </span>
                                   ) : (
                                     <span className="bg-gradient-to-r from-green-500 to-green-600 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
-                                      Free Trade
+                                      集市商品
                                     </span>
                                   )}
                                 </div>
@@ -235,26 +235,26 @@ export default function AdminProductsPage() {
 
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                               <div>
-                                <span className="text-gray-500">Price: </span>
+                                <span className="text-gray-500">价格：</span>
                                 <span className="font-semibold text-gray-900">¥{product.price.toFixed(2)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-500">Stock: </span>
+                                <span className="text-gray-500">库存：</span>
                                 <span className="font-semibold">{product.stock}</span>
                               </div>
                               <div>
-                                <span className="text-gray-500">Category: </span>
+                                <span className="text-gray-500">分类：</span>
                                 <span className="font-semibold">{product.category.name}</span>
                               </div>
                               <div>
-                                <span className="text-gray-500">Seller: </span>
+                                <span className="text-gray-500">卖家：</span>
                                 <span className="font-semibold">{product.seller.username}</span>
                               </div>
                             </div>
 
                             <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                              <span>Published: {formatDate(product.createdAt)}</span>
-                              <span>Reviews: {product._count.reviews} | Orders: {product._count.orderItems}</span>
+                              <span>发布时间：{formatDate(product.createdAt)}</span>
+                              <span>评价：{product._count.reviews} | 下单：{product._count.orderItems}</span>
                             </div>
 
                             {/* 操作按钮 */}
@@ -266,14 +266,14 @@ export default function AdminProductsPage() {
                                     disabled={processing === product.id}
                                     className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    {processing === product.id ? 'Processing...' : 'Withdraw Product'}
+                                    {processing === product.id ? '处理中…' : '下架商品'}
                                   </button>
                                   <button
                                     onClick={() => handleReview(product.id, 'delete')}
                                     disabled={processing === product.id}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    {processing === product.id ? 'Processing...' : 'Delete'}
+                                    {processing === product.id ? '处理中…' : '删除'}
                                   </button>
                                 </>
                               ) : product.status === 'INACTIVE' ? (
@@ -283,14 +283,14 @@ export default function AdminProductsPage() {
                                     disabled={processing === product.id}
                                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    {processing === product.id ? 'Processing...' : 'Approve Product'}
+                                    {processing === product.id ? '处理中…' : '通过审核'}
                                   </button>
                                   <button
                                     onClick={() => handleReview(product.id, 'delete')}
                                     disabled={processing === product.id}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    {processing === product.id ? 'Processing...' : 'Delete'}
+                                    {processing === product.id ? '处理中…' : '删除'}
                                   </button>
                                 </>
                               ) : (
@@ -299,7 +299,7 @@ export default function AdminProductsPage() {
                                   disabled={processing === product.id}
                                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  {processing === product.id ? 'Processing...' : 'Approve Product'}
+                                  {processing === product.id ? '处理中…' : '通过审核'}
                                 </button>
                               )}
                             </div>

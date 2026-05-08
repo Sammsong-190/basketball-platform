@@ -22,7 +22,7 @@ export default function ScrapeProductsPage() {
             setUser(userObj)
             
             if (userObj.role !== 'ADMIN') {
-                alert('You do not have permission to access this page')
+                alert('无权访问此页面')
                 router.push('/dashboard')
             }
         } else {
@@ -40,7 +40,7 @@ export default function ScrapeProductsPage() {
             if (!token) {
                 setResult({
                     success: false,
-                    error: 'Please login first'
+                    error: '请先登录'
                 })
                 setLoading(false)
                 return
@@ -74,14 +74,14 @@ export default function ScrapeProductsPage() {
             } else {
                 setResult({
                     success: false,
-                    error: data.error || data.details || 'Scraping failed',
+                    error: data.error || data.details || '采集失败',
                     errors: data.errors
                 })
             }
         } catch (error: any) {
             setResult({
                 success: false,
-                error: error.message || 'Scraping failed, please try again'
+                error: error.message || '采集失败，请稍后重试'
             })
         } finally {
             setLoading(false)
@@ -101,16 +101,16 @@ export default function ScrapeProductsPage() {
                     <div className="mb-8">
                         <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
                             <span className="mr-3">🕷️</span>
-                            <span className="bg-gradient-to-r text-gray-900">Product Scraper</span>
+                            <span className="bg-gradient-to-r text-gray-900">商品数据采集</span>
                         </h1>
-                        <p className="text-xl text-gray-600">Scrape product info from basketball e-commerce sites</p>
+                        <p className="text-xl text-gray-600">从篮球电商相关数据源抓取商品信息</p>
                     </div>
 
                     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
                         <form onSubmit={handleScrape} className="space-y-6">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Data Source
+                                    数据源
                                 </label>
                                 <select
                                     value={formData.source}
@@ -118,20 +118,20 @@ export default function ScrapeProductsPage() {
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                                     required
                                 >
-                                    <option value="mock">Mock Data (Recommended)</option>
-                                    <option value="jd">JD.com</option>
-                                    <option value="taobao">Taobao</option>
+                                    <option value="mock">内置模拟数据（推荐）</option>
+                                    <option value="jd">京东</option>
+                                    <option value="taobao">淘宝</option>
                                 </select>
                                 <p className="mt-2 text-sm text-gray-500">
-                                    {formData.source === 'mock' && 'Use built-in mock product data, stable and reliable'}
-                                    {formData.source === 'jd' && 'Scrape from JD.com (may be limited by anti-scraping)'}
-                                    {formData.source === 'taobao' && 'Scrape from Taobao (may be limited by anti-scraping)'}
+                                    {formData.source === 'mock' && '使用内置模拟商品数据，稳定可靠'}
+                                    {formData.source === 'jd' && '从京东抓取（可能受站点反爬限制）'}
+                                    {formData.source === 'taobao' && '从淘宝抓取（可能受站点反爬限制）'}
                                 </p>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Scrape Count
+                                    抓取数量
                                 </label>
                                 <input
                                     type="number"
@@ -142,7 +142,7 @@ export default function ScrapeProductsPage() {
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
                                     required
                                 />
-                                <p className="mt-2 text-sm text-gray-500">Recommended: 10-20 products</p>
+                                <p className="mt-2 text-sm text-gray-500">建议每次 10～20 条商品</p>
                             </div>
 
                             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
@@ -151,12 +151,12 @@ export default function ScrapeProductsPage() {
                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                     </svg>
                                     <div className="text-sm text-blue-700">
-                                        <p className="font-semibold mb-1">Tips</p>
+                                        <p className="font-semibold mb-1">提示</p>
                                         <ul className="list-disc list-inside space-y-1">
-                                            <li>Scraped products will be saved to the database</li>
-                                            <li>Categories will be created automatically if not exist</li>
-                                            <li>Duplicate products will be skipped</li>
-                                            <li>You will be redirected to product list when done</li>
+                                            <li>抓取结果会写入数据库</li>
+                                            <li>若分类不存在会自动创建</li>
+                                            <li>重复商品会被跳过</li>
+                                            <li>完成后会自动跳转到商品列表</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -174,16 +174,16 @@ export default function ScrapeProductsPage() {
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            Scraping...
+                                            采集中…
                                         </span>
-                                    ) : 'Start Scraping'}
+                                    ) : '开始采集'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => router.push('/products')}
                                     className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold"
                                 >
-                                    Back to Products
+                                    返回商品列表
                                 </button>
                             </div>
                         </form>
@@ -206,7 +206,7 @@ export default function ScrapeProductsPage() {
                                     <div className="flex-1">
                                         <p className={`font-semibold mb-2 ${result.success ? 'text-green-700' : 'text-red-700'
                                             }`}>
-                                            {result.success ? 'Scraping successful!' : 'Scraping failed'}
+                                            {result.success ? '采集成功' : '采集失败'}
                                         </p>
                                         <p className={`text-sm ${result.success ? 'text-green-600' : 'text-red-600'
                                             }`}>
@@ -214,7 +214,7 @@ export default function ScrapeProductsPage() {
                                         </p>
                                         {result.errors && result.errors.length > 0 && (
                                             <div className="mt-3">
-                                                <p className="text-xs font-semibold text-red-600 mb-1">Errors:</p>
+                                                <p className="text-xs font-semibold text-red-600 mb-1">错误详情：</p>
                                                 <ul className="text-xs text-red-600 space-y-1">
                                                     {result.errors.map((err: string, idx: number) => (
                                                         <li key={idx}>• {err}</li>
@@ -225,7 +225,7 @@ export default function ScrapeProductsPage() {
                                         {result.success && result.products && (
                                             <div className="mt-4">
                                                 <p className="text-sm text-green-600 mb-2">
-                                                    Saved {result.products.length} products. Redirecting to product list in 3 seconds...
+                                                    已保存 {result.products.length} 条商品，3 秒后跳转至商品列表…
                                                 </p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
                                                     {result.products.slice(0, 4).map((product: any) => (

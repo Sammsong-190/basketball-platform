@@ -10,7 +10,6 @@ import { useToast } from '@/components/Toast'
 interface Post {
   id: string
   title: string
-  content: string
   status: string
   author: { username: string }
   category: { name: string } | null
@@ -36,7 +35,7 @@ export default function AdminPostsPage() {
     setUser(userObj)
     
     if (userObj.role !== 'ADMIN') {
-      alert('You do not have permission to access this page')
+      alert('无权访问此页面')
       router.push('/dashboard')
       return
     }
@@ -44,9 +43,11 @@ export default function AdminPostsPage() {
     fetchPosts()
   }, [statusFilter, router])
 
-  const fetchPosts = async () => {
-    setPosts([])
-    setLoading(true)
+  const fetchPosts = async (opts?: { silent?: boolean }) => {
+    const silent = opts?.silent === true
+    if (!silent) {
+      setLoading(true)
+    }
     const token = localStorage.getItem('token')
     try {
       const response = await fetch(`/api/admin/posts?status=${statusFilter}`, {
@@ -56,18 +57,20 @@ export default function AdminPostsPage() {
         const data = await response.json()
         setPosts(data)
       } else {
-        alert('Failed to fetch post list')
+        alert('获取帖子列表失败')
       }
     } catch (error) {
-      console.error('Failed to fetch post list:', error)
-      alert('Failed to fetch posts')
+      console.error('获取帖子列表失败:', error)
+      alert('加载帖子失败')
     } finally {
-      setLoading(false)
+      if (!silent) {
+        setLoading(false)
+      }
     }
   }
 
   const handleReview = async (postId: string, newStatus: 'APPROVED' | 'REJECTED' | 'DELETED') => {
-    if (newStatus === 'DELETED' && !confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+    if (newStatus === 'DELETED' && !confirm('确定删除该帖子吗？此操作不可恢复。')) {
       return
     }
 
@@ -83,23 +86,23 @@ export default function AdminPostsPage() {
       })
 
       if (response.ok) {
-        showToast(newStatus === 'APPROVED' ? 'Post approved' : newStatus === 'REJECTED' ? 'Post rejected' : 'Post deleted')
-        fetchPosts() // 刷新列表
+        showToast(newStatus === 'APPROVED' ? '帖子已通过' : newStatus === 'REJECTED' ? '帖子已拒绝' : '帖子已删除')
+        setPosts((prev) => prev.filter((p) => p.id !== postId))
       } else {
         const data = await response.json()
-        alert(data.error || 'Operation failed')
+        alert(data.error || '操作失败')
       }
     } catch (error) {
-      console.error('Review failed:', error)
-      alert('Review failed, please try again')
+      console.error('审核失败:', error)
+      alert('审核失败，请重试')
     }
   }
 
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { text: string; color: string } } = {
-      'PENDING': { text: 'Pending Review', color: 'bg-yellow-100 text-yellow-800' },
-      'APPROVED': { text: 'Approved', color: 'bg-green-100 text-green-800' },
-      'REJECTED': { text: 'Rejected', color: 'bg-red-100 text-red-800' }
+      'PENDING': { text: '待审核', color: 'bg-yellow-100 text-yellow-800' },
+      'APPROVED': { text: '已通过', color: 'bg-green-100 text-green-800' },
+      'REJECTED': { text: '已拒绝', color: 'bg-red-100 text-red-800' }
     }
     const statusInfo = statusMap[status] || { text: status, color: 'bg-gray-100 text-gray-800' }
     return (
@@ -122,15 +125,15 @@ export default function AdminPostsPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">📋</span>
-              <span className="bg-gradient-to-r text-gray-900">Post Review</span>
+              <span className="bg-gradient-to-r text-gray-900">帖子审核</span>
             </h1>
-            <p className="text-xl text-gray-600">Manage pending, approved, and rejected posts</p>
+            <p className="text-xl text-gray-600">管理待审、已通过和已拒绝的帖子</p>
           </div>
 
           {/* 状态筛选 */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-8 p-6">
             <div className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-gray-700">Filter Status: </span>
+              <span className="text-sm font-semibold text-gray-700">筛选状态： </span>
               {(['PENDING', 'APPROVED', 'REJECTED'] as const).map((status) => (
                 <button
                   key={status}
@@ -141,7 +144,7 @@ export default function AdminPostsPage() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {status === 'PENDING' ? 'Pending Review' : status === 'APPROVED' ? 'Approved' : 'Rejected'}
+                  {status === 'PENDING' ? '待审核' : status === 'APPROVED' ? '已通过' : '已拒绝'}
                 </button>
               ))}
             </div>
@@ -150,11 +153,17 @@ export default function AdminPostsPage() {
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 text-gray-600">加载中…</p>
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-200">
-              <p className="text-gray-500 text-lg">No {statusFilter === 'PENDING' ? 'pending' : statusFilter === 'APPROVED' ? 'approved' : 'rejected'} posts</p>
+              <p className="text-gray-500 text-lg">
+                {statusFilter === 'PENDING'
+                  ? '暂无待审核帖子'
+                  : statusFilter === 'APPROVED'
+                    ? '暂无已通过帖子'
+                    : '暂无已拒绝帖子'}
+              </p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -172,17 +181,17 @@ export default function AdminPostsPage() {
                       </div>
                       <h2 className="text-2xl font-bold text-gray-900 mb-2">{post.title}</h2>
                       <div className="flex items-center text-sm text-gray-500 mb-4">
-                        <span className="mr-4">Author: {post.author.username}</span>
-                        <span>{new Date(post.createdAt).toLocaleString('en-US')}</span>
+                        <span className="mr-4">作者：{post.author.username}</span>
+                        <span>{new Date(post.createdAt).toLocaleString('zh-CN')}</span>
                       </div>
-                      <div className="text-gray-700 leading-relaxed line-clamp-3 mb-4">
-                        {post.content}
-                      </div>
+                      <p className="text-gray-500 text-sm mb-4">
+                        正文未在列表中加载以提升速度，请点此查看全文。
+                      </p>
                       <Link
                         href={`/posts/${post.id}`}
                         className="text-gray-900 hover:text-gray-700 font-semibold text-sm"
                       >
-                        View Full Content →
+                        查看全文 →
                       </Link>
                     </div>
                   </div>
@@ -193,19 +202,19 @@ export default function AdminPostsPage() {
                         onClick={() => handleReview(post.id, 'APPROVED')}
                         className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
-                        ✅ Approve
+                        ✅ 通过
                       </button>
                       <button
                         onClick={() => handleReview(post.id, 'REJECTED')}
                         className="flex-1 px-6 py-3 bg-gradient-to-r bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
-                        ❌ Reject
+                        ❌ 拒绝
                       </button>
                       <button
                         onClick={() => handleReview(post.id, 'DELETED')}
                         className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold"
                       >
-                        🗑️ Delete
+                        🗑️ 删除
                       </button>
                     </div>
                   )}
@@ -217,14 +226,14 @@ export default function AdminPostsPage() {
                           onClick={() => handleReview(post.id, 'APPROVED')}
                           className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                         >
-                          ✅ Re-approve
+                          ✅ 改为通过
                         </button>
                       )}
                       <button
                         onClick={() => handleReview(post.id, 'DELETED')}
                         className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold"
                       >
-                        🗑️ Delete
+                        🗑️ 删除
                       </button>
                     </div>
                   )}

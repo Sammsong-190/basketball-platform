@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { orderId, type, reason, amount } = body
 
     if (!orderId || !type || !reason) {
-      return NextResponse.json({ error: 'Order ID, type and reason are required' }, { status: 400 })
+      return NextResponse.json({ error: '订单 ID、类型和原因为必填项' }, { status: 400 })
     }
 
     const order = await prisma.order.findFirst({
@@ -35,11 +35,18 @@ export async function POST(request: NextRequest) {
     })
 
     if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      return NextResponse.json({ error: '订单不存在' }, { status: 404 })
     }
 
-    if (order.status !== 'COMPLETED' && order.status !== 'SHIPPED') {
-      return NextResponse.json({ error: 'Order status does not allow refund' }, { status: 400 })
+    if (
+      order.status !== 'COMPLETED' &&
+      order.status !== 'SHIPPED' &&
+      order.status !== 'PAID'
+    ) {
+      return NextResponse.json(
+        { error: '当前订单状态不允许申请售后' },
+        { status: 400 }
+      )
     }
 
     const refundAmount = typeof amount === 'number' ? amount : order.totalAmount
@@ -72,6 +79,7 @@ export async function POST(request: NextRequest) {
       const sellerIdsToNotify = new Set<string>()
       let hasPlatformManaged = false
 
+      const freeTradeSellerIds = new Set<string>()
       for (const item of order.items) {
         const p = item.product
         if (!p) continue
@@ -79,6 +87,9 @@ export async function POST(request: NextRequest) {
           hasPlatformManaged = true
         } else if (p.sellerId && p.sellerId !== userId) {
           sellerIdsToNotify.add(p.sellerId)
+        }
+        if (p.sellerId && p.sourceType !== 'PLATFORM_MANAGED') {
+          freeTradeSellerIds.add(p.sellerId)
         }
       }
 
@@ -104,6 +115,26 @@ export async function POST(request: NextRequest) {
         })
       }
 
+      // 多卖家自由交易：通知管理员协同（单一卖家仅通知该卖家）
+      if (!hasPlatformManaged && freeTradeSellerIds.size > 1) {
+        const admins = await prisma.user.findMany({
+          where: { role: 'ADMIN' },
+          select: { id: true },
+        })
+        for (const a of admins) {
+          toCreate.push({
+            userId: a.id,
+            title: '新的退款/售后申请（多卖家订单）',
+            body: `订单号 ${order.orderNumber}：买家提交了「${typeLabel}」申请，金额 ¥${refundAmount.toFixed(
+              2
+            )}。原因：${reasonShort}\n本订单含多个卖家商品，请到管理后台「退款」或订单详情处理。`,
+            type: 'REFUND_REQUEST',
+            refundId: refund.id,
+            orderId,
+          })
+        }
+      }
+
       if (hasPlatformManaged) {
         const admins = await prisma.user.findMany({
           where: { role: 'ADMIN' },
@@ -127,12 +158,12 @@ export async function POST(request: NextRequest) {
         await prisma.userNotification.createMany({ data: toCreate })
       }
     } catch (notifyErr) {
-      console.error('Refund notification failed:', notifyErr)
+      console.error('退款通知发送失败:', notifyErr)
     }
 
     return NextResponse.json(refund, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to submit refund request' }, { status: 500 })
+    return NextResponse.json({ error: '提交售后申请失败' }, { status: 500 })
   }
 }
 
@@ -165,6 +196,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(refunds)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch refund list' }, { status: 500 })
+    return NextResponse.json({ error: '获取售后列表失败' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/middleware'
+import { getRequestLogContext, writeSystemLog } from '@/lib/system-log'
 
 // 获取待审核评论列表
 export async function GET(request: NextRequest) {
@@ -23,8 +24,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(comments)
   } catch (error) {
-    console.error('Failed to fetch comments:', error)
-    return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 })
+    console.error('获取评论失败:', error)
+    return NextResponse.json({ error: '获取评论失败' }, { status: 500 })
   }
 }
 
@@ -38,7 +39,7 @@ export async function PUT(request: NextRequest) {
     const { id, status } = body
 
     if (!id || !status) {
-      return NextResponse.json({ error: 'Comment ID and status are required' }, { status: 400 })
+      return NextResponse.json({ error: '评论 ID 和状态为必填项' }, { status: 400 })
     }
 
     if (status === 'DELETED') {
@@ -52,7 +53,16 @@ export async function PUT(request: NextRequest) {
         }
         await deleteCommentAndReplies(id)
       })
-      return NextResponse.json({ message: 'Deleted successfully' })
+      const admin = authResult as { userId: string }
+      const ctx = getRequestLogContext(request)
+      void writeSystemLog({
+        userId: admin.userId,
+        action: '删除评论（含回复）',
+        module: 'ADMIN_COMMENT',
+        description: `commentId=${id}`,
+        ...ctx,
+      })
+      return NextResponse.json({ message: '删除成功' })
     }
 
     const comment = await prisma.comment.update({
@@ -60,9 +70,19 @@ export async function PUT(request: NextRequest) {
       data: { status }
     })
 
+    const admin = authResult as { userId: string }
+    const ctx = getRequestLogContext(request)
+    void writeSystemLog({
+      userId: admin.userId,
+      action: `评论审核：${status}`,
+      module: 'ADMIN_COMMENT',
+      description: `commentId=${id}`,
+      ...ctx,
+    })
+
     return NextResponse.json(comment)
   } catch (error: any) {
-    console.error('Failed to update/delete comment:', error)
-    return NextResponse.json({ error: 'Operation failed' }, { status: 500 })
+    console.error('更新或删除评论失败:', error)
+    return NextResponse.json({ error: '操作失败' }, { status: 500 })
   }
 }

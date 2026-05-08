@@ -1,32 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken, getTokenFromRequest, TokenPayload } from './auth'
+import { verifyTokenDetailed, getTokenFromRequest, TokenPayload } from './auth'
 import { prisma } from './prisma'
+
+function authErrorMessage(code: 'malformed' | 'expired' | 'invalid'): string {
+  if (code === 'expired') {
+    return '登录已过期，请重新登录'
+  }
+  if (code === 'malformed') {
+    return '授权令牌无效，请重新登录'
+  }
+  return '令牌无效或已过期'
+}
 
 export async function authenticate(request: NextRequest): Promise<NextResponse | TokenPayload> {
   const token = getTokenFromRequest(request as unknown as Request)
-  
+
   if (!token) {
     return NextResponse.json(
-      { error: 'Unauthorized, please login first' },
+      { error: '未授权，请先登录' },
       { status: 401 }
     )
   }
 
-  const payload = verifyToken(token)
-  if (!payload) {
-    return NextResponse.json(
-      { error: 'Token invalid or expired' },
-      { status: 401 }
-    )
+  const result = verifyTokenDetailed(token)
+  if (!result.ok) {
+    return NextResponse.json({ error: authErrorMessage(result.code) }, { status: 401 })
   }
 
-  return payload
+  return result.payload
 }
 
 export function requireRole(allowedRoles: string[]) {
   return async (request: NextRequest) => {
     const authResult = await authenticate(request)
-    
+
     if (authResult instanceof NextResponse) {
       return authResult
     }
@@ -34,7 +41,7 @@ export function requireRole(allowedRoles: string[]) {
     const payload = authResult as TokenPayload
     if (!allowedRoles.includes(payload.role)) {
       return NextResponse.json(
-        { error: 'Insufficient permissions' },
+        { error: '权限不足' },
         { status: 403 }
       )
     }
@@ -49,13 +56,13 @@ export async function requireAdmin(request: NextRequest): Promise<NextResponse |
 
 export async function requireSeller(request: NextRequest): Promise<NextResponse | TokenPayload> {
   const authResult = await authenticate(request)
-  
+
   if (authResult instanceof NextResponse) {
     return authResult
   }
 
   const payload = authResult as TokenPayload
-  
+
   // 管理员可以直接发布商品
   if (payload.role === 'ADMIN') {
     return payload
@@ -70,7 +77,7 @@ export async function requireSeller(request: NextRequest): Promise<NextResponse 
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: '用户不存在' },
         { status: 404 }
       )
     }
@@ -81,12 +88,12 @@ export async function requireSeller(request: NextRequest): Promise<NextResponse 
     }
 
     return NextResponse.json(
-      { error: 'Insufficient permissions, you are not a seller' },
+      { error: '权限不足，您不是卖家' },
       { status: 403 }
     )
   } catch (error) {
     return NextResponse.json(
-      { error: 'Permission verification failed' },
+      { error: '权限校验失败' },
       { status: 500 }
     )
   }

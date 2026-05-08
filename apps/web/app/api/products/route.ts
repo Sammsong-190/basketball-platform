@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticate, requireSeller } from '@/lib/middleware'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const categoryId = searchParams.get('categoryId')
   const keyword = searchParams.get('keyword')
   const page = parseInt(searchParams.get('page') || '1')
-  const limit = parseInt(searchParams.get('limit') || '10')
+  const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100)
 
   try {
     const where: any = { status: 'ACTIVE' }
@@ -26,10 +28,22 @@ export async function GET(request: NextRequest) {
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          stock: true,
+          images: true,
+          sellerId: true,
+          categoryId: true,
+          status: true,
+          sourceType: true,
+          rating: true,
+          reviewCount: true,
+          createdAt: true,
           seller: { select: { id: true, username: true } },
-          category: true,
-          _count: { select: { reviews: true } }
+          category: { select: { id: true, name: true } },
+          _count: { select: { reviews: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
@@ -40,8 +54,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ products, total, page, limit })
   } catch (error) {
-    console.error('Failed to fetch products:', error)
-    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
+    console.error('获取商品列表失败:', error)
+    return NextResponse.json({ error: '获取商品列表失败' }, { status: 500 })
   }
 }
 
@@ -58,15 +72,15 @@ export async function POST(request: NextRequest) {
     // 验证必需字段
     if (!name || !description || !price || !categoryId) {
       return NextResponse.json({ 
-        error: 'Required fields cannot be empty',
-        details: `Missing: ${!name ? 'name, ' : ''}${!description ? 'description, ' : ''}${!price ? 'price, ' : ''}${!categoryId ? 'categoryId' : ''}`
+        error: '必填项不能为空',
+        details: `缺少：${!name ? '名称、' : ''}${!description ? '描述、' : ''}${!price ? '价格、' : ''}${!categoryId ? '分类 ID' : ''}`
       }, { status: 400 })
     }
 
     // 验证价格
     const parsedPrice = parseFloat(price)
     if (isNaN(parsedPrice) || parsedPrice < 0) {
-      return NextResponse.json({ error: 'Invalid price' }, { status: 400 })
+      return NextResponse.json({ error: '价格无效' }, { status: 400 })
     }
 
     // 验证库存（自由交易商品默认至少 1，否则无法购买）
@@ -77,7 +91,7 @@ export async function POST(request: NextRequest) {
       where: { id: categoryId }
     })
     if (!category) {
-      return NextResponse.json({ error: 'Category not found' }, { status: 400 })
+      return NextResponse.json({ error: '分类不存在' }, { status: 400 })
     }
 
     // 管理员发布的商品自动激活，普通卖家需要审核
@@ -93,7 +107,7 @@ export async function POST(request: NextRequest) {
         if (img.startsWith('data:image')) {
           // base64 图片，如果太长则截断或压缩提示
           if (img.length > 500000) { // 约500KB的base64
-            console.warn('Image too large, truncating base64 data')
+            console.warn('图片过大，已截断 base64 数据')
             // 返回一个占位符或错误提示
             return img.substring(0, 500000)
           }
@@ -118,8 +132,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(product, { status: 201 })
   } catch (error: any) {
-    console.error('Failed to create product:', error)
-    console.error('Error details:', {
+    console.error('创建商品失败:', error)
+    console.error('错误详情:', {
       message: error?.message,
       code: error?.code,
       meta: error?.meta,
@@ -127,18 +141,18 @@ export async function POST(request: NextRequest) {
     })
     
     // 提供更详细的错误信息
-    let errorMessage = 'Failed to create product'
+    let errorMessage = '创建商品失败'
     if (error?.code === 'P2002') {
-      errorMessage = 'Product with this name already exists'
+      errorMessage = '已存在同名商品'
     } else if (error?.code === 'P2003') {
-      errorMessage = 'Invalid category or seller ID'
+      errorMessage = '分类或卖家 ID 无效'
     } else if (error?.message) {
       errorMessage = error.message
     }
     
     return NextResponse.json({ 
       error: errorMessage,
-      details: error?.message || 'Unknown error',
+      details: error?.message || '未知错误',
       code: error?.code
     }, { status: 500 })
   }

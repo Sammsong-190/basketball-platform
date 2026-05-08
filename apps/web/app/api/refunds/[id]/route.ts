@@ -1,28 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticate } from '@/lib/middleware'
-
-type OrderWithItems = {
-  items: Array<{ product: { sellerId: string; sourceType: string } }>
-}
-
-function sellerCanProcessRefund(userId: string, order: OrderWithItems): boolean {
-  const items = order.items
-  if (!items?.length) return false
-
-  let hasPlatform = false
-  const sellerIds = new Set<string>()
-
-  for (const it of items) {
-    const p = it.product
-    if (p.sourceType === 'PLATFORM_MANAGED') hasPlatform = true
-    else if (p.sellerId) sellerIds.add(p.sellerId)
-  }
-
-  if (hasPlatform) return false
-  if (sellerIds.size !== 1) return false
-  return sellerIds.has(userId)
-}
+import {
+  adminCanProcessOrderRefund,
+  sellerCanProcessOrderRefund,
+} from '@/lib/refundPermissions'
 
 export async function PUT(
   request: NextRequest,
@@ -39,7 +21,7 @@ export async function PUT(
     const { status, adminNote } = body
 
     if (!status || !['APPROVED', 'REJECTED', 'COMPLETED'].includes(status)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+      return NextResponse.json({ error: '状态无效' }, { status: 400 })
     }
 
     const refund = await prisma.refund.findUnique({
@@ -58,27 +40,35 @@ export async function PUT(
     })
 
     if (!refund) {
-      return NextResponse.json({ error: 'Refund request not found' }, { status: 404 })
+      return NextResponse.json({ error: '售后申请不存在' }, { status: 404 })
     }
 
     if (refund.status !== 'PENDING') {
-      return NextResponse.json({ error: 'This refund has already been processed' }, { status: 400 })
+      return NextResponse.json({ error: '该售后申请已处理' }, { status: 400 })
     }
 
-    let allowed = role === 'ADMIN'
-    if (!allowed) {
+    let allowed = false
+    if (role === 'ADMIN') {
+      allowed = adminCanProcessOrderRefund(refund.order)
+    } else {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { isSeller: true },
       })
-      if (user?.isSeller && sellerCanProcessRefund(userId, refund.order)) {
+      if (user?.isSeller && sellerCanProcessOrderRefund(userId, refund.order)) {
         allowed = true
       }
     }
 
     if (!allowed) {
       return NextResponse.json(
-        { error: 'No permission to process this refund' },
+        {
+          error: '无权处理该售后申请',
+          hint:
+            role === 'ADMIN'
+              ? '单一卖家的自由交易退款由卖家处理，管理员仅处理含平台自营或多卖家等订单'
+              : undefined,
+        },
         { status: 403 }
       )
     }
@@ -99,7 +89,7 @@ export async function PUT(
       })
     } else if (status === 'COMPLETED') {
       if (role !== 'ADMIN') {
-        return NextResponse.json({ error: 'Only admins can set COMPLETED' }, { status: 403 })
+        return NextResponse.json({ error: '仅管理员可将状态设为已完成' }, { status: 403 })
       }
       updateData.completedAt = new Date()
     }
@@ -112,6 +102,6 @@ export async function PUT(
     return NextResponse.json(updated)
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: 'Review failed' }, { status: 500 })
+    return NextResponse.json({ error: '审核失败' }, { status: 500 })
   }
 }

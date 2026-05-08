@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ cartItems, total })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch cart' }, { status: 500 })
+    return NextResponse.json({ error: '获取购物车失败' }, { status: 500 })
   }
 }
 
@@ -33,15 +33,15 @@ export async function POST(request: NextRequest) {
     const { productId, quantity } = body
 
     if (!productId || !quantity) {
-      return NextResponse.json({ error: 'Product ID and quantity are required' }, { status: 400 })
+      return NextResponse.json({ error: '商品 ID 和数量为必填项' }, { status: 400 })
     }
 
     const product = await prisma.product.findUnique({ where: { id: productId }, select: { sellerId: true } })
     if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 })
     }
     if (product.sellerId === userId) {
-      return NextResponse.json({ error: 'You cannot add your own product to cart' }, { status: 400 })
+      return NextResponse.json({ error: '不能将本人发布的商品加入购物车' }, { status: 400 })
     }
 
     const existing = await prisma.cartItem.findUnique({
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(cartItem, { status: 201 })
     }
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to add to cart' }, { status: 500 })
+    return NextResponse.json({ error: '加入购物车失败' }, { status: 500 })
   }
 }
 
@@ -78,5 +78,5 @@ export async function DELETE(request: NextRequest) {
     await prisma.cartItem.deleteMany({ where: { userId } })
   }
 
-  return NextResponse.json({ message: 'Deleted successfully' })
+  return NextResponse.json({ message: '删除成功' })
 }

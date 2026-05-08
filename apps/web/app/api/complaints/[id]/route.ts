@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { authenticate, requireAdmin } from '@/lib/middleware'
+import { requireAdmin } from '@/lib/middleware'
 
 export async function PUT(
   request: NextRequest,
@@ -24,6 +24,6 @@ export async function PUT(
 
     return NextResponse.json(complaint)
   } catch (error) {
-    return NextResponse.json({ error: 'Update failed' }, { status: 500 })
+    return NextResponse.json({ error: '更新失败' }, { status: 500 })
   }
 }

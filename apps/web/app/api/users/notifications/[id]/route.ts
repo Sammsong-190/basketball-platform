@@ -19,7 +19,7 @@ export async function PATCH(
       where: { id, userId },
     })
     if (!existing) {
-      return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
+      return NextResponse.json({ error: '通知不存在' }, { status: 404 })
     }
 
     const updated = await prisma.userNotification.update({
@@ -30,6 +30,6 @@ export async function PATCH(
     return NextResponse.json(updated)
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: 'Failed to update notification' }, { status: 500 })
+    return NextResponse.json({ error: '更新通知失败' }, { status: 500 })
   }
 }

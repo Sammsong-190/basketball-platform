@@ -452,7 +452,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ news, error: false, ...(debug ? { newsDebug } : {}) })
     }
 
-    return NextResponse.json({ error: 'Invalid type parameter' }, { status: 400 })
+    return NextResponse.json({ error: 'type 参数无效' }, { status: 400 })
   } catch (error: any) {
     console.error('获取NBA数据失败:', error)
     return NextResponse.json(

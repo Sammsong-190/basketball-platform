@@ -13,11 +13,11 @@ export async function POST(request: NextRequest) {
     const { content, postId, productId, parentId } = body
 
     if (!content) {
-      return NextResponse.json({ error: 'Comment content is required' }, { status: 400 })
+      return NextResponse.json({ error: '评论内容为必填项' }, { status: 400 })
     }
 
     if (!postId && !productId) {
-      return NextResponse.json({ error: 'Post ID or Product ID is required' }, { status: 400 })
+      return NextResponse.json({ error: '需要提供帖子 ID 或商品 ID' }, { status: 400 })
     }
 
     // 管理员发布的评论自动通过审核
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(comment, { status: 201 })
   } catch (error) {
-    console.error('Failed to create comment:', error)
-    return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 })
+    console.error('创建评论失败:', error)
+    return NextResponse.json({ error: '发表评论失败' }, { status: 500 })
   }
 }

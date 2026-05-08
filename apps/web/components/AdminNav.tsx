@@ -7,51 +7,15 @@ export default function AdminNav() {
   const pathname = usePathname()
 
   const navItems = [
-    {
-      href: '/admin',
-      label: 'Admin Home',
-      icon: '⚙️'
-    },
-    {
-      href: '/admin/posts',
-      label: 'Post Review',
-      icon: '📋'
-    },
-    {
-      href: '/admin/products',
-      label: 'Product Review',
-      icon: '🛒'
-    },
-    {
-      href: '/admin/comments',
-      label: 'Comment Review',
-      icon: '💬'
-    },
-    {
-      href: '/admin/scrape-products',
-      label: 'Scrape Products',
-      icon: '🕷️'
-    },
-    {
-      href: '/admin/refunds',
-      label: 'Refunds',
-      icon: '↩️'
-    },
-    {
-      href: '/admin/complaints',
-      label: 'Complaints',
-      icon: '📢'
-    },
-    {
-      href: '/admin/users',
-      label: 'Users',
-      icon: '👥'
-    },
-    {
-      href: '/admin/logs',
-      label: 'System Logs',
-      icon: '📋'
-    }
+    { href: '/admin', label: '管理首页', icon: '⚙️' },
+    { href: '/admin/posts', label: '帖子审核', icon: '📋' },
+    { href: '/admin/products', label: '商品审核', icon: '🛒' },
+    { href: '/admin/comments', label: '评论审核', icon: '💬' },
+    { href: '/admin/scrape-products', label: '抓取商品', icon: '🕷️' },
+    { href: '/admin/refunds', label: '退款管理', icon: '↩️' },
+    { href: '/admin/complaints', label: '投诉建议', icon: '📢' },
+    { href: '/admin/users', label: '用户管理', icon: '👥' },
+    { href: '/admin/logs', label: '系统日志', icon: '📋' },
   ]
 
   return (
@@ -65,9 +29,7 @@ export default function AdminNav() {
                 key={item.href}
                 href={item.href}
                 className={`px-6 py-4 font-semibold text-sm whitespace-nowrap transition-all relative ${
-                  isActive
-                    ? 'text-gray-900 bg-gray-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  isActive ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 <span className="mr-2">{item.icon}</span>

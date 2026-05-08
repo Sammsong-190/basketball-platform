@@ -2,121 +2,76 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticate, requireSeller } from '@/lib/middleware'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const productId = params.id
-    
+
     if (!productId) {
-      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 })
+      return NextResponse.json({ error: '商品 ID 为必填项' }, { status: 400 })
     }
 
-    console.log('Fetching product with ID:', productId)
-    
-    // First, try to find the product with minimal includes to avoid relation errors
-    let product: any = null
-    try {
-      product = await prisma.product.findUnique({
-        where: { id: productId },
-        include: {
-          seller: { 
-            select: { id: true, username: true, avatar: true } 
-          },
-          category: {
-            select: { id: true, name: true }
-          },
-          _count: { 
-            select: { reviews: true, orderItems: true } 
-          }
-        }
-      })
-    } catch (queryError: any) {
-      console.error('Prisma query error:', queryError)
-      // Try without includes if the query fails
-      product = await prisma.product.findUnique({
-        where: { id: productId }
-      })
-      if (product) {
-        // Manually fetch related data
-        try {
-          const seller = await prisma.user.findUnique({
-            where: { id: product.sellerId },
-            select: { id: true, username: true, avatar: true }
-          })
-          const category = await prisma.category.findUnique({
-            where: { id: product.categoryId },
-            select: { id: true, name: true }
-          })
-          product.seller = seller
-          product.category = category
-          product._count = {
-            reviews: await prisma.productReview.count({ where: { productId: productId } }),
-            orderItems: await prisma.orderItem.count({ where: { productId: productId } })
-          }
-        } catch (relationError) {
-          console.warn('Failed to fetch relations, continuing without them:', relationError)
-        }
-      }
-    }
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        seller: {
+          select: { id: true, username: true, avatar: true },
+        },
+        category: {
+          select: { id: true, name: true },
+        },
+        _count: {
+          select: { reviews: true, orderItems: true },
+        },
+      },
+    })
 
     if (!product) {
-      console.error('Product not found in database:', productId)
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 })
     }
 
     if (product.status === 'DELETED') {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 })
     }
 
-    // Check if product is active (allow viewing inactive products but show warning)
-    if (product.status !== 'ACTIVE') {
-      console.warn('Product is not active:', productId, 'Status:', product.status)
-    }
-
-    // Calculate average rating from ProductReview (separate query to avoid relation issues)
-    let avgRating = 0
-    let reviewCount = 0
-    let reviews: any[] = []
-    
-    try {
-      reviews = await prisma.productReview.findMany({
-        where: { productId: productId },
+    const [aggregate, reviews] = await Promise.all([
+      prisma.productReview.aggregate({
+        where: { productId },
+        _avg: { rating: true },
+        _count: { _all: true },
+      }),
+      prisma.productReview.findMany({
+        where: { productId },
         include: {
-          user: { select: { username: true, avatar: true } }
+          user: { select: { username: true, avatar: true } },
         },
         orderBy: { createdAt: 'desc' },
-        take: 10
-      })
-      reviewCount = reviews.length
-      if (reviews.length > 0) {
-        avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      }
-    } catch (reviewError: any) {
-      console.warn('Failed to fetch reviews, using product defaults:', reviewError?.message)
-      // Use product's default rating if review query fails
-      avgRating = product.rating || 0
-      reviewCount = product.reviewCount || product._count?.reviews || 0
-    }
+        take: 10,
+      }),
+    ])
+
+    const reviewCount = aggregate._count._all
+    const avgRating = aggregate._avg.rating ?? 0
 
     return NextResponse.json({
       ...product,
-      reviews: reviews,
+      reviews,
       rating: avgRating,
-      reviewCount: reviewCount
+      reviewCount,
     })
   } catch (error: any) {
-    console.error('Failed to fetch product:', error)
-    console.error('Error details:', {
-      message: error?.message,
-      code: error?.code,
-      meta: error?.meta
-    })
-    return NextResponse.json({ 
-      error: 'Failed to fetch product',
-      details: error?.message || 'Unknown error'
-    }, { status: 500 })
+    console.error('获取商品失败:', error?.message || error)
+    return NextResponse.json(
+      {
+        error: '获取商品失败',
+        details: error?.message || '未知错误',
+      },
+      { status: 500 }
+    )
   }
 }
 
@@ -131,9 +86,9 @@ export async function PUT(
 
   try {
     const productId = params.id
-    
+
     if (!productId) {
-      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 })
+      return NextResponse.json({ error: '商品 ID 为必填项' }, { status: 400 })
     }
 
     // 检查商品是否存在
@@ -142,7 +97,7 @@ export async function PUT(
     })
 
     if (!existingProduct) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 })
     }
 
     // 严格检查权限：只有商品所有者或管理员可以编辑
@@ -151,8 +106,8 @@ export async function PUT(
     if (userRole !== 'ADMIN' && existingProduct.sellerId !== userId) {
       console.warn(`Unauthorized edit attempt: User ${userId} tried to edit product ${productId} owned by ${existingProduct.sellerId}`)
       return NextResponse.json({ 
-        error: 'You do not have permission to edit this product',
-        details: 'You can only edit your own products'
+        error: '无权编辑该商品',
+        details: '仅可编辑您本人发布的商品'
       }, { status: 403 })
     }
 
@@ -162,21 +117,21 @@ export async function PUT(
     // 验证必需字段
     if (!name || !description || !price || !categoryId) {
       return NextResponse.json({ 
-        error: 'Required fields cannot be empty',
-        details: `Missing: ${!name ? 'name, ' : ''}${!description ? 'description, ' : ''}${!price ? 'price, ' : ''}${!categoryId ? 'categoryId' : ''}`
+        error: '必填项不能为空',
+        details: `缺少：${!name ? '名称、' : ''}${!description ? '描述、' : ''}${!price ? '价格、' : ''}${!categoryId ? '分类 ID' : ''}`
       }, { status: 400 })
     }
 
     // 验证价格
     const parsedPrice = parseFloat(price)
     if (isNaN(parsedPrice) || parsedPrice < 0) {
-      return NextResponse.json({ error: 'Invalid price' }, { status: 400 })
+      return NextResponse.json({ error: '价格无效' }, { status: 400 })
     }
 
     // 验证库存
     const parsedStock = parseInt(stock || '0')
     if (isNaN(parsedStock) || parsedStock < 0) {
-      return NextResponse.json({ error: 'Invalid stock' }, { status: 400 })
+      return NextResponse.json({ error: '库存无效' }, { status: 400 })
     }
 
     // 验证分类是否存在
@@ -184,7 +139,7 @@ export async function PUT(
       where: { id: categoryId }
     })
     if (!category) {
-      return NextResponse.json({ error: 'Category not found' }, { status: 400 })
+      return NextResponse.json({ error: '分类不存在' }, { status: 400 })
     }
 
     // 限制图片数量和大小
@@ -193,7 +148,7 @@ export async function PUT(
       processedImages = processedImages.slice(0, 10)
       processedImages = processedImages.map((img: string) => {
         if (img.startsWith('data:image') && img.length > 500000) {
-          console.warn('Image too large, truncating base64 data')
+          console.warn('图片过大，已截断 base64 数据')
           return img.substring(0, 500000)
         }
         return img
@@ -217,26 +172,141 @@ export async function PUT(
 
     return NextResponse.json(updatedProduct)
   } catch (error: any) {
-    console.error('Failed to update product:', error)
-    console.error('Error details:', {
+    console.error('更新商品失败:', error)
+    console.error('错误详情:', {
       message: error?.message,
       code: error?.code,
       meta: error?.meta
     })
     
-    let errorMessage = 'Failed to update product'
+    let errorMessage = '更新商品失败'
     if (error?.code === 'P2002') {
-      errorMessage = 'Product with this name already exists'
+      errorMessage = '已存在同名商品'
     } else if (error?.code === 'P2003') {
-      errorMessage = 'Invalid category or seller ID'
+      errorMessage = '分类或卖家 ID 无效'
     } else if (error?.message) {
       errorMessage = error.message
     }
     
     return NextResponse.json({ 
       error: errorMessage,
-      details: error?.message || 'Unknown error',
+      details: error?.message || '未知错误',
       code: error?.code
     }, { status: 500 })
+  }
+}
+
+/** 卖家/管理员仅修改上架状态（不改变其它字段） */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authResult = await requireSeller(request)
+  if (authResult instanceof NextResponse) return authResult
+  const userId = (authResult as any).userId
+  const userRole = (authResult as any).role
+
+  try {
+    const productId = params.id
+    if (!productId) {
+      return NextResponse.json({ error: '商品 ID 为必填项' }, { status: 400 })
+    }
+
+    const existing = await prisma.product.findUnique({
+      where: { id: productId },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 })
+    }
+
+    if (userRole !== 'ADMIN' && existing.sellerId !== userId) {
+      return NextResponse.json({ error: '无权操作该商品' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { status } = body
+
+    const sellerAllowed = ['ACTIVE', 'INACTIVE'] as const
+    const adminAllowed = ['ACTIVE', 'INACTIVE', 'DELETED'] as const
+    const allowed =
+      userRole === 'ADMIN' ? adminAllowed : sellerAllowed
+
+    if (!status || !allowed.includes(status)) {
+      return NextResponse.json(
+        {
+          error:
+            userRole === 'ADMIN'
+              ? '状态无效，仅可为 ACTIVE、INACTIVE 或 DELETED'
+              : '状态无效，卖家仅可上架（ACTIVE）或下架（INACTIVE）',
+        },
+        { status: 400 }
+      )
+    }
+
+    if (existing.status === 'DELETED') {
+      return NextResponse.json(
+        { error: '该商品已删除，无法修改状态' },
+        { status: 400 }
+      )
+    }
+
+    const updated = await prisma.product.update({
+      where: { id: productId },
+      data: { status },
+    })
+
+    return NextResponse.json(updated)
+  } catch (error: unknown) {
+    console.error('更新商品状态失败:', error)
+    return NextResponse.json({ error: '更新状态失败' }, { status: 500 })
+  }
+}
+
+/** 卖家：仅当商品已被管理员标记为 DELETED 时可物理删除；管理员可删除任意 DELETED 商品 */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authResult = await requireSeller(request)
+  if (authResult instanceof NextResponse) return authResult
+  const userId = (authResult as any).userId
+  const userRole = (authResult as any).role
+
+  try {
+    const productId = params.id
+    if (!productId) {
+      return NextResponse.json({ error: '商品 ID 为必填项' }, { status: 400 })
+    }
+
+    const existing = await prisma.product.findUnique({
+      where: { id: productId },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 })
+    }
+
+    if (existing.status !== 'DELETED') {
+      return NextResponse.json(
+        {
+          error:
+            '仅当被管理员删除后的商品，才能从「我的商品」中彻底移除',
+        },
+        { status: 400 }
+      )
+    }
+
+    const isAdmin = userRole === 'ADMIN'
+    const isOwner = existing.sellerId === userId
+    if (!isAdmin && !isOwner) {
+      return NextResponse.json({ error: '无权删除该商品' }, { status: 403 })
+    }
+
+    await prisma.product.delete({ where: { id: productId } })
+    return NextResponse.json({ ok: true })
+  } catch (error: unknown) {
+    console.error('删除商品失败:', error)
+    return NextResponse.json({ error: '删除失败' }, { status: 500 })
   }
 }

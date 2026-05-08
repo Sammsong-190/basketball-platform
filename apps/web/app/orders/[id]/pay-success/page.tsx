@@ -61,13 +61,11 @@ export default function PaySuccessPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful</h1>
-          <p className="text-gray-600 mb-6">
-            Your order has been paid successfully. Thank you for your purchase!
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">支付成功</h1>
+          <p className="text-gray-600 mb-6">订单已支付成功，感谢您的购买！</p>
           {order && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm text-gray-600">Order No.: {order.orderNumber}</p>
+              <p className="text-sm text-gray-600">订单号：{order.orderNumber}</p>
               <p className="text-lg font-bold text-gray-900 mt-1">¥{order.totalAmount?.toFixed(2)}</p>
             </div>
           )}
@@ -76,19 +74,19 @@ export default function PaySuccessPage() {
               href={`/orders/${params.id}`}
               className="px-6 py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800"
             >
-              View Order Details
+              查看订单详情
             </Link>
             <Link
               href="/products"
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
             >
-              Continue Shopping
+              继续逛
             </Link>
             <Link
               href="/dashboard"
               className="text-gray-600 hover:text-gray-900 text-sm"
             >
-              Back to Dashboard
+              返回个人中心
             </Link>
           </div>
         </div>

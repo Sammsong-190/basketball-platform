@@ -37,7 +37,7 @@ export async function GET(
     })
 
     if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      return NextResponse.json({ error: '订单不存在' }, { status: 404 })
     }
 
     // 检查权限：用户只能查看自己的订单，卖家可以查看自己商品的订单，管理员可以查看所有
@@ -45,13 +45,13 @@ export async function GET(
       // 检查是否是卖家
       const isSeller = order.items.some(item => item.product.sellerId === userId)
       if (!isSeller) {
-        return NextResponse.json({ error: 'No permission to view this order' }, { status: 403 })
+        return NextResponse.json({ error: '无权查看该订单' }, { status: 403 })
       }
     }
 
     return NextResponse.json(order)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch order details' }, { status: 500 })
+    return NextResponse.json({ error: '获取订单详情失败' }, { status: 500 })
   }
 }
 
@@ -72,7 +72,7 @@ export async function PUT(
     })
 
     if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      return NextResponse.json({ error: '订单不存在' }, { status: 404 })
     }
 
     const body = await request.json()
@@ -91,7 +91,7 @@ export async function PUT(
     if (status === 'SHIPPED') {
       const isSeller = order.items.some(item => item.product.sellerId === userId)
       if (!isSeller && role !== 'ADMIN') {
-        return NextResponse.json({ error: 'No permission to update order status' }, { status: 403 })
+        return NextResponse.json({ error: '无权更新订单状态' }, { status: 403 })
       }
 
       const updated = await prisma.order.update({
@@ -118,15 +118,6 @@ export async function PUT(
             description: `Order ${order.orderNumber} income`
           }
         })
-
-        await prisma.expense.create({
-          data: {
-            userId: order.userId,
-            orderId: order.id,
-            amount: item.price * item.quantity,
-            description: `Purchase ${item.product.name}`
-          }
-        })
       }
 
       return NextResponse.json(updated)
@@ -145,8 +136,8 @@ export async function PUT(
       return NextResponse.json(updated)
     }
 
-    return NextResponse.json({ error: 'No permission to update order status' }, { status: 403 })
+    return NextResponse.json({ error: '无权更新订单状态' }, { status: 403 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update order status' }, { status: 500 })
+    return NextResponse.json({ error: '更新订单状态失败' }, { status: 500 })
   }
 }

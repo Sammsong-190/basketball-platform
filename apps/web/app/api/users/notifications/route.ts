@@ -23,6 +23,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(notifications)
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: 'Failed to load notifications' }, { status: 500 })
+    return NextResponse.json({ error: '加载通知失败' }, { status: 500 })
   }
 }

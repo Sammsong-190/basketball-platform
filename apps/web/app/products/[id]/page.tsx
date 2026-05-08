@@ -8,6 +8,16 @@ import { useToast } from '@/components/Toast'
 import CheckoutDrawer from '@/components/CheckoutDrawer'
 import FlyToCart from '@/components/FlyToCart'
 
+function parseProductImages(raw: string | null | undefined): string[] {
+  if (!raw) return []
+  try {
+    const x = JSON.parse(raw)
+    return Array.isArray(x) ? x : []
+  } catch {
+    return []
+  }
+}
+
 interface Product {
   id: string
   name: string
@@ -30,6 +40,8 @@ export default function ProductDetailPage() {
   const { showToast } = useToast()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [detailRetryKey, setDetailRetryKey] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [autoPlay, setAutoPlay] = useState(false)
@@ -49,21 +61,99 @@ export default function ProductDetailPage() {
   }, [])
 
   useEffect(() => {
-    if (productId) {
-      console.log('ProductDetailPage: productId from params:', productId)
-      fetchProduct()
-    } else {
-      console.error('ProductDetailPage: No product ID in params')
+    if (!productId) {
       setLoading(false)
+      setLoadError(null)
       router.push('/products')
+      return
     }
-  }, [productId])
+
+    const ac = new AbortController()
+
+    const run = async () => {
+      setLoading(true)
+      setLoadError(null)
+
+      const fetchOnce = async () => {
+        const response = await fetch(`/api/products/${productId}`, {
+          signal: ac.signal,
+          cache: 'no-store',
+        })
+        const text = await response.text()
+        if (response.status === 404) {
+          return { kind: 'not_found' as const }
+        }
+        let data: Product | { error?: string } | null = null
+        if (text) {
+          try {
+            data = JSON.parse(text) as Product | { error?: string }
+          } catch {
+            return {
+              kind: 'error' as const,
+              message: '服务器返回数据异常',
+            }
+          }
+        }
+        if (!response.ok) {
+          const msg =
+            data && typeof data === 'object' && 'error' in data && data.error
+              ? String(data.error)
+              : `加载失败（${response.status}）`
+          return { kind: 'error' as const, message: msg }
+        }
+        if (
+          !data ||
+          typeof data !== 'object' ||
+          !('id' in data) ||
+          typeof (data as Product).id !== 'string'
+        ) {
+          return {
+            kind: 'error' as const,
+            message: '商品数据异常，请重试',
+          }
+        }
+        return { kind: 'ok' as const, data: data as Product }
+      }
+
+      try {
+        let result = await fetchOnce()
+        if (result.kind === 'error') {
+          await new Promise((r) => setTimeout(r, 450))
+          if (!ac.signal.aborted) {
+            result = await fetchOnce()
+          }
+        }
+
+        if (ac.signal.aborted) return
+
+        if (result.kind === 'not_found') {
+          setProduct(null)
+          setLoadError(null)
+        } else if (result.kind === 'error') {
+          setProduct(null)
+          setLoadError(result.message)
+        } else {
+          setProduct(result.data)
+          setLoadError(null)
+        }
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+        setProduct(null)
+        setLoadError('网络异常，请稍后重试')
+      } finally {
+        if (!ac.signal.aborted) setLoading(false)
+      }
+    }
+
+    void run()
+    return () => ac.abort()
+  }, [productId, detailRetryKey, router])
 
   // 自动轮播功能
   useEffect(() => {
     if (!product) return
     
-    const images = product.images ? JSON.parse(product.images) : []
+    const images = parseProductImages(product.images)
     if (images.length <= 1) {
       setAutoPlay(false)
       return
@@ -80,7 +170,7 @@ export default function ProductDetailPage() {
 
   const handlePreviousImage = () => {
     if (!product) return
-    const images = product.images ? JSON.parse(product.images) : []
+    const images = parseProductImages(product.images)
     if (images.length <= 1) return
     setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length)
     setAutoPlay(false) // 手动切换时停止自动播放
@@ -88,58 +178,20 @@ export default function ProductDetailPage() {
 
   const handleNextImage = () => {
     if (!product) return
-    const images = product.images ? JSON.parse(product.images) : []
+    const images = parseProductImages(product.images)
     if (images.length <= 1) return
     setSelectedImageIndex((prev) => (prev + 1) % images.length)
     setAutoPlay(false) // 手动切换时停止自动播放
   }
 
-  const fetchProduct = async () => {
-    if (!productId) {
-      console.error('No product ID provided')
-      setLoading(false)
-      return
-    }
-    
-    setLoading(true)
-    try {
-      console.log('Fetching product:', productId)
-      const response = await fetch(`/api/products/${productId}`)
-      console.log('Product API response status:', response.status)
-      
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Product data received:', data)
-        
-        // Check if product is active
-        if (data.status && data.status !== 'ACTIVE') {
-          console.warn('Product is not active, status:', data.status)
-        }
-        
-        setProduct(data)
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('Failed to fetch product:', response.status, errorData)
-        
-        // Don't show alert immediately, let the UI handle it
-        setProduct(null)
-      }
-    } catch (error) {
-      console.error('Failed to fetch product:', error)
-      setProduct(null)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleAddToCart = async () => {
     if (!user) {
-      alert('Please login first')
+      alert('请先登录')
       router.push('/login')
       return
     }
 
-    const images = product?.images ? JSON.parse(product.images) : []
+    const images = product ? parseProductImages(product.images) : []
     const imageSrc = images[selectedImageIndex] || (images[0] ?? '')
     const rect = productImageRef.current?.getBoundingClientRect()
 
@@ -162,27 +214,27 @@ export default function ProductDetailPage() {
       })
 
       if (response.ok) {
-        if (!imageSrc || !rect) showToast('Added to cart')
+        if (!imageSrc || !rect) showToast('已加入购物车')
       } else {
         setFlyToCart(null)
         const data = await response.json()
-        alert(data.error || 'Failed to add to cart')
+        alert(data.error || '加入购物车失败')
       }
     } catch (error) {
       setFlyToCart(null)
-      console.error('Failed to add to cart:', error)
-      alert('Failed to add to cart, please try again')
+      console.error('加入购物车失败:', error)
+      alert('加入购物车失败，请稍后重试')
     }
   }
 
   const handleFlyToCartComplete = () => {
     setFlyToCart(null)
-    showToast('Added to cart')
+    showToast('已加入购物车')
   }
 
   const handleBuyNowClick = () => {
     if (!user) {
-      alert('Please login first')
+      alert('请先登录')
       router.push('/login')
       return
     }
@@ -210,17 +262,17 @@ export default function ProductDetailPage() {
 
       if (response.ok) {
         const order = await response.json()
-        showToast('Order created successfully!')
+        showToast('订单创建成功！')
         setCheckoutOpen(false)
         router.push(`/orders/${order.id}`)
       } else {
         const data = await response.json()
-        alert(data.error || 'Failed to create order')
+        alert(data.error || '创建订单失败')
         throw new Error(data.error)
       }
     } catch (error) {
-      console.error('Failed to create order:', error)
-      alert('Failed to create order, please try again')
+      console.error('创建订单失败:', error)
+      alert('创建订单失败，请稍后重试')
       throw error
     } finally {
       setCheckoutLoading(false)
@@ -234,7 +286,37 @@ export default function ProductDetailPage() {
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+            <p className="mt-4 text-gray-600">加载中…</p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (!loading && loadError) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-white flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <div className="text-6xl mb-4">📡</div>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">商品加载失败</h1>
+            <p className="text-gray-600 mb-6">{loadError}</p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <button
+                type="button"
+                onClick={() => setDetailRetryKey((k) => k + 1)}
+                className="px-6 py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800"
+              >
+                重试
+              </button>
+              <Link
+                href="/products"
+                className="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 inline-block"
+              >
+                返回列表
+              </Link>
+            </div>
           </div>
         </div>
       </>
@@ -248,13 +330,13 @@ export default function ProductDetailPage() {
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
             <div className="text-6xl mb-4">😕</div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">未找到商品</h1>
             <p className="text-gray-600 mb-2">
-              The product you're looking for doesn't exist or has been removed.
+              该商品不存在、已下架或已被移除。
             </p>
             {productId && (
               <p className="text-sm text-gray-500 mb-6">
-                Product ID: {productId}
+                商品 ID：{productId}
               </p>
             )}
             <div className="flex gap-4 justify-center">
@@ -262,13 +344,13 @@ export default function ProductDetailPage() {
                 href="/products" 
                 className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold"
               >
-                Browse Products
+                浏览商品
               </Link>
               <button
                 onClick={() => router.back()}
                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-semibold"
               >
-                Go Back
+                返回上页
               </button>
             </div>
           </div>
@@ -279,7 +361,7 @@ export default function ProductDetailPage() {
 
   if (!product) return null
 
-  const images = product.images ? JSON.parse(product.images) : []
+  const images = parseProductImages(product.images)
 
   return (
     <>
@@ -287,7 +369,7 @@ export default function ProductDetailPage() {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 py-12">
           <Link href="/products" className="text-gray-900 hover:underline mb-6 inline-block">
-            ← Back to Products
+            ← 返回商品列表
           </Link>
 
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -325,11 +407,11 @@ export default function ProductDetailPage() {
                     )}
                   </div>
                   
-                  {/* 平台管理标签 */}
+                  {/* 平台自营标签 */}
                   {product.sourceType === 'PLATFORM_MANAGED' && (
                     <div className="absolute top-4 left-4 z-10">
                       <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-                        Platform Managed
+                        平台自营
                       </span>
                     </div>
                   )}
@@ -341,7 +423,7 @@ export default function ProductDetailPage() {
                       <button
                         onClick={handlePreviousImage}
                         className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                        aria-label="Previous image"
+                        aria-label="上一张图片"
                       >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -352,7 +434,7 @@ export default function ProductDetailPage() {
                       <button
                         onClick={handleNextImage}
                         className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                        aria-label="Next image"
+                        aria-label="下一张图片"
                       >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -373,7 +455,7 @@ export default function ProductDetailPage() {
                                 ? 'bg-white w-8'
                                 : 'bg-white/50 w-2 hover:bg-white/75'
                             }`}
-                            aria-label={`Go to image ${index + 1}`}
+                            aria-label={`查看第 ${index + 1} 张图片`}
                           />
                         ))}
                       </div>
@@ -382,7 +464,7 @@ export default function ProductDetailPage() {
                       <button
                         onClick={() => setAutoPlay(!autoPlay)}
                         className="absolute top-4 right-4 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                        aria-label={autoPlay ? 'Pause slideshow' : 'Play slideshow'}
+                        aria-label={autoPlay ? '暂停轮播' : '播放轮播'}
                       >
                         {autoPlay ? (
                           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -446,11 +528,11 @@ export default function ProductDetailPage() {
                         {product.rating.toFixed(1)}
                       </span>
                       <span className="ml-2 text-sm text-gray-500">
-                        ({product.reviewCount} reviews)
+                        ({product.reviewCount} 条评价)
                       </span>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {product._count.orderItems} orders
+                      {product._count.orderItems} 笔成交
                     </span>
                   </div>
                   <div className="text-4xl font-bold text-gray-900 mb-6">
@@ -462,7 +544,7 @@ export default function ProductDetailPage() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div>
-                        <span className="text-gray-600 font-semibold">Seller: </span>
+                        <span className="text-gray-600 font-semibold">卖家：</span>
                         <span className="text-gray-900">{product.seller.username}</span>
                       </div>
                       {/* 只有商品所有者或管理员可以编辑 */}
@@ -471,20 +553,22 @@ export default function ProductDetailPage() {
                           href={`/products/${product.id}/edit`}
                           className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all text-sm font-semibold"
                         >
-                          ✏️ Edit Product
+                          ✏️ 编辑商品
                         </Link>
                       )}
                     </div>
                     <div>
-                      <span className="text-gray-600 font-semibold">Stock: </span>
+                      <span className="text-gray-600 font-semibold">库存：</span>
                       <span className={`font-semibold ${product.stock > 0 ? 'text-gray-700' : 'text-gray-500'}`}>
-                        {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
+                        {product.stock > 0 ? `剩余 ${product.stock} 件` : '暂无库存'}
                       </span>
                     </div>
                     {product.status && product.status !== 'ACTIVE' && (
                       <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-sm text-yellow-800">
-                          ⚠️ This product is currently {product.status === 'INACTIVE' ? 'inactive' : product.status.toLowerCase()}. It may not be available for purchase.
+                          ⚠️ 当前商品状态为{' '}
+                          {product.status === 'INACTIVE' ? '已下架/不可用' : product.status}
+                          ，可能无法下单购买。
                         </p>
                       </div>
                     )}
@@ -496,7 +580,7 @@ export default function ProductDetailPage() {
                   {user ? (
                     <>
                       <div className="flex items-center gap-4 mb-6">
-                        <label className="text-gray-700 font-semibold">Quantity:</label>
+                        <label className="text-gray-700 font-semibold">数量：</label>
                         <div className="flex items-center border border-gray-300 rounded-lg">
                           <button
                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -532,24 +616,24 @@ export default function ProductDetailPage() {
                           disabled={product.stock <= 0}
                           className="flex-1 px-6 py-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          🛒 Add to Cart
+                          🛒 加入购物车
                         </button>
                         <button
                           onClick={handleBuyNowClick}
                           disabled={product.stock <= 0}
                           className="flex-1 px-6 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Buy Now
+                          立即购买
                         </button>
                       </div>
                       {product.stock <= 0 && (
-                        <p className="text-amber-600 font-medium mt-2">Out of stock</p>
+                        <p className="text-amber-600 font-medium mt-2">暂无库存</p>
                       )}
                     </>
                   ) : (
                     <p className="text-gray-600 py-2">
-                      <Link href="/login" className="text-gray-900 font-semibold hover:underline">Login</Link>
-                      {' '}to add to cart or purchase
+                      <Link href="/login" className="text-gray-900 font-semibold hover:underline">登录</Link>
+                      {' '}后可加入购物车或购买
                     </p>
                   )}
                 </div>
@@ -558,7 +642,7 @@ export default function ProductDetailPage() {
 
             {/* Product Description */}
             <div className="border-t border-gray-200 p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">商品详情</h2>
               <div className="prose max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
                 {product.description}
               </div>

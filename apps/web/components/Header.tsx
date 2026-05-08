@@ -35,58 +35,58 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-2 group">
             <span className="text-3xl">🏀</span>
             <span className="text-xl font-bold group-hover:scale-105 transition-transform">
-              Basketball Platform
+              篮球平台
             </span>
             <span className="ml-1 px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-md group-hover:text-gray-700 group-hover:bg-gray-200 transition-colors">
-              Home
+              首页
             </span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
-            <Link 
-              href="/products" 
+            <Link
+              href="/products"
               className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
-                pathname === '/products' 
-                  ? 'bg-gray-100 text-gray-900 font-semibold' 
+                pathname === '/products'
+                  ? 'bg-gray-100 text-gray-900 font-semibold'
                   : 'hover:bg-gray-100'
               }`}
             >
-              Products
+              商品
             </Link>
-            <Link 
-              href="/posts" 
+            <Link
+              href="/posts"
               className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
-                pathname === '/posts' 
-                  ? 'bg-gray-100 text-gray-900 font-semibold' 
+                pathname === '/posts'
+                  ? 'bg-gray-100 text-gray-900 font-semibold'
                   : 'hover:bg-gray-100'
               }`}
             >
-              Community
+              社区
             </Link>
-            <Link 
-              href="/events" 
+            <Link
+              href="/events"
               className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
-                pathname === '/events' 
-                  ? 'bg-gray-100 text-gray-900 font-semibold' 
+                pathname === '/events'
+                  ? 'bg-gray-100 text-gray-900 font-semibold'
                   : 'hover:bg-gray-100'
               }`}
             >
-              <span className="font-events text-xl tracking-wider">📰 Events</span>
+              <span className="font-events text-xl tracking-wider">📰 赛事</span>
             </Link>
-            
+
             {isLoggedIn ? (
               <>
                 {user?.role === 'ADMIN' && (
-                  <Link 
-                    href="/admin" 
+                  <Link
+                    href="/admin"
                     className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
-                      pathname === '/admin' 
-                        ? 'bg-gray-100 text-gray-900 font-semibold' 
+                      pathname === '/admin'
+                        ? 'bg-gray-100 text-gray-900 font-semibold'
                         : 'hover:bg-gray-100'
                     }`}
                   >
-                    Admin
+                    管理后台
                   </Link>
                 )}
                 <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-3">
@@ -105,11 +105,11 @@ export default function Header() {
                   >
                     👤 {user?.username}
                   </Link>
-                  <button 
-                    onClick={handleLogout} 
+                  <button
+                    onClick={handleLogout}
                     className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-medium"
                   >
-                    Logout
+                    退出登录
                   </button>
                 </div>
               </>
@@ -122,17 +122,17 @@ export default function Header() {
                 >
                   <span className="text-2xl">🛒</span>
                 </Link>
-                <Link 
-                  href="/login" 
+                <Link
+                  href="/login"
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium"
                 >
-                  Login
+                  登录
                 </Link>
-                <Link 
-                  href="/register" 
+                <Link
+                  href="/register"
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium font-semibold"
                 >
-                  Register
+                  注册
                 </Link>
               </div>
             )}
@@ -157,61 +157,78 @@ export default function Header() {
         {isMenuOpen && (
           <nav className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-2">
-              <Link 
-                href="/products" 
+              <Link
+                href="/products"
                 className={`px-4 py-2 rounded-lg ${
-                  pathname === '/products' 
-                    ? 'bg-gray-100 text-gray-900 font-semibold' 
+                  pathname === '/products'
+                    ? 'bg-gray-100 text-gray-900 font-semibold'
                     : 'hover:bg-gray-100'
                 }`}
               >
-                Products
+                商品
               </Link>
-              <Link 
-                href="/posts" 
+              <Link
+                href="/posts"
                 className={`px-4 py-2 rounded-lg ${
-                  pathname === '/posts' 
-                    ? 'bg-gray-100 text-gray-900 font-semibold' 
+                  pathname === '/posts'
+                    ? 'bg-gray-100 text-gray-900 font-semibold'
                     : 'hover:bg-gray-100'
                 }`}
               >
-                Community
+                社区
               </Link>
-              <Link 
-                href="/events" 
+              <Link
+                href="/events"
                 className={`px-4 py-2 rounded-lg ${
-                  pathname === '/events' 
-                    ? 'bg-gray-100 text-gray-900 font-semibold' 
+                  pathname === '/events'
+                    ? 'bg-gray-100 text-gray-900 font-semibold'
                     : 'hover:bg-gray-100'
                 }`}
               >
-                <span className="font-events text-xl tracking-wider">📰 Events</span>
+                <span className="font-events text-xl tracking-wider">📰 赛事</span>
               </Link>
               {isLoggedIn ? (
                 <>
-                  <Link 
-                    href="/dashboard" 
+                  {user?.role === 'ADMIN' && (
+                    <Link
+                      href="/admin"
+                      className={`px-4 py-2 rounded-lg ${
+                        pathname === '/admin'
+                          ? 'bg-gray-100 text-gray-900 font-semibold'
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      管理后台
+                    </Link>
+                  )}
+                  <Link
+                    href="/dashboard"
                     className={`px-4 py-2 rounded-lg ${
-                      pathname === '/dashboard' 
-                        ? 'bg-gray-100 text-gray-900 font-semibold' 
+                      pathname === '/dashboard'
+                        ? 'bg-gray-100 text-gray-900 font-semibold'
                         : 'hover:bg-gray-100'
                     }`}
                   >
                     👤 {user?.username}
                   </Link>
-                  <Link 
-                    href="/cart" 
-                    className="px-4 py-2 rounded-lg hover:bg-gray-100"
-                  >
-                    🛒 Cart
+                  <Link href="/cart" className="px-4 py-2 rounded-lg hover:bg-gray-100">
+                    🛒 购物车
                   </Link>
-                  <button onClick={handleLogout} className="px-4 py-2 rounded-lg hover:bg-gray-100 text-left">Logout</button>
+                  <button onClick={handleLogout} className="px-4 py-2 rounded-lg hover:bg-gray-100 text-left">
+                    退出登录
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link href="/cart" className="px-4 py-2 rounded-lg hover:bg-gray-100">🛒 Cart</Link>
-                  <Link href="/login" className="px-4 py-2 rounded-lg hover:bg-gray-100">Login</Link>
-                  <Link href="/register" className="px-4 py-2 rounded-lg hover:bg-gray-100">Register</Link>
+                  <Link href="/cart" className="px-4 py-2 rounded-lg hover:bg-gray-100">
+                    🛒 购物车
+                  </Link>
+                  <Link href="/login" className="px-4 py-2 rounded-lg hover:bg-gray-100">
+                    登录
+                  </Link>
+                  <Link href="/register" className="px-4 py-2 rounded-lg hover:bg-gray-100">
+                    注册
+                  </Link>
                 </>
               )}
             </div>

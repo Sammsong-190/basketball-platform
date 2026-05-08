@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ posts, total, page, limit })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to get posts list' }, { status: 500 })
+    return NextResponse.json({ error: '获取帖子列表失败' }, { status: 500 })
   }
 }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const { title, content, categoryId, images, contentType } = body
 
     if (!title || !content) {
-      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
+      return NextResponse.json({ error: '标题和内容为必填项' }, { status: 400 })
     }
 
     // 验证 contentType，默认为 TEXT
@@ -88,11 +88,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(post, { status: 201 })
   } catch (error: any) {
-    console.error('Failed to create post:', error)
+    console.error('创建帖子失败:', error)
     const msg = error?.message || ''
     if (msg.includes('Data too long') || msg.includes('packet') || msg.includes('max_allowed_packet')) {
-      return NextResponse.json({ error: 'Images are too large. Please use fewer or smaller images.' }, { status: 413 })
+      return NextResponse.json({ error: '图片过大，请减少数量或缩小图片后再试。' }, { status: 413 })
     }
-    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
+    return NextResponse.json({ error: '发布帖子失败' }, { status: 500 })
   }
 }

@@ -73,15 +73,15 @@ export default function AdminComplaintsPage() {
         fetchComplaints()
       } else {
         const err = await res.json()
-        alert(err.error || 'Operation failed')
+        alert(err.error || '操作失败')
       }
     } catch (e) {
-      alert('Operation failed')
+      alert('操作失败')
     }
   }
 
   const formatDate = (d: string) =>
-    new Date(d).toLocaleString('en-US', {
+    new Date(d).toLocaleString('zh-CN', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -89,13 +89,28 @@ export default function AdminComplaintsPage() {
       minute: '2-digit'
     })
 
+  const statusLabel: Record<string, string> = {
+    PENDING: '待处理',
+    RESOLVED: '已解决',
+    REJECTED: '已拒绝'
+  }
+
+  const complaintTypeLabel: Record<string, string> = {
+    COMPLAINT: '投诉',
+    SUGGESTION: '建议'
+  }
+
   const getStatusBadge = (s: string) => {
     const map: Record<string, string> = {
       PENDING: 'bg-yellow-100 text-yellow-800',
       RESOLVED: 'bg-green-100 text-green-800',
       REJECTED: 'bg-red-100 text-red-800'
     }
-    return <span className={`px-2 py-1 rounded text-xs font-semibold ${map[s] || 'bg-gray-100'}`}>{s}</span>
+    return (
+      <span className={`px-2 py-1 rounded text-xs font-semibold ${map[s] || 'bg-gray-100'}`}>
+        {statusLabel[s] || s}
+      </span>
+    )
   }
 
   return (
@@ -105,9 +120,9 @@ export default function AdminComplaintsPage() {
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Complaints & Suggestions</h1>
+            <h1 className="text-2xl font-bold text-gray-900">投诉与建议</h1>
             <Link href="/admin" className="text-gray-600 hover:text-gray-900">
-              Back to Admin
+              返回管理后台
             </Link>
           </div>
 
@@ -116,9 +131,7 @@ export default function AdminComplaintsPage() {
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-600"></div>
             </div>
           ) : complaints.length === 0 ? (
-            <div className="bg-white rounded-xl p-12 text-center text-gray-500">
-            No complaints or suggestions
-            </div>
+            <div className="bg-white rounded-xl p-12 text-center text-gray-500">暂无投诉或建议</div>
           ) : (
             <div className="space-y-4">
               {complaints.map((c) => (
@@ -126,15 +139,17 @@ export default function AdminComplaintsPage() {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <p className="font-semibold text-gray-900">{c.title}</p>
-                      <p className="text-sm text-gray-500">User: {c.user.username} · Type: {c.type} · {formatDate(c.createdAt)}</p>
-                      {c.order && <p className="text-sm text-gray-500">Order: {c.order.orderNumber}</p>}
+                      <p className="text-sm text-gray-500">
+                        用户：{c.user.username} · 类型：{complaintTypeLabel[c.type] || c.type} · {formatDate(c.createdAt)}
+                      </p>
+                      {c.order && <p className="text-sm text-gray-500">订单：{c.order.orderNumber}</p>}
                     </div>
                     {getStatusBadge(c.status)}
                   </div>
                   <p className="text-gray-700 mb-4">{c.content}</p>
                   {c.reply && (
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <p className="text-sm font-medium text-gray-600 mb-1">Reply:</p>
+                      <p className="text-sm font-medium text-gray-600 mb-1">回复：</p>
                       <p className="text-gray-800">{c.reply}</p>
                       {c.repliedAt && <p className="text-xs text-gray-500 mt-1">{formatDate(c.repliedAt)}</p>}
                     </div>
@@ -146,7 +161,7 @@ export default function AdminComplaintsPage() {
                           <textarea
                             value={reply}
                             onChange={(e) => setReply(e.target.value)}
-                            placeholder="Reply content"
+                            placeholder="请输入回复内容"
                             rows={3}
                             className="w-full px-3 py-2 border rounded-lg"
                           />
@@ -155,21 +170,24 @@ export default function AdminComplaintsPage() {
                             onChange={(e) => setNewStatus(e.target.value)}
                             className="px-3 py-2 border rounded-lg"
                           >
-                            <option value="RESOLVED">Resolved</option>
-                            <option value="REJECTED">Rejected</option>
+                            <option value="RESOLVED">已解决</option>
+                            <option value="REJECTED">已拒绝</option>
                           </select>
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleReply(c.id)}
                               className="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800"
                             >
-                              Submit Reply
+                              提交回复
                             </button>
                             <button
-                              onClick={() => { setEditingId(null); setReply('') }}
+                              onClick={() => {
+                                setEditingId(null)
+                                setReply('')
+                              }}
                               className="px-4 py-2 border rounded-lg"
                             >
-                              Cancel
+                              取消
                             </button>
                           </div>
                         </div>
@@ -178,7 +196,7 @@ export default function AdminComplaintsPage() {
                           onClick={() => setEditingId(c.id)}
                           className="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800"
                         >
-                          Reply
+                          回复
                         </button>
                       )}
                     </div>

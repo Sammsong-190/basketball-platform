@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-
 // 这个API用于定时更新NBA数据到数据库
 // 可以通过cron job或定时任务调用
 
@@ -9,7 +8,7 @@ export async function POST(request: NextRequest) {
     // 验证请求来源（可以添加API密钥验证）
     const authHeader = request.headers.get('authorization')
     if (authHeader !== `Bearer ${process.env.CRON_SECRET || 'your-secret-key'}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: '未授权' }, { status: 401 })
     }
 
     // 从NBA API获取最新数据
@@ -18,13 +17,13 @@ export async function POST(request: NextRequest) {
     })
 
     if (!nbaResponse.ok) {
-      throw new Error('Failed to fetch NBA data')
+      throw new Error('获取 NBA 数据失败')
     }
 
     const { matches } = await nbaResponse.json()
 
     if (!matches || matches.length === 0) {
-      return NextResponse.json({ message: 'No matches to update', updated: 0 })
+      return NextResponse.json({ message: '暂无比赛需要更新', updated: 0 })
     }
 
     // 这里可以将数据存储到数据库
@@ -32,7 +31,7 @@ export async function POST(request: NextRequest) {
     // 如果需要持久化存储，需要先添加相应的Prisma模型
 
     return NextResponse.json({ 
-      message: 'NBA data updated successfully',
+      message: 'NBA 数据更新成功',
       matchesCount: matches.length,
       updatedAt: new Date().toISOString()
     })

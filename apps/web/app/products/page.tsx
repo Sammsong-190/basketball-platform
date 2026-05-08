@@ -9,8 +9,8 @@ interface Product {
   name: string
   price: number
   images: string
-  category: { name: string }
-  seller: { username: string }
+  category?: { name: string } | null
+  seller?: { username: string } | null
   rating: number
   reviewCount: number
   sourceType?: string
@@ -32,22 +32,14 @@ function ProductCard({ product }: { product: Product }) {
   const images = safeParseImages(product.images)
 
   if (!product.id) {
-    console.error('Product missing ID:', product)
     return null
-  }
-
-  const handleClick = (e: React.MouseEvent) => {
-    console.log('Product card clicked, ID:', product.id)
-    console.log('Product name:', product.name)
-    // Let Link handle the navigation
   }
 
   return (
     <Link
       href={`/products/${product.id}`}
       className="block h-full"
-      prefetch={true}
-      onClick={handleClick}
+      prefetch={false}
     >
       <div className="h-full flex flex-col bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer">
         <div className="h-64 flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
@@ -55,6 +47,8 @@ function ProductCard({ product }: { product: Product }) {
             <img
               src={images[0]}
               alt={product.name}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300 pointer-events-none"
               onError={(e) => {
                 const target = e.target as HTMLImageElement
@@ -68,21 +62,21 @@ function ProductCard({ product }: { product: Product }) {
           ) : null}
           <div className="no-image-placeholder absolute inset-0 flex flex-col items-center justify-center text-center px-4 pointer-events-none" style={{ display: images[0] ? 'none' : 'flex' }}>
             <span className="text-5xl mb-2">🏀</span>
-            <span className="text-sm text-gray-500 font-medium">Seller has not provided image</span>
+            <span className="text-sm text-gray-500 font-medium">卖家未上传图片</span>
           </div>
           <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
             {product.sourceType === 'PLATFORM_MANAGED' ? (
               <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-                Platform Managed
+                平台自营
               </span>
             ) : (
               <span className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-                Free Trade
+                自由交易
               </span>
             )}
           </div>
           <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-medium text-gray-900 pointer-events-none">
-            {product.category.name}
+            {product.category?.name ?? '未分类'}
           </div>
         </div>
         <div className="flex-1 flex flex-col p-6 min-h-[140px]">
@@ -93,19 +87,19 @@ function ProductCard({ product }: { product: Product }) {
             <div className="flex items-center">
               <span className="text-yellow-400">⭐</span>
               <span className="ml-1 text-sm font-semibold text-gray-700">
-                {product.rating.toFixed(1)}
+                {(Number(product.rating) || 0).toFixed(1)}
               </span>
               <span className="ml-2 text-xs text-gray-500">
-                ({product.reviewCount})
+                ({Number(product.reviewCount) || 0})
               </span>
             </div>
           </div>
           <div className="flex items-center justify-between mt-auto">
             <span className="text-2xl font-bold text-gray-900">
-              ¥{product.price.toFixed(2)}
+              ¥{(Number(product.price) || 0).toFixed(2)}
             </span>
             <span className="text-sm text-gray-500 truncate max-w-[120px]">
-              {product.seller.username}
+              {product.seller?.username ?? '—'}
             </span>
           </div>
         </div>
@@ -117,6 +111,8 @@ function ProductCard({ product }: { product: Product }) {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [listError, setListError] = useState<string | null>(null)
+  const [listRetryKey, setListRetryKey] = useState(0)
   const [isSeller, setIsSeller] = useState(false)
   const [keyword, setKeyword] = useState('')
   const [appliedKeyword, setAppliedKeyword] = useState('')
@@ -126,8 +122,15 @@ export default function ProductsPage() {
   const DISPLAY_LIMIT = 8
 
   useEffect(() => {
-    fetchProducts('')
-    checkSellerStatus()
+    const userData = localStorage.getItem('user')
+    if (userData) {
+      try {
+        const user = JSON.parse(userData)
+        setIsSeller(user.isSeller === true)
+      } catch {
+        setIsSeller(false)
+      }
+    }
   }, [])
 
   // 300ms 防抖：输入时自动搜索（也支持回车/按钮）
@@ -139,9 +142,74 @@ export default function ProductsPage() {
   }, [keyword])
 
   useEffect(() => {
-    fetchProducts(appliedKeyword)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appliedKeyword])
+    const ac = new AbortController()
+
+    const load = async (attempt: number) => {
+      setLoading(true)
+      setListError(null)
+      const params = new URLSearchParams()
+      params.set('limit', '48')
+      if (appliedKeyword) params.set('keyword', appliedKeyword)
+      const url = `/api/products?${params.toString()}`
+
+      const doFetch = async () => {
+        const response = await fetch(url, {
+          signal: ac.signal,
+          cache: 'no-store',
+        })
+        const text = await response.text()
+        let data: { products?: Product[]; error?: string } = {}
+        if (text) {
+          try {
+            data = JSON.parse(text) as typeof data
+          } catch {
+            throw new Error('服务器返回数据格式异常')
+          }
+        }
+        if (!response.ok) {
+          throw new Error(data.error || `加载失败（${response.status}）`)
+        }
+        return data
+      }
+
+      try {
+        let data: { products?: Product[]; error?: string }
+        try {
+          data = await doFetch()
+        } catch (e) {
+          if (
+            attempt === 0 &&
+            !(e instanceof DOMException && e.name === 'AbortError')
+          ) {
+            await new Promise((r) => setTimeout(r, 450))
+            if (ac.signal.aborted) return
+            data = await doFetch()
+          } else {
+            throw e
+          }
+        }
+
+        if (ac.signal.aborted) return
+
+        const productsList = (data.products || []).filter((p: Product) => {
+          if (!p.id || typeof p.id !== 'string') return false
+          return true
+        })
+        setProducts(productsList)
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setProducts([])
+        setListError(
+          err instanceof Error ? err.message : '加载商品列表失败，请检查网络后重试'
+        )
+      } finally {
+        if (!ac.signal.aborted) setLoading(false)
+      }
+    }
+
+    void load(0)
+    return () => ac.abort()
+  }, [appliedKeyword, listRetryKey])
 
   // 按 sourceType 分组
   const platformManagedProducts = products.filter(p => p.sourceType === 'PLATFORM_MANAGED')
@@ -149,51 +217,6 @@ export default function ProductsPage() {
 
   // 是否有搜索关键词
   const hasSearchKeyword = appliedKeyword.length > 0
-
-  const checkSellerStatus = () => {
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      const user = JSON.parse(userData)
-      setIsSeller(user.isSeller === true)
-    }
-  }
-
-  const fetchProducts = async (kw: string) => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams()
-      params.set('limit', '100')
-      if (kw) params.set('keyword', kw)
-      const url = `/api/products?${params.toString()}`
-
-      const response = await fetch(url)
-      const data = await response.json()
-
-      if (response.ok) {
-        const productsList = (data.products || []).filter((p: Product) => {
-          // Ensure product has valid ID
-          if (!p.id || typeof p.id !== 'string') {
-            console.warn('Invalid product found (missing ID):', p)
-            return false
-          }
-          return true
-        })
-        console.log('Fetched products:', productsList.length, 'products')
-        if (productsList.length > 0) {
-          console.log('Sample product IDs:', productsList.slice(0, 3).map((p: Product) => p.id))
-        }
-        setProducts(productsList)
-      } else {
-        console.error('Failed to fetch products:', data.error)
-        setProducts([])
-      }
-    } catch (error) {
-      console.error('Failed to fetch products:', error)
-      setProducts([])
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <>
@@ -204,16 +227,16 @@ export default function ProductsPage() {
             <div>
               <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
                 <span className="mr-3">🛒</span>
-                <span className="text-gray-900">Featured Products</span>
+                <span className="text-gray-900">精选好物</span>
               </h1>
-              <p className="text-xl text-gray-600">Discover the finest basketball products</p>
+              <p className="text-xl text-gray-600">发现心仪的篮球装备与周边</p>
             </div>
             {isSeller && (
               <Link
                 href="/products/new"
                 className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 whitespace-nowrap"
               >
-                ➕ Add Product
+                ➕ 上架商品
               </Link>
             )}
           </div>
@@ -235,7 +258,7 @@ export default function ProductsPage() {
                       if (e.key === 'Enter') setAppliedKeyword(keyword.trim())
                     }}
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                    placeholder="Search by product name / seller name / category name..."
+                    placeholder="搜索商品名、卖家名或分类…"
                   />
                 </div>
                 <div className="flex gap-3">
@@ -243,7 +266,7 @@ export default function ProductsPage() {
                     onClick={() => setAppliedKeyword(keyword.trim())}
                     className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all font-semibold shadow-md hover:shadow-lg"
                   >
-                    Search
+                    搜索
                   </button>
                   <button
                     onClick={() => {
@@ -252,25 +275,44 @@ export default function ProductsPage() {
                     }}
                     className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all font-semibold"
                   >
-                    Clear
+                    清空
                   </button>
                 </div>
               </div>
               <div className="mt-3 text-xs text-gray-500">
-                Search by <span className="font-semibold text-gray-700">product name</span>, <span className="font-semibold text-gray-700">seller name</span>, or <span className="font-semibold text-gray-700">category name</span>
+                支持按 <span className="font-semibold text-gray-700">商品名称</span>、
+                <span className="font-semibold text-gray-700">卖家名称</span> 或{' '}
+                <span className="font-semibold text-gray-700">分类名称</span> 搜索
               </div>
             </div>
           </div>
 
+          {listError && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <p className="text-sm text-amber-900">{listError}</p>
+              <button
+                type="button"
+                onClick={() => setListRetryKey((k) => k + 1)}
+                className="shrink-0 px-4 py-2 bg-amber-800 text-white rounded-lg text-sm font-semibold hover:bg-amber-900"
+              >
+                重新加载
+              </button>
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 text-gray-600">加载中…</p>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-gray-600 text-lg">
-                {appliedKeyword ? `No products found for "${appliedKeyword}"` : 'No products available'}
+                {listError
+                  ? '商品列表未能加载，请点击上方「重新加载」。'
+                  : appliedKeyword
+                    ? `未找到与「${appliedKeyword}」相关的商品`
+                    : '暂无商品'}
               </p>
             </div>
           ) : hasSearchKeyword ? (
@@ -288,7 +330,7 @@ export default function ProductsPage() {
                 <div>
                   <div className="flex items-center mb-6">
                     <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mr-4"></div>
-                    <h2 className="text-3xl font-bold text-gray-900">Platform Managed</h2>
+                    <h2 className="text-3xl font-bold text-gray-900">平台自营</h2>
                     <span className="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
                       {platformManagedProducts.length}
                     </span>
@@ -304,7 +346,7 @@ export default function ProductsPage() {
                         onClick={() => setPlatformExpanded(!platformExpanded)}
                         className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-semibold shadow-md"
                       >
-                        {platformExpanded ? 'Show Less' : `Show More (${platformManagedProducts.length - DISPLAY_LIMIT} more)`}
+                        {platformExpanded ? '收起' : `展开（还有 ${platformManagedProducts.length - DISPLAY_LIMIT} 件）`}
                       </button>
                     </div>
                   )}
@@ -316,7 +358,7 @@ export default function ProductsPage() {
                 <div>
                   <div className="flex items-center mb-6">
                     <div className="h-1 w-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full mr-4"></div>
-                    <h2 className="text-3xl font-bold text-gray-900">Free Trade</h2>
+                    <h2 className="text-3xl font-bold text-gray-900">自由交易</h2>
                     <span className="ml-4 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
                       {freeTradeProducts.length}
                     </span>
@@ -332,7 +374,7 @@ export default function ProductsPage() {
                         onClick={() => setFreeTradeExpanded(!freeTradeExpanded)}
                         className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-semibold shadow-md"
                       >
-                        {freeTradeExpanded ? 'Show Less' : `Show More (${freeTradeProducts.length - DISPLAY_LIMIT} more)`}
+                        {freeTradeExpanded ? '收起' : `展开（还有 ${freeTradeProducts.length - DISPLAY_LIMIT} 件）`}
                       </button>
                     </div>
                   )}

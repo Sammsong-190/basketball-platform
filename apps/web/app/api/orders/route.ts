@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(orders)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
+    return NextResponse.json({ error: '获取订单失败' }, { status: 500 })
   }
 }
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const { items, shippingAddress, shippingName, shippingPhone } = body
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Order items cannot be empty' }, { status: 400 })
+      return NextResponse.json({ error: '订单商品不能为空' }, { status: 400 })
     }
 
     // 计算总价
@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
     for (const item of items) {
       const product = await prisma.product.findUnique({ where: { id: item.productId } })
       if (!product || product.stock < item.quantity) {
-        return NextResponse.json({ error: `Product ${product?.name || ''} is out of stock` }, { status: 400 })
+        return NextResponse.json({ error: `商品「${product?.name || ''}」库存不足` }, { status: 400 })
       }
       if (product.sellerId === userId) {
-        return NextResponse.json({ error: 'You cannot purchase your own product' }, { status: 400 })
+        return NextResponse.json({ error: '不能购买自己发布的商品' }, { status: 400 })
       }
       const itemPrice = product.price * item.quantity
       totalAmount += itemPrice
@@ -84,6 +84,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(order, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    return NextResponse.json({ error: '创建订单失败' }, { status: 500 })
   }
 }

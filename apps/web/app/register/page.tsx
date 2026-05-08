@@ -23,13 +23,13 @@ export default function RegisterPage() {
 
     // 验证密码是否一致
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match, please re-enter')
+      setError('两次密码不一致，请重新输入')
       return
     }
 
     // 验证密码长度
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError('密码至少 6 位')
       return
     }
 
@@ -48,7 +48,7 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Registration failed')
+        setError(data.error || '注册失败')
         return
       }
 
@@ -56,7 +56,7 @@ export default function RegisterPage() {
       localStorage.setItem('user', JSON.stringify(data.user))
       router.push('/dashboard')
     } catch (err) {
-      setError('Network error, please try again later')
+      setError('网络异常，请稍后重试')
     } finally {
       setLoading(false)
     }
@@ -69,8 +69,8 @@ export default function RegisterPage() {
         <div className="max-w-md mx-auto">
           {/* 标题区域 */}
           <div className="text-center mb-6">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Create Account</h1>
-            <p className="text-gray-600">Register a new account to get started</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">创建账户</h1>
+            <p className="text-gray-600">注册新账号开始使用</p>
           </div>
 
           {/* 成为卖家选项 */}
@@ -79,15 +79,15 @@ export default function RegisterPage() {
               <div className="flex items-center">
                 <span className="text-2xl mr-3">🏪</span>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Want to become a seller?</p>
-                  <p className="text-xs text-gray-600 mt-0.5">Register a seller account to start selling products</p>
+                  <p className="text-sm font-semibold text-gray-900">想成为卖家？</p>
+                  <p className="text-xs text-gray-600 mt-0.5">注册卖家账号即可上架销售</p>
                 </div>
               </div>
               <Link
                 href="/register/seller"
                 className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 text-sm font-semibold shadow-md hover:shadow-lg transform hover:scale-105 whitespace-nowrap"
               >
-                Become Seller
+                成为卖家
               </Link>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
             <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Username <span className="text-red-500">*</span>
+                  用户名 <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -116,13 +116,13 @@ export default function RegisterPage() {
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter username"
+                  placeholder="请输入用户名"
               />
             </div>
 
             <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email <span className="text-red-500">*</span>
+                  电子邮箱 <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -130,13 +130,13 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter email address"
+                  placeholder="请输入邮箱"
               />
             </div>
 
             <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Password <span className="text-red-500">*</span>
+                  密码 <span className="text-red-500">*</span>
               </label>
               <input
                 type="password"
@@ -144,13 +144,13 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter password (at least 6 characters)"
+                  placeholder="请输入密码（至少 6 位）"
               />
             </div>
 
             <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Confirm Password <span className="text-red-500">*</span>
+                  确认密码 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="password"
@@ -162,14 +162,14 @@ export default function RegisterPage() {
                       ? 'border-red-300 bg-red-50'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Re-enter password"
+                  placeholder="再次输入密码"
                 />
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
                     <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
-                    Passwords do not match
+                    两次密码不一致
                   </p>
                 )}
                 {formData.confirmPassword && formData.password === formData.confirmPassword && formData.password.length >= 6 && (
@@ -177,21 +177,21 @@ export default function RegisterPage() {
                     <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    Passwords match
+                    密码一致
                   </p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone <span className="text-gray-400 text-xs">(Optional)</span>
+                  手机号 <span className="text-gray-400 text-xs">（选填）</span>
               </label>
               <input
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter phone number"
+                  placeholder="请输入手机号"
               />
             </div>
 
@@ -206,17 +206,17 @@ export default function RegisterPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Registering...
+                    注册中…
                   </span>
-                ) : 'Register'}
+                ) : '注册'}
             </button>
           </form>
 
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            已有账号？{' '}
                 <a href="/login" className="text-gray-900 hover:text-gray-700 font-semibold hover:underline">
-              Login Now
+              立即登录
             </a>
           </p>
             </div>

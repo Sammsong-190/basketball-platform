@@ -8,18 +8,18 @@ const ALLOWED_HOSTS = ['a.espncdn.com', 'cdn.nba.com', 'espncdn.com']
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url')
   if (!url) {
-    return NextResponse.json({ error: 'Missing url' }, { status: 400 })
+    return NextResponse.json({ error: '缺少 url 参数' }, { status: 400 })
   }
 
   let parsed: URL
   try {
     parsed = new URL(url)
   } catch {
-    return NextResponse.json({ error: 'Invalid url' }, { status: 400 })
+    return NextResponse.json({ error: 'URL 无效' }, { status: 400 })
   }
 
   if (!ALLOWED_HOSTS.includes(parsed.hostname)) {
-    return NextResponse.json({ error: 'URL not allowed' }, { status: 400 })
+    return NextResponse.json({ error: '不允许使用该 URL' }, { status: 400 })
   }
 
   try {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     })
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Image fetch failed' }, { status: 502 })
+      return NextResponse.json({ error: '图片获取失败' }, { status: 502 })
     }
 
     const contentType = res.headers.get('content-type') || 'image/png'
@@ -46,6 +46,6 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (err) {
-    return NextResponse.json({ error: 'Proxy error' }, { status: 502 })
+    return NextResponse.json({ error: '代理请求失败' }, { status: 502 })
   }
 }

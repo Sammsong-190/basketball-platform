@@ -20,7 +20,7 @@ export default function AdminPage() {
     setUser(userObj)
     
     if (userObj.role !== 'ADMIN') {
-      alert('You do not have permission to access this page')
+      alert('无权访问此页面')
       router.push('/dashboard')
       return
     }
@@ -32,57 +32,57 @@ export default function AdminPage() {
 
   const adminMenus = [
     {
-      title: 'Post Review',
-      description: 'Review pending, approved, and rejected posts',
+      title: '帖子审核',
+      description: '审核待处理、已通过与被拒绝的帖子',
       href: '/admin/posts',
       icon: '📋',
       color: 'from-gray-500 to-gray-700'
     },
     {
-      title: 'Comment Review',
-      description: 'Review and manage comments on posts and products',
+      title: '评论管理',
+      description: '审核与管理帖子、商品下的用户评论',
       href: '/admin/comments',
       icon: '💬',
       color: 'from-gray-500 to-gray-700'
     },
     {
-      title: 'Product Review',
-      description: 'Review and manage platform products, approve or withdraw products',
+      title: '商品审核',
+      description: '审核与管理平台商品，通过或下架商品',
       href: '/admin/products',
       icon: '🛒',
       color: 'from-gray-600 to-gray-800'
     },
     {
-      title: 'Product Scraping',
-      description: 'Scrape basketball products from well-known e-commerce websites',
+      title: '商品数据采集',
+      description: '从常见电商数据源抓取篮球相关商品（仅供运营使用）',
       href: '/admin/scrape-products',
       icon: '🕷️',
       color: 'from-gray-700 to-gray-900'
     },
     {
-      title: 'Refunds',
-      description: 'Process user refund and return requests',
+      title: '退款处理',
+      description: '处理用户的退款与退货申请',
       href: '/admin/refunds',
       icon: '↩️',
       color: 'from-orange-500 to-orange-700'
     },
     {
-      title: 'Complaints',
-      description: 'View and reply to user complaints and suggestions',
+      title: '投诉与建议',
+      description: '查看并回复用户投诉与建议',
       href: '/admin/complaints',
       icon: '📢',
       color: 'from-blue-500 to-blue-700'
     },
     {
-      title: 'User Management',
-      description: 'Manage user roles and seller permissions',
+      title: '用户管理',
+      description: '管理用户角色与卖家权限',
       href: '/admin/users',
       icon: '👥',
       color: 'from-green-500 to-green-700'
     },
     {
-      title: 'System Logs',
-      description: 'View system maintenance and operation logs',
+      title: '系统日志',
+      description: '查看系统运行与运维相关日志',
       href: '/admin/logs',
       icon: '📋',
       color: 'from-gray-600 to-gray-800'
@@ -98,9 +98,9 @@ export default function AdminPage() {
           <div className="mb-8">
             <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
               <span className="mr-3">⚙️</span>
-              <span className="text-gray-900">Admin Dashboard</span>
+              <span className="text-gray-900">管理后台</span>
             </h1>
-            <p className="text-xl text-gray-600">Platform management and review functions</p>
+            <p className="text-xl text-gray-600">平台运营与审核功能入口</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

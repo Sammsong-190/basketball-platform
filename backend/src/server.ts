@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // 健康检查
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend API is running' })
+  res.json({ status: 'ok', message: '后端 API 运行中' })
 })
 
 // API 路由
@@ -53,7 +53,7 @@ app.use('/api/admin', adminRoutes)
 
 // 错误处理
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err)
+  console.error('错误:', err)
   res.status(err.status || 500).json({
     error: err.message || '服务器内部错误'
   })
@@ -65,5 +65,5 @@ app.use((req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`)
+  console.log(`🚀 后端服务运行于 http://localhost:${PORT}`)
 })

@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
+import FavoriteStar from '@/components/FavoriteStar'
 
 interface Post {
   id: string
@@ -41,7 +42,7 @@ function PostsContent() {
       const data = await response.json()
       setPosts(data.posts || [])
     } catch (error) {
-      console.error('Failed to fetch posts:', error)
+      console.error('加载帖子失败:', error)
     } finally {
       setLoading(false)
     }
@@ -57,11 +58,15 @@ function PostsContent() {
               <h1 className="text-5xl font-bold mb-4 text-gray-900 flex items-center">
                 <span className="mr-3">{isNews ? '📰' : isHot ? '🔥' : '💬'}</span>
                 <span className="text-gray-900">
-                  {isNews ? 'Event News' : isHot ? 'Trending' : 'Community'}
+                  {isNews ? '赛事资讯' : isHot ? '热门' : '社区'}
                 </span>
               </h1>
               <p className="text-xl text-gray-600">
-                {isNews ? 'Latest basketball event news and score analysis' : isHot ? 'Most liked and popular community content' : 'Share and interact with basketball enthusiasts'}
+                {isNews
+                  ? '最新篮球赛事新闻与战报解读'
+                  : isHot
+                    ? '按热度排序的精选社区内容'
+                    : '与球友分享见闻、互动讨论'}
               </p>
             </div>
             {!isNews && (
@@ -69,7 +74,7 @@ function PostsContent() {
                 href="/posts/new" 
                 className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                ✏️ New Post
+                ✏️ 发帖
               </Link>
             )}
           </div>
@@ -80,13 +85,13 @@ function PostsContent() {
                 href="/posts"
                 className={`px-4 py-2 rounded-lg font-medium ${!isHot ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
-                All
+                全部
               </Link>
               <Link
                 href="/posts?isHot=true"
                 className={`px-4 py-2 rounded-lg font-medium ${isHot ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
-                🔥 Trending
+                🔥 热门
               </Link>
             </div>
           )}
@@ -94,11 +99,11 @@ function PostsContent() {
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 text-gray-600">加载中…</p>
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-gray-600 text-lg">No posts available</p>
+              <p className="text-gray-600 text-lg">暂无帖子</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -115,8 +120,18 @@ function PostsContent() {
                   } catch (_) {}
                 }
                 return (
-                <Link key={post.id} href={`/posts/${post.id}`}>
-                  <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 group">
+                  <div
+                    key={post.id}
+                    className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 group"
+                  >
+                    <div className="absolute top-5 right-5 z-10">
+                      <FavoriteStar
+                        type="POST"
+                        targetId={post.id}
+                        className="px-2 py-1 rounded-lg bg-white/95 shadow-sm border border-gray-200 text-sm"
+                      />
+                    </div>
+                    <Link href={`/posts/${post.id}`} className="block p-8">
                     <div className="flex items-start justify-between mb-4">
                       <h2 className="text-2xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors line-clamp-2 flex-1">
                         {post.title}
@@ -128,12 +143,12 @@ function PostsContent() {
                       )}
                       {post.isNews && (
                         <span className="ml-2 px-3 py-1 bg-gray-700 text-white rounded-full text-xs font-semibold">
-                          📰 News
+                          📰 资讯
                         </span>
                       )}
                       {(post as any).isHot && (
                         <span className="ml-2 px-3 py-1 bg-orange-500 text-white rounded-full text-xs font-semibold">
-                          🔥 Hot
+                          🔥 热门
                         </span>
                       )}
                     </div>
@@ -166,15 +181,15 @@ function PostsContent() {
                         </div>
                       </div>
                       <span className="text-gray-400">
-                        {new Date(post.createdAt).toLocaleDateString('en-US', {
+                        {new Date(post.createdAt).toLocaleDateString('zh-CN', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
                         })}
                       </span>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               )})}
             </div>
           )}
@@ -193,7 +208,7 @@ export default function PostsPage() {
           <div className="container mx-auto px-4 py-12">
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 text-gray-600">加载中…</p>
             </div>
           </div>
         </div>

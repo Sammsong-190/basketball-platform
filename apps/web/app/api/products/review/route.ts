@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticate } from '@/lib/middleware'
+import { getRequestLogContext, writeSystemLog } from '@/lib/system-log'
 
 // 获取待审核商品列表
 export async function GET(request: NextRequest) {
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     // 检查是否为管理员
     if (user.role !== 'ADMIN') {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+        return NextResponse.json({ error: '无权访问' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ products })
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to get products list' }, { status: 500 })
+        return NextResponse.json({ error: '获取商品列表失败' }, { status: 500 })
     }
 }
 
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // 检查是否为管理员
     if (user.role !== 'ADMIN') {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+        return NextResponse.json({ error: '无权访问' }, { status: 403 })
     }
 
     try {
@@ -56,11 +57,11 @@ export async function POST(request: NextRequest) {
         const { productId, action, reason } = body // action: 'approve' 或 'reject'
 
         if (!productId || !action) {
-            return NextResponse.json({ error: 'Incomplete parameters' }, { status: 400 })
+            return NextResponse.json({ error: '参数不完整' }, { status: 400 })
         }
 
         if (action !== 'approve' && action !== 'reject' && action !== 'delete') {
-            return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+            return NextResponse.json({ error: '操作类型无效' }, { status: 400 })
         }
 
         if (action === 'delete') {
@@ -68,7 +69,14 @@ export async function POST(request: NextRequest) {
                 where: { id: productId },
                 data: { status: 'DELETED' }
             })
-            return NextResponse.json({ message: 'Product deleted', productId })
+            void writeSystemLog({
+                userId: user.userId,
+                action: '商品标记删除（管理员）',
+                module: 'ADMIN_PRODUCT',
+                description: `productId=${productId}`,
+                ...getRequestLogContext(request),
+            })
+            return NextResponse.json({ message: '商品已删除', productId })
         }
 
         // 更新商品状态
@@ -83,11 +91,19 @@ export async function POST(request: NextRequest) {
             }
         })
 
+        void writeSystemLog({
+            userId: user.userId,
+            action: action === 'approve' ? '商品审核通过' : '商品审核驳回',
+            module: 'ADMIN_PRODUCT',
+            description: `productId=${productId} name=${product.name}`,
+            ...getRequestLogContext(request),
+        })
+
         return NextResponse.json({
-            message: action === 'approve' ? 'Product approved' : 'Product rejected',
+            message: action === 'approve' ? '商品已通过审核' : '商品审核未通过',
             product
         })
     } catch (error) {
-        return NextResponse.json({ error: 'Review failed' }, { status: 500 })
+        return NextResponse.json({ error: '审核失败' }, { status: 500 })
     }
 }

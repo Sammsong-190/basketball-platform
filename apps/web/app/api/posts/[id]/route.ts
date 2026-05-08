@@ -9,7 +9,7 @@ export async function GET(
   try {
     const existing = await prisma.post.findUnique({ where: { id: params.id }, select: { status: true } })
     if (!existing || existing.status === 'DELETED') {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+      return NextResponse.json({ error: '帖子不存在' }, { status: 404 })
     }
     const post = await prisma.post.update({
       where: { id: params.id },
@@ -36,7 +36,7 @@ export async function GET(
 
     return NextResponse.json(post)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to get post details' }, { status: 500 })
+    return NextResponse.json({ error: '获取帖子详情失败' }, { status: 500 })
   }
 }
 
@@ -51,13 +51,13 @@ export async function PUT(
   try {
     const post = await prisma.post.findUnique({ where: { id: params.id } })
     if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+      return NextResponse.json({ error: '帖子不存在' }, { status: 404 })
     }
     
     const userRole = (authResult as any).role
     // 管理员可以修改任何帖子，普通用户只能修改自己的帖子
     if (userRole !== 'ADMIN' && post.authorId !== userId) {
-      return NextResponse.json({ error: 'You do not have permission to modify this post' }, { status: 403 })
+      return NextResponse.json({ error: '无权修改该帖子' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -78,8 +78,8 @@ export async function PUT(
 
     return NextResponse.json(updated)
   } catch (error) {
-    console.error('Failed to update post:', error)
-    return NextResponse.json({ error: 'Failed to update post' }, { status: 500 })
+    console.error('更新帖子失败:', error)
+    return NextResponse.json({ error: '更新帖子失败' }, { status: 500 })
   }
 }
 
@@ -94,7 +94,7 @@ export async function DELETE(
   try {
     const post = await prisma.post.findUnique({ where: { id: params.id } })
     if (!post || post.authorId !== userId) {
-      return NextResponse.json({ error: 'No permission to delete this post' }, { status: 403 })
+      return NextResponse.json({ error: '无权删除该帖子' }, { status: 403 })
     }
 
     await prisma.post.update({
@@ -102,8 +102,8 @@ export async function DELETE(
       data: { status: 'DELETED' }
     })
 
-    return NextResponse.json({ message: 'Deleted successfully' })
+    return NextResponse.json({ message: '删除成功' })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 })
+    return NextResponse.json({ error: '删除帖子失败' }, { status: 500 })
   }
 }

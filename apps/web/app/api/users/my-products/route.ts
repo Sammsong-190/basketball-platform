@@ -11,11 +11,16 @@ export async function GET(request: NextRequest) {
     // 验证用户是否为卖家
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { isSeller: true }
+      select: { isSeller: true, role: true },
     })
 
-    if (!user || !user.isSeller) {
-      return NextResponse.json({ error: 'You are not a seller' }, { status: 403 })
+    if (!user) {
+      return NextResponse.json({ error: '用户不存在' }, { status: 404 })
+    }
+
+    const canList = user.role === 'ADMIN' || user.isSeller === true
+    if (!canList) {
+      return NextResponse.json({ error: '您不是卖家' }, { status: 403 })
     }
 
     const products = await prisma.product.findMany({
@@ -45,6 +50,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(productsWithSales)
   } catch (error) {
     console.error('获取商品列表失败:', error)
-    return NextResponse.json({ error: 'Failed to get products list' }, { status: 500 })
+    return NextResponse.json({ error: '获取商品列表失败' }, { status: 500 })
   }
 }

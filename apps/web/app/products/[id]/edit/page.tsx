@@ -55,7 +55,7 @@ export default function EditProductPage() {
         // 检查权限：只有商品所有者或管理员可以编辑
         const userData = localStorage.getItem('user')
         if (!userData) {
-          alert('Please login first')
+          alert('请先登录')
           router.push('/login')
           return
         }
@@ -64,14 +64,14 @@ export default function EditProductPage() {
         
         // 严格检查：只有商品的所有者（seller.id === user.id）或管理员可以编辑
         if (userObj.role !== 'ADMIN' && product.seller.id !== userObj.id) {
-          alert('You do not have permission to edit this product. You can only edit your own products.')
+          alert('您无权编辑该商品，仅能编辑自己的商品。')
           router.push(`/products/${productId}`)
           return
         }
         
         // 确保用户是卖家
         if (userObj.role !== 'ADMIN' && !userObj.isSeller) {
-          alert('You are not a seller. Only sellers can edit products.')
+          alert('您不是卖家，只有卖家可以编辑商品。')
           router.push(`/products/${productId}`)
           return
         }
@@ -92,7 +92,7 @@ export default function EditProductPage() {
               setPreviewImages(images)
             }
           } catch (e) {
-            console.error('Failed to parse images:', e)
+            console.error('解析图片数据失败:', e)
           }
         }
 
@@ -120,12 +120,12 @@ export default function EditProductPage() {
           }
         }
       } else {
-        alert('Failed to load product')
+        alert('加载商品失败')
         router.push('/products')
       }
     } catch (error) {
-      console.error('Failed to fetch product:', error)
-      alert('Failed to load product')
+      console.error('获取商品失败:', error)
+      alert('加载商品失败')
       router.push('/products')
     } finally {
       setLoading(false)
@@ -143,7 +143,7 @@ export default function EditProductPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch categories:', error)
+      console.error('获取分类失败:', error)
     } finally {
       setCategoriesLoading(false)
     }
@@ -176,7 +176,7 @@ export default function EditProductPage() {
     const maxImages = 10
     const remainingSlots = maxImages - previewImages.length
     if (remainingSlots <= 0) {
-      alert(`Maximum ${maxImages} images allowed`)
+      alert(`最多只能上传 ${maxImages} 张图片`)
       e.target.value = ''
       return
     }
@@ -189,7 +189,7 @@ export default function EditProductPage() {
     filesToProcess.forEach((file) => {
       const maxSize = 5 * 1024 * 1024
       if (file.size > maxSize) {
-        alert(`Image "${file.name}" is too large (max 5MB)`)
+        alert(`图片「${file.name}」过大（最大 5MB）`)
         errorCount++
         if (errorCount === filesToProcess.length) {
           e.target.value = ''
@@ -201,7 +201,7 @@ export default function EditProductPage() {
       reader.onloadend = () => {
         const result = reader.result as string
         if (result.length > 700000) {
-          alert(`Image "${file.name}" is too large after encoding`)
+          alert(`图片「${file.name}」编码后仍过大，请换用更小的图片。`)
           errorCount++
         } else {
           newImages.push(result)
@@ -216,7 +216,7 @@ export default function EditProductPage() {
         }
       }
       reader.onerror = () => {
-        alert(`Failed to load image "${file.name}"`)
+        alert(`加载图片失败「${file.name}"`)
         errorCount++
         loadedCount++
         if (loadedCount === filesToProcess.length) {
@@ -238,13 +238,13 @@ export default function EditProductPage() {
     try {
       const token = localStorage.getItem('token')
       if (!token) {
-        alert('Please login first')
+        alert('请先登录')
         router.push('/login')
         return
       }
 
       if (!formData.name || !formData.description || !formData.price || !formData.categoryId) {
-        alert('Please fill in all required fields')
+        alert('请填写所有必填项')
         setSubmitting(false)
         return
       }
@@ -268,16 +268,16 @@ export default function EditProductPage() {
       const data = await response.json()
 
       if (response.ok) {
-        showToast('Product updated successfully!')
+        showToast('商品已更新')
         router.push(`/products/${productId}`)
       } else {
-        console.error('Failed to update product:', data)
-        const errorMsg = data.error || data.details || 'Failed to update product'
-        alert(`Failed to update product: ${errorMsg}`)
+        console.error('更新商品失败:', data)
+        const errorMsg = data.error || data.details || '更新商品失败'
+        alert(`更新商品失败：${errorMsg}`)
       }
     } catch (error: any) {
-      console.error('Failed to update product:', error)
-      alert(`Failed to update product: ${error.message || 'Please try again'}`)
+      console.error('更新商品失败:', error)
+      alert(`更新商品失败：${error.message || '请重试'}`)
     } finally {
       setSubmitting(false)
     }
@@ -290,7 +290,7 @@ export default function EditProductPage() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+            <p className="mt-4 text-gray-600">加载中…</p>
           </div>
         </div>
       </>
@@ -303,15 +303,15 @@ export default function EditProductPage() {
       <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Edit Product</h1>
-            <p className="text-gray-600">Update your product information</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">编辑商品</h1>
+            <p className="text-gray-600">更新商品信息与展示内容</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Name <span className="text-red-500">*</span>
+                  商品名称 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -319,13 +319,13 @@ export default function EditProductPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                  placeholder="Enter product name"
+                  placeholder="请输入商品名称"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Description <span className="text-red-500">*</span>
+                  商品描述 <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
@@ -333,14 +333,14 @@ export default function EditProductPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={8}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none resize-none"
-                  placeholder="Enter detailed product description..."
+                  placeholder={`请填写商品详情…`}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    Price <span className="text-red-500">*</span>
+                    价格 <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
@@ -359,7 +359,7 @@ export default function EditProductPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    Stock <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                    库存 <span className="text-gray-400 text-xs font-normal">（选填）</span>
                   </label>
                   <input
                     type="number"
@@ -374,11 +374,11 @@ export default function EditProductPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Category <span className="text-red-500">*</span>
+                  商品分类 <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Select Main Category</label>
+                    <label className="block text-xs text-gray-600 mb-1">选择一级分类</label>
                     <select
                       required
                       value={selectedParentId}
@@ -387,12 +387,12 @@ export default function EditProductPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       {categoriesLoading ? (
-                        <option value="">Loading categories...</option>
+                        <option value="">加载分类中…</option>
                       ) : categories.length === 0 ? (
-                        <option value="">No categories available</option>
+                        <option value="">暂无可用分类</option>
                       ) : (
                         <>
-                          <option value="">Select main category</option>
+                          <option value="">请选择一级分类</option>
                           {categories
                             .filter(cat => cat.id)
                             .map((category) => (
@@ -406,7 +406,7 @@ export default function EditProductPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Select Sub-category</label>
+                    <label className="block text-xs text-gray-600 mb-1">选择子分类</label>
                     <select
                       required
                       value={formData.categoryId}
@@ -415,12 +415,12 @@ export default function EditProductPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       {!selectedParentId ? (
-                        <option value="">Please select main category first</option>
+                        <option value="">请先选择主分类</option>
                       ) : subCategories.length === 0 ? (
-                        <option value={selectedParentId}>Use main category: {categories.find(c => c.id === selectedParentId)?.name}</option>
+                        <option value={selectedParentId}>使用一级分类：{categories.find(c => c.id === selectedParentId)?.name}</option>
                       ) : (
                         <>
-                          <option value="">Select sub-category</option>
+                          <option value="">请选择子分类</option>
                           {subCategories
                             .filter(child => child.id)
                             .map((child) => (
@@ -437,14 +437,14 @@ export default function EditProductPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  Product Images <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                  商品图片 <span className="text-gray-400 text-xs font-normal">（选填）</span>
                 </label>
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
                   {previewImages.map((image, index) => (
                     <div key={index} className="relative group aspect-square">
                       <img
                         src={image}
-                        alt={`Preview ${index + 1}`}
+                        alt={`预览图 ${index + 1}`}
                         className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
                       />
                       <button
@@ -471,11 +471,11 @@ export default function EditProductPage() {
                       <svg className="w-8 h-8 text-gray-400 group-hover:text-gray-600 mx-auto mb-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      <span className="text-xs text-gray-500 group-hover:text-gray-600">Add</span>
+                      <span className="text-xs text-gray-500 group-hover:text-gray-600">添加</span>
                     </div>
                   </label>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">Supports multiple images, recommend uploading clear product photos (optional)</p>
+                <p className="mt-2 text-xs text-gray-500">支持多张图片，建议上传清晰的商品实拍图（可选）</p>
               </div>
 
               <div className="flex gap-4 pt-4 border-t border-gray-200">
@@ -490,15 +490,15 @@ export default function EditProductPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Updating...
+                      保存中…
                     </span>
-                  ) : 'Update Product'}
+                  ) : '保存修改'}
                 </button>
                 <Link
                   href={`/products/${productId}`}
                   className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold"
                 >
-                  Cancel
+                  取消
                 </Link>
               </div>
             </form>

@@ -72,10 +72,10 @@ export default function AdminUsersPage() {
       if (res.ok) fetchUsers()
       else {
         const err = await res.json()
-        alert(err.error || 'Update failed')
+        alert(err.error || '更新失败')
       }
     } catch (e) {
-      alert('Update failed')
+      alert('更新失败')
     }
   }
 
@@ -93,21 +93,26 @@ export default function AdminUsersPage() {
       if (res.ok) fetchUsers()
       else {
         const err = await res.json()
-        alert(err.error || 'Update failed')
+        alert(err.error || '更新失败')
       }
     } catch (e) {
-      alert('Update failed')
+      alert('更新失败')
     }
   }
 
   const formatDate = (d: string) =>
-    new Date(d).toLocaleString('en-US', {
+    new Date(d).toLocaleString('zh-CN', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
     })
 
   const totalPages = Math.ceil(total / 10)
+
+  const roleLabel: Record<string, string> = {
+    USER: '普通用户',
+    ADMIN: '管理员'
+  }
 
   return (
     <>
@@ -116,9 +121,9 @@ export default function AdminUsersPage() {
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900">用户管理</h1>
             <Link href="/admin" className="text-gray-600 hover:text-gray-900">
-              Back to Admin
+              返回管理后台
             </Link>
           </div>
 
@@ -127,19 +132,19 @@ export default function AdminUsersPage() {
               onClick={() => setRoleFilter('')}
               className={`px-4 py-2 rounded-lg font-medium ${!roleFilter ? 'bg-gray-900 text-white' : 'bg-white border'}`}
             >
-              All
+              全部
             </button>
             <button
               onClick={() => setRoleFilter('USER')}
               className={`px-4 py-2 rounded-lg font-medium ${roleFilter === 'USER' ? 'bg-gray-900 text-white' : 'bg-white border'}`}
             >
-              Users
+              普通用户
             </button>
             <button
               onClick={() => setRoleFilter('ADMIN')}
               className={`px-4 py-2 rounded-lg font-medium ${roleFilter === 'ADMIN' ? 'bg-gray-900 text-white' : 'bg-white border'}`}
             >
-              Admins
+              管理员
             </button>
           </div>
 
@@ -152,12 +157,12 @@ export default function AdminUsersPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">User</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Role</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Seller</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Orders/Posts/Products</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Joined</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">用户</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">角色</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">卖家</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">订单/帖子/商品</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">注册时间</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,11 +174,11 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100'}`}>
-                          {u.role}
+                          {roleLabel[u.role] || u.role}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        {u.isSeller ? <span className="text-green-600">Yes</span> : <span className="text-gray-500">No</span>}
+                        {u.isSeller ? <span className="text-green-600">是</span> : <span className="text-gray-500">否</span>}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {u._count.orders} / {u._count.posts} / {u._count.products}
@@ -186,13 +191,13 @@ export default function AdminUsersPage() {
                               onClick={() => handleUpdateRole(u.id, u.role === 'ADMIN' ? 'USER' : 'ADMIN')}
                               className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
                             >
-                              {u.role === 'ADMIN' ? 'Remove Admin' : 'Set as Admin'}
+                              {u.role === 'ADMIN' ? '取消管理员' : '设为管理员'}
                             </button>
                             <button
                               onClick={() => handleUpdateSeller(u.id, !u.isSeller)}
                               className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
                             >
-                              {u.isSeller ? 'Remove Seller' : 'Set as Seller'}
+                              {u.isSeller ? '取消卖家' : '设为卖家'}
                             </button>
                           </div>
                         )}
@@ -208,7 +213,7 @@ export default function AdminUsersPage() {
                     disabled={page <= 1}
                     className="px-4 py-2 border rounded disabled:opacity-50"
                   >
-                    Prev
+                    上一页
                   </button>
                   <span className="px-4 py-2">{page} / {totalPages}</span>
                   <button
@@ -216,7 +221,7 @@ export default function AdminUsersPage() {
                     disabled={page >= totalPages}
                     className="px-4 py-2 border rounded disabled:opacity-50"
                   >
-                    Next
+                    下一页
                   </button>
                 </div>
               )}

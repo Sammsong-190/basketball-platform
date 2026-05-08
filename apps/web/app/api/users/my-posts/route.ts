@@ -18,6 +18,6 @@ export async function GET(request: NextRequest) {
     })
     return NextResponse.json(posts)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to get posts' }, { status: 500 })
+    return NextResponse.json({ error: '获取帖子失败' }, { status: 500 })
   }
 }

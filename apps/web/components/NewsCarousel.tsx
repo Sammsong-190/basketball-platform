@@ -59,12 +59,12 @@ export default function NewsCarousel() {
         content: post.content,
         image: post.images ? JSON.parse(post.images)[0] : null,
         publishedAt: post.createdAt,
-        author: post.author?.username || 'Unknown',
+        author: post.author?.username || '未知',
         url: null
       }))
       setNews(newsData)
     } catch (error) {
-      console.error('Failed to fetch news:', error)
+      console.error('获取资讯失败:', error)
     } finally {
       setLoading(false)
     }
@@ -81,17 +81,17 @@ export default function NewsCarousel() {
   if (news.length === 0) {
     return (
       <div className="h-96 bg-gradient-to-r from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
-        <p className="text-gray-600">No event news available</p>
+        <p className="text-gray-600">暂无赛事资讯</p>
       </div>
     )
   }
 
   const currentNews = news[currentIndex]
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
@@ -131,7 +131,7 @@ export default function NewsCarousel() {
       <div className="relative h-full flex flex-col justify-center p-8 md:p-12">
         <div className="flex items-center space-x-2 mb-4">
           <span className="px-3 py-1 bg-gray-500 text-white rounded-full text-sm font-semibold">
-            🏀 NBA Events
+            🏀 NBA 赛事
           </span>
           <span className="text-gray-900 text-sm">
             {formatDate(currentNews.publishedAt)}
@@ -157,14 +157,14 @@ export default function NewsCarousel() {
               rel="noopener noreferrer"
               className="px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              Read More →
+              阅读全文 →
             </a>
           ) : (
             <Link
               href={`/events?tab=news`}
               className="px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              View Details →
+              查看详情 →
             </Link>
           )}
         </div>
@@ -180,7 +180,7 @@ export default function NewsCarousel() {
               ? 'w-8 bg-gray-600 shadow-lg'
               : 'w-2 bg-gray-400 hover:bg-gray-500'
               }`}
-            aria-label={`Switch to news ${index + 1}`}
+            aria-label={`切换到第 ${index + 1} 条资讯`}
           />
         ))}
       </div>
@@ -192,7 +192,7 @@ export default function NewsCarousel() {
             onClick={() => setCurrentIndex((prev) => (prev - 1 + news.length) % news.length)}
             className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-white/95 rounded-full hover:bg-white transition-all shadow-xl z-10 backdrop-blur-sm border border-gray-200 ${isHovered ? 'opacity-100' : 'opacity-0'
               }`}
-            aria-label="Previous news"
+            aria-label="上一条资讯"
           >
             <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -202,7 +202,7 @@ export default function NewsCarousel() {
             onClick={() => setCurrentIndex((prev) => (prev + 1) % news.length)}
             className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-white/95 rounded-full hover:bg-white transition-all shadow-xl z-10 backdrop-blur-sm border border-gray-200 ${isHovered ? 'opacity-100' : 'opacity-0'
               }`}
-            aria-label="Next news"
+            aria-label="下一条资讯"
           >
             <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

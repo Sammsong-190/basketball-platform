@@ -39,6 +39,7 @@ model User {
   incomes       Income[]         @relation("SellerIncomes")
   expenses      Expense[]
   notifications UserNotification[]
+  walletLedgers WalletLedger[]
   systemLogs    SystemLog[]      @relation("UserLogs")
 
   @@index([username])
@@ -346,6 +347,21 @@ model Expense {
   amount      Float
   description String?
   createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// 平台虚拟币（球币）流水：充值等
+model WalletLedger {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Float
+  type         String
+  balanceAfter Float
+  description  String?
+  createdAt    DateTime @default(now())
 
   @@index([userId])
   @@index([createdAt])

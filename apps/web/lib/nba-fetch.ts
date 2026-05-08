@@ -161,14 +161,14 @@ export async function fetchNBAScheduleNode(): Promise<NBAMatchFromFetch[]> {
             const displayClock = st.displayClock ?? ''
             const shortDetail = (st.type as { shortDetail?: string })?.shortDetail ?? ''
             if (shortDetail && (shortDetail.toLowerCase().includes('halftime') || shortDetail === 'Half')) {
-              timeStr = 'Halftime'
+              timeStr = '中场休息'
             } else if (period > 0 && displayClock) {
-              timeStr = `Q${period} ${displayClock}`
+              timeStr = `第${period}节 ${displayClock}`
             } else {
-              timeStr = shortDetail || 'Live'
+              timeStr = shortDetail || '进行中'
             }
           } else {
-            timeStr = rawDate ? dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBD'
+            timeStr = rawDate ? dateObj.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }) : '待定'
           }
 
           const venue = comp.venue?.fullName || comp.venue?.address?.city || '未知场馆'

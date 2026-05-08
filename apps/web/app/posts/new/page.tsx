@@ -37,13 +37,13 @@ export default function NewPostPage() {
                 canvas.width = width
                 canvas.height = height
                 const ctx = canvas.getContext('2d')
-                if (!ctx) return reject(new Error('Canvas not supported'))
+                if (!ctx) return reject(new Error('当前环境不支持画布'))
                 ctx.drawImage(img, 0, 0, width, height)
                 resolve(canvas.toDataURL('image/jpeg', quality))
             }
             img.onerror = () => {
                 URL.revokeObjectURL(url)
-                reject(new Error('Failed to load image'))
+                reject(new Error('图片加载失败'))
             }
             img.src = url
         })
@@ -59,7 +59,7 @@ export default function NewPostPage() {
         const maxImages = 9
         const currentCount = previewImages.length
         if (currentCount >= maxImages) {
-            alert(`Maximum ${maxImages} images allowed`)
+            alert(`最多只能上传 ${maxImages} 张图片`)
             e.target.value = ''
             return
         }
@@ -78,7 +78,7 @@ export default function NewPostPage() {
             })
         } catch (err) {
             console.error(err)
-            alert('Failed to process images. Please try smaller files.')
+            alert('图片处理失败，请尝试较小的文件。')
         }
 
         e.target.value = ''
@@ -102,7 +102,7 @@ export default function NewPostPage() {
         try {
             const token = localStorage.getItem('token')
             if (!token) {
-                alert('Please login first')
+                alert('请先登录')
                 router.push('/login')
                 return
             }
@@ -129,14 +129,14 @@ export default function NewPostPage() {
             const data = await response.json()
 
             if (response.ok) {
-                showToast('Post published, awaiting review')
+                showToast('帖子已提交，待审核')
                 router.push('/posts')
             } else {
-                alert(data.error || 'Failed to publish')
+                alert(data.error || '发布失败')
             }
         } catch (error) {
-            console.error('Failed to publish post:', error)
-            alert('Failed to publish, please try again')
+            console.error('发布帖子失败:', error)
+            alert('发布失败，请稍后重试')
         } finally {
             setLoading(false)
         }
@@ -149,8 +149,8 @@ export default function NewPostPage() {
                 <div className="max-w-4xl mx-auto">
                     {/* 标题区域 */}
                     <div className="mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">New Post</h1>
-                        <p className="text-gray-600">Share your basketball insights and experiences</p>
+                        <h1 className="text-4xl font-bold text-gray-900 mb-2">发帖</h1>
+                        <p className="text-gray-600">分享你的篮球见闻与心得</p>
                     </div>
 
                     {/* 表单卡片 */}
@@ -158,13 +158,13 @@ export default function NewPostPage() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                    Title <span className="text-red-500">*</span>
+                                    标题 <span className="text-red-500">*</span>
                                     <div className="group relative inline-flex items-center">
                                         <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help transition-colors" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                                         </svg>
                                         <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
-                                            <p>Title should be concise and clear, summarizing the post content</p>
+                                            <p>标题尽量简洁明了，概括帖子要点</p>
                                             <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-900"></div>
                                         </div>
                                     </div>
@@ -175,19 +175,19 @@ export default function NewPostPage() {
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none"
-                                    placeholder="Enter post title"
+                                    placeholder="请输入帖子标题"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                    Content <span className="text-red-500">*</span>
+                                    正文 <span className="text-red-500">*</span>
                                     <div className="group relative inline-flex items-center">
                                         <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help transition-colors" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                                         </svg>
                                         <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
-                                            <p>Content should be detailed and meaningful, helping other users understand your perspective</p>
+                                            <p>正文应有实质内容，便于其他用户理解你的观点</p>
                                             <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-900"></div>
                                         </div>
                                     </div>
@@ -198,19 +198,19 @@ export default function NewPostPage() {
                                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                                     rows={12}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all outline-none resize-none"
-                                    placeholder="Enter post content...&#10;&#10;Supports multi-line text, you can share your thoughts, experiences, or questions."
+                                    placeholder={`请输入正文…\n\n可多行撰写，分享观点、经历或提出问题。`}
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                    Images <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                                    图片 <span className="text-gray-400 text-xs font-normal">（选填）</span>
                                     <div className="group relative inline-flex items-center">
                                         <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help transition-colors" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                                         </svg>
                                         <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
-                                            <p>Click the plus icon to select images, supports multiple image uploads</p>
+                                            <p>点击加号选择图片，支持一次选择多张</p>
                                             <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-900"></div>
                                         </div>
                                     </div>
@@ -222,7 +222,7 @@ export default function NewPostPage() {
                                         <div key={index} className="relative group aspect-square">
                                             <img
                                                 src={image}
-                                                alt={`Preview ${index + 1}`}
+                                                alt={`预览图 ${index + 1}`}
                                                 className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
                                             />
                                             <button
@@ -250,7 +250,7 @@ export default function NewPostPage() {
                                             <svg className="w-8 h-8 text-gray-400 group-hover:text-gray-600 mx-auto mb-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                             </svg>
-                                            <span className="text-xs text-gray-500 group-hover:text-gray-600">Add</span>
+                                            <span className="text-xs text-gray-500 group-hover:text-gray-600">添加</span>
                                         </div>
                                     </label>
                                 </div>
@@ -268,16 +268,16 @@ export default function NewPostPage() {
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            Publishing...
+                                            发布中…
                                         </span>
-                                    ) : 'Publish Post'}
+                                    ) : '发布帖子'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => router.back()}
                                     className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold"
                                 >
-                                    Cancel
+                                    取消
                                 </button>
                             </div>
 
@@ -287,8 +287,8 @@ export default function NewPostPage() {
                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                     </svg>
                                     <div className="text-sm text-blue-700">
-                                        <p className="font-semibold mb-1">Tip</p>
-                                        <p>Posts need administrator review after publishing, and will only be displayed in the community after approval.</p>
+                                        <p className="font-semibold mb-1">提示</p>
+                                        <p>帖子提交后需管理员审核，通过后方可在社区展示。</p>
                                     </div>
                                 </div>
                             </div>

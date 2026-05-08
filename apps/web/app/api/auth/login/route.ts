@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { comparePassword, generateToken } from '@/lib/auth'
+import { getRequestLogContext, writeSystemLog } from '@/lib/system-log'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!username || !password) {
       return NextResponse.json(
-        { error: 'Username and password are required' },
+        { error: '请输入用户名和密码' },
         { status: 400 }
       )
     }
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid username or password' },
+        { error: '用户名或密码错误' },
         { status: 401 }
       )
     }
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     const isValid = await comparePassword(password, user.password)
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Invalid username or password' },
+        { error: '用户名或密码错误' },
         { status: 401 }
       )
     }
@@ -41,6 +42,15 @@ export async function POST(request: NextRequest) {
       role: user.role
     })
 
+    const ctx = getRequestLogContext(request)
+    void writeSystemLog({
+      userId: user.id,
+      action: '登录成功',
+      module: 'AUTH',
+      description: user.role === 'ADMIN' ? `管理员 ${user.username}` : `用户 ${user.username}`,
+      ...ctx,
+    })
+
     return NextResponse.json({
       user: {
         id: user.id,
@@ -48,9 +58,10 @@ export async function POST(request: NextRequest) {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
-        isSeller: user.isSeller
+        isSeller: user.isSeller,
+        balance: user.balance,
       },
-      token
+      token,
     })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error)
@@ -58,7 +69,7 @@ export async function POST(request: NextRequest) {
     // 开发/预览环境返回详细错误，便于排查 Vercel 部署问题
     const isDev = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview'
     return NextResponse.json(
-      { error: isDev ? `Login failed: ${msg}` : 'Login failed, please try again later' },
+      { error: isDev ? `登录失败：${msg}` : '登录失败，请稍后再试' },
       { status: 500 }
     )
   }

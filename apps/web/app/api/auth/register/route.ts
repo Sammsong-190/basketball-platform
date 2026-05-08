@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, generateToken } from '@/lib/auth'
 import { isValidEmail, isValidPhone } from '@/lib/utils'
+import { getRequestLogContext, writeSystemLog } from '@/lib/system-log'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,21 +11,21 @@ export async function POST(request: NextRequest) {
 
     if (!username || !email || !password) {
       return NextResponse.json(
-        { error: 'Username, email and password are required' },
+        { error: '用户名、邮箱和密码为必填项' },
         { status: 400 }
       )
     }
 
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: '邮箱格式不正确' },
         { status: 400 }
       )
     }
 
     if (phone && !isValidPhone(phone)) {
       return NextResponse.json(
-        { error: 'Invalid phone format' },
+        { error: '手机号格式不正确' },
         { status: 400 }
       )
     }
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Username or email already exists' },
+        { error: '用户名或邮箱已被占用' },
         { status: 400 }
       )
     }
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
         email: true,
         role: true,
         isSeller: true,
+        balance: true,
         createdAt: true
       }
     })
@@ -68,6 +70,15 @@ export async function POST(request: NextRequest) {
       role: user.role
     })
 
+    const ctx = getRequestLogContext(request)
+    void writeSystemLog({
+      userId: user.id,
+      action: '注册成功',
+      module: 'AUTH',
+      description: `username=${user.username} isSeller=${user.isSeller}`,
+      ...ctx,
+    })
+
     return NextResponse.json({ user, token }, { status: 201 })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error)
@@ -75,7 +86,7 @@ export async function POST(request: NextRequest) {
     // 开发/预览环境返回详细错误，便于排查 Vercel 部署问题
     const isDev = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview'
     return NextResponse.json(
-      { error: isDev ? `Registration failed: ${msg}` : 'Registration failed, please try again later' },
+      { error: isDev ? `注册失败：${msg}` : '注册失败，请稍后再试' },
       { status: 500 }
     )
   }
